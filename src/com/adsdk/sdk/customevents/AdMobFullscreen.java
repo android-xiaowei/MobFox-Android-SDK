@@ -79,7 +79,7 @@ public class AdMobFullscreen extends CustomEventFullscreen {
 
 	@Override
 	public void showFullscreen() {
-		if (interstitial.isLoaded()) {
+		if (interstitial != null && interstitial.isLoaded()) {
 			interstitial.show();
 		}
 	}
