@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 
+import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
@@ -35,7 +36,7 @@ public abstract class RequestAd<T> {
 				response = client.execute(get);
 				int responseCode = response.getStatusLine().getStatusCode();
 				if (responseCode == HttpURLConnection.HTTP_OK) {
-					return parse(response.getEntity().getContent(), request.isVideoRequest());
+					return parse(response.getEntity().getContent(), response.getAllHeaders(), request.isVideoRequest());
 				} else {
 					throw new RequestException("Server Error. Response code:"
 							+ responseCode);
@@ -57,6 +58,6 @@ public abstract class RequestAd<T> {
 
 	abstract T parseTestString() throws RequestException;
 
-	abstract T parse(InputStream inputStream, boolean isVideo) throws RequestException;
+	abstract T parse(InputStream inputStream, Header[] headers, boolean isVideo) throws RequestException;
 
 }

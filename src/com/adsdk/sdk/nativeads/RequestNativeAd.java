@@ -7,8 +7,11 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
+import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
@@ -25,6 +28,7 @@ import android.graphics.BitmapFactory;
 import com.adsdk.sdk.Const;
 import com.adsdk.sdk.Log;
 import com.adsdk.sdk.RequestException;
+import com.adsdk.sdk.customevents.CustomEvent;
 import com.adsdk.sdk.nativeads.NativeAd.ImageAsset;
 import com.adsdk.sdk.nativeads.NativeAd.Tracker;
 
@@ -44,7 +48,7 @@ public class RequestNativeAd {
 			response = client.execute(get);
 			int responseCode = response.getStatusLine().getStatusCode();
 			if (responseCode == HttpURLConnection.HTTP_OK) {
-				return parse(response.getEntity().getContent());
+				return parse(response.getEntity().getContent(), response.getAllHeaders());
 			} else {
 				throw new RequestException("Server Error. Response code:" + responseCode);
 			}
@@ -58,8 +62,35 @@ public class RequestNativeAd {
 			throw new RequestException("Error in HTTP request", t);
 		}
 	}
+	
+	private List<CustomEvent> getCustomEvents(Header[] headers) {
+		List<CustomEvent> customEvents = new ArrayList<CustomEvent>();
+		if(headers == null) {
+			return customEvents;
+		}
 
-	protected NativeAd parse(final InputStream inputStream) throws RequestException {
+		for (int i = 0; i < headers.length; i++) {
+			if (headers[i].getName().startsWith("X-CustomEvent")) {
+				String json = headers[i].getValue();
+				JSONObject customEventObject;
+				try {
+					customEventObject = new JSONObject(json);
+					String className = customEventObject.getString("class");
+					String parameter = customEventObject.getString("parameter");
+					String pixel = customEventObject.getString("pixel");
+					CustomEvent event = new CustomEvent(className, parameter, pixel);
+					customEvents.add(event);
+				} catch (JSONException e) {
+					Log.e("Cannot parse json with custom event: "+headers[i].getName());
+				}
+				
+			}
+		}
+
+		return customEvents;
+	}
+
+	protected NativeAd parse(final InputStream inputStream, Header[] headers) throws RequestException {
 
 		final NativeAd response = new NativeAd();
 
@@ -117,6 +148,9 @@ public class RequestNativeAd {
 					}
 				}
 			}
+			
+			List<CustomEvent> customEvents = this.getCustomEvents(headers);
+			response.setCustomEvents(customEvents);
 
 		} catch (UnsupportedEncodingException e) {
 			throw new RequestException("Cannot parse Response", e);

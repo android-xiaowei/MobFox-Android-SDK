@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.adsdk.sdk.customevents.CustomEvent;
+
 import android.graphics.Bitmap;
 
 public class NativeAd {
@@ -24,6 +26,7 @@ public class NativeAd {
 	private Map<String, ImageAsset> imageAssets = new HashMap<String, NativeAd.ImageAsset>();
 	private Map<String, String> textAssets = new HashMap<String, String>();
 	private List<Tracker> trackers = new ArrayList<NativeAd.Tracker>();
+	private List<CustomEvent> customEvents;
 
 	public String getClickUrl() {
 		return clickUrl;
@@ -55,6 +58,14 @@ public class NativeAd {
 
 	public void setTrackers(List<Tracker> trackers) {
 		this.trackers = trackers;
+	}
+
+	public List<CustomEvent> getCustomEvents() {
+		return customEvents;
+	}
+
+	public void setCustomEvents(List<CustomEvent> customEvents) {
+		this.customEvents = customEvents;
 	}
 
 }

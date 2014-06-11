@@ -1,3 +1,4 @@
+
 package com.adsdk.sdk;
 
 import static com.adsdk.sdk.Const.RESPONSE_ENCODING;
@@ -12,9 +13,11 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.http.Header;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -77,32 +80,28 @@ public class RequestGeneralAd extends RequestAd<AdResponse> {
 		return null;
 	}
 
-	private String getTextValue(final Element element, final String name) {
-		NodeList nodeList = element.getElementsByTagName(name);
-		if (nodeList.getLength() > 0) {
-			if (nodeList.item(0).getFirstChild() != null) {
-				return nodeList.item(0).getFirstChild().getNodeValue();
-			}
-		}
-		return "";
-	}
 
-	private List<CustomEvent> getCustomEvents(Document doc) {
+	private List<CustomEvent> getCustomEvents(Header[] headers) {
 		List<CustomEvent> customEvents = new ArrayList<CustomEvent>();
+		if(headers == null) {
+			return customEvents;
+		}
 
-		NodeList elements = doc.getElementsByTagName("customevents");
-		Element element = (Element) elements.item(0);
-		if (element != null) {
-
-			NodeList nodeList = element.getElementsByTagName("customevent");
-			for (int i = 0; i < nodeList.getLength(); i++) {
-				Node n = nodeList.item(i);
-				Element el = (Element) n;
-				String className = getTextValue(el, "class");
-				String parameter = getTextValue(el, "parameter");
-				String pixel = getTextValue(el, "pixel");
-				CustomEvent event = new CustomEvent(className, parameter, pixel);
-				customEvents.add(event);
+		for (int i = 0; i < headers.length; i++) {
+			if (headers[i].getName().startsWith("X-CustomEvent")) {
+				String json = headers[i].getValue();
+				JSONObject customEventObject;
+				try {
+					customEventObject = new JSONObject(json);
+					String className = customEventObject.getString("class");
+					String parameter = customEventObject.getString("parameter");
+					String pixel = customEventObject.getString("pixel");
+					CustomEvent event = new CustomEvent(className, parameter, pixel);
+					customEvents.add(event);
+				} catch (JSONException e) {
+					Log.e("Cannot parse json with custom event: "+headers[i].getName());
+				}
+				
 			}
 		}
 
@@ -126,7 +125,7 @@ public class RequestGeneralAd extends RequestAd<AdResponse> {
 	}
 
 	@Override
-	AdResponse parse(final InputStream inputStream, boolean isVideo) throws RequestException {
+	AdResponse parse(final InputStream inputStream, Header[] headers, boolean isVideo) throws RequestException {
 
 		final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		DocumentBuilder db;
@@ -135,7 +134,7 @@ public class RequestGeneralAd extends RequestAd<AdResponse> {
 		try {
 			if (isVideo) {
 				response.setCustomEvents(new ArrayList<CustomEvent>());
-				
+
 				VAST vast = VASTParser.createVastFromStream(inputStream);
 				VideoData video = VASTParser.fillVideoDataFromVast(vast);
 				if (video == null) {
@@ -219,7 +218,7 @@ public class RequestGeneralAd extends RequestAd<AdResponse> {
 					throw new RequestException("Unknown response type " + type);
 				}
 
-				List<CustomEvent> customEvents = this.getCustomEvents(doc);
+				List<CustomEvent> customEvents = this.getCustomEvents(headers);
 				response.setCustomEvents(customEvents);
 			}
 
@@ -238,6 +237,6 @@ public class RequestGeneralAd extends RequestAd<AdResponse> {
 
 	@Override
 	AdResponse parseTestString() throws RequestException {
-		return parse(is, false);
+		return parse(is, null, false);
 	}
 }
