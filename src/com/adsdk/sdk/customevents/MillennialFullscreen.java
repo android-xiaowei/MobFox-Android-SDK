@@ -1,20 +1,21 @@
 
 package com.adsdk.sdk.customevents;
 
+import android.app.Activity;
+
 import com.millennialmedia.android.MMAd;
 import com.millennialmedia.android.MMException;
 import com.millennialmedia.android.MMInterstitial;
 import com.millennialmedia.android.MMRequest;
 import com.millennialmedia.android.RequestListener;
 
-import android.content.Context;
-
 public class MillennialFullscreen extends CustomEventFullscreen {
 
 	private MMInterstitial interstitial;
+	private boolean wasTapped;
 
 	@Override
-	public void loadFullscreen(Context context, CustomEventFullscreenListener customEventFullscreenListener, String optionalParameters, String trackingPixel) {
+	public void loadFullscreen(Activity activity, CustomEventFullscreenListener customEventFullscreenListener, String optionalParameters, String trackingPixel) {
 		String adId = optionalParameters;
 		listener = customEventFullscreenListener;
 		this.trackingPixel = trackingPixel;
@@ -32,7 +33,7 @@ public class MillennialFullscreen extends CustomEventFullscreen {
 			return;
 		}
 
-		interstitial = new MMInterstitial(context);
+		interstitial = new MMInterstitial(activity);
 		interstitial.setListener(createListener());
 		interstitial.setApid(adId);
 		MMRequest request = new MMRequest();
@@ -67,6 +68,11 @@ public class MillennialFullscreen extends CustomEventFullscreen {
 
 			@Override
 			public void onSingleTap(MMAd arg0) {
+				
+				if(listener != null && wasTapped) { //millennial reports tap also on close button "X" click
+					listener.onFullscreenLeftApplication();
+				}
+				wasTapped = true;
 			}
 
 			@Override
@@ -75,8 +81,8 @@ public class MillennialFullscreen extends CustomEventFullscreen {
 
 			@Override
 			public void MMAdOverlayLaunched(MMAd arg0) {
+				reportImpression();
 				if (listener != null) {
-					reportImpression();
 					listener.onFullscreenOpened();
 				}
 			}

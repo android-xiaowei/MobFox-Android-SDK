@@ -9,7 +9,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
-import android.content.Context;
+import android.app.Activity;
 import android.os.AsyncTask;
 
 public abstract class CustomEventFullscreen {
@@ -17,7 +17,7 @@ public abstract class CustomEventFullscreen {
 	protected String trackingPixel;
 	protected CustomEventFullscreenListener listener;
 	
-    public abstract void loadFullscreen(Context context,
+    public abstract void loadFullscreen(Activity activity,
             CustomEventFullscreenListener customEventFullscreenListener, String optionalParameters, String trackingPixel);
     
     public abstract void showFullscreen();

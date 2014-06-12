@@ -1,3 +1,4 @@
+
 package com.adsdk.sdk;
 
 import static com.adsdk.sdk.Const.AD_EXTRA;
@@ -369,7 +370,8 @@ public class AdManager {
 					@Override
 					public void run() {
 						try {
-							customEventFullscreen.loadFullscreen(mContext, customFullscreenListener, event.getOptionalParameter(), event.getPixelUrl());
+							Activity activity = (Activity) getContext();
+							customEventFullscreen.loadFullscreen(activity, customFullscreenListener, event.getOptionalParameter(), event.getPixelUrl());
 						} catch (Exception e) {
 							customEventFullscreen = null;
 							Log.d("Failed to create Custom Event Fullscreen.");

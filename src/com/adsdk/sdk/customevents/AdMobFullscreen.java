@@ -1,6 +1,6 @@
 package com.adsdk.sdk.customevents;
 
-import android.content.Context;
+import android.app.Activity;
 
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
@@ -12,7 +12,7 @@ public class AdMobFullscreen extends CustomEventFullscreen {
 	private AdListener adListener;
 
 	@Override
-	public void loadFullscreen(Context context, CustomEventFullscreenListener customEventFullscreenListener, String optionalParameters, String trackingPixel) {
+	public void loadFullscreen(Activity activity, CustomEventFullscreenListener customEventFullscreenListener, String optionalParameters, String trackingPixel) {
 		String adId = optionalParameters;
 		listener = customEventFullscreenListener;
 		this.trackingPixel = trackingPixel;
@@ -29,7 +29,7 @@ public class AdMobFullscreen extends CustomEventFullscreen {
 		}
 		
 		adListener = createAdListener();
-		interstitial = new InterstitialAd(context);
+		interstitial = new InterstitialAd(activity);
 		interstitial.setAdUnitId(adId);
 		interstitial.setAdListener(adListener);
 		AdRequest adRequest = new AdRequest.Builder().build();
@@ -69,8 +69,8 @@ public class AdMobFullscreen extends CustomEventFullscreen {
 			
 			@Override
 			public void onAdOpened() {
+				reportImpression();
 				if(listener != null) {
-					reportImpression();
 					listener.onFullscreenOpened();
 				}
 			}
