@@ -21,7 +21,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Handler;
 import android.view.MotionEvent;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
@@ -30,7 +29,6 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.RelativeLayout;
 
-import com.adsdk.sdk.AdListener;
 import com.adsdk.sdk.AdResponse;
 import com.adsdk.sdk.Const;
 import com.adsdk.sdk.Log;
@@ -60,14 +58,12 @@ public class BannerAdView extends RelativeLayout {
 	private int width;
 	private int height;
 
-	private AdListener adListener;
+	private BannerAdViewListener adListener;
 
 	private static Method mWebView_SetLayerType;
 	private static Field mWebView_LAYER_TYPE_SOFTWARE;
 
-	private final Handler updateHandler = new Handler();
-
-	public BannerAdView(final Context context, final AdResponse response, int width, int height, final boolean animation, final AdListener adListener) {
+	public BannerAdView(final Context context, final AdResponse response, int width, int height, final boolean animation, final BannerAdViewListener adListener) {
 		super(context);
 		mContext = context;
 		this.response = response;
@@ -125,7 +121,7 @@ public class BannerAdView extends RelativeLayout {
 	}
 
 	private void doOpenUrl(final String url) {
-		notifyAdClicked();
+		adListener.onClick();
 		if (this.response.getClickUrl() != null && this.response.getSkipOverlay() == 1) {
 			makeTrackingRequest(this.response.getClickUrl());
 		}
@@ -272,32 +268,6 @@ public class BannerAdView extends RelativeLayout {
 		return this.isInternalBrowser;
 	}
 
-	private void notifyAdClicked() {
-		this.updateHandler.post(new Runnable() {
-
-			@Override
-			public void run() {
-				if (adListener != null) {
-					Log.d(Const.TAG, "notify bannerListener of ad clicked: " + BannerAdView.this.adListener.getClass().getName());
-					adListener.adClicked();
-				}
-			}
-		});
-	}
-
-	private void notifyLoadAdSucceeded() {
-		this.updateHandler.post(new Runnable() {
-
-			@Override
-			public void run() {
-				if (adListener != null) {
-					Log.d(Const.TAG, "notify bannerListener of load succeeded: " + BannerAdView.this.adListener.getClass().getName());
-					adListener.adLoadSucceeded(null);
-				}
-			}
-		});
-	}
-
 	private void openLink() {
 
 		if (this.response != null && this.response.getClickUrl() != null)
@@ -305,7 +275,7 @@ public class BannerAdView extends RelativeLayout {
 
 	}
 
-	public void setAdListener(final AdListener bannerListener) {
+	public void setAdListener(final BannerAdViewListener bannerListener) {
 		this.adListener = bannerListener;
 	}
 
@@ -322,12 +292,12 @@ public class BannerAdView extends RelativeLayout {
 				Log.d(Const.TAG, "set image: " + text);
 				text = Uri.encode(Const.HIDE_BORDER + text);
 				webView.loadData(text, "text/html", Const.ENCODING);
-				this.notifyLoadAdSucceeded();
+				adListener.onLoad();
 			} else if (this.response.getType() == Const.TEXT) {
 				final String text = Uri.encode(Const.HIDE_BORDER + this.response.getText());
 				Log.d(Const.TAG, "set text: " + text);
 				webView.loadData(text, "text/html", Const.ENCODING);
-				this.notifyLoadAdSucceeded();
+				adListener.onLoad();
 			}
 			if (animation) {
 				webView.startAnimation(fadeInAnimation);
@@ -335,6 +305,11 @@ public class BannerAdView extends RelativeLayout {
 		} catch (final Throwable t) {
 			Log.e(Const.TAG, "Exception in show content", t);
 		}
+	}
+	
+	public interface BannerAdViewListener {
+		public void onLoad();
+		public void onClick();
 	}
 
 }

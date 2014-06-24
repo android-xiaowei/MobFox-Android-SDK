@@ -42,13 +42,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.VideoView;
 
-import com.adsdk.sdk.Ad;
-import com.adsdk.sdk.AdListener;
 import com.adsdk.sdk.AdManager;
 import com.adsdk.sdk.AdResponse;
 import com.adsdk.sdk.Const;
 import com.adsdk.sdk.Log;
 import com.adsdk.sdk.banner.BannerAdView;
+import com.adsdk.sdk.banner.BannerAdView.BannerAdViewListener;
 import com.adsdk.sdk.mraid.MraidView;
 import com.adsdk.sdk.mraid.MraidView.MraidListener;
 import com.adsdk.sdk.mraid.MraidView.ViewState;
@@ -577,27 +576,15 @@ public class RichMediaActivity extends Activity {
 		this.mRootLayout.addView(layout);
 	}
 
-	private AdListener createLocalAdListener() {
-		return new AdListener() {
+	private BannerAdViewListener createLocalAdListener() {
+		return new BannerAdViewListener() {
 
 			@Override
-			public void noAdFound() {
+			public void onLoad() {
 			}
 
 			@Override
-			public void adShown(Ad ad, boolean succeeded) {
-			}
-
-			@Override
-			public void adLoadSucceeded(Ad ad) {
-			}
-
-			@Override
-			public void adClosed(Ad ad, boolean completed) {
-			}
-
-			@Override
-			public void adClicked() {
+			public void onClick() {
 				notifyAdClicked();
 			}
 		};

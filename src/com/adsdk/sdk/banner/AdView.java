@@ -28,6 +28,7 @@ import com.adsdk.sdk.Gender;
 import com.adsdk.sdk.Log;
 import com.adsdk.sdk.RequestGeneralAd;
 import com.adsdk.sdk.Util;
+import com.adsdk.sdk.banner.BannerAdView.BannerAdViewListener;
 import com.adsdk.sdk.customevents.CustomEvent;
 import com.adsdk.sdk.customevents.CustomEventBanner;
 import com.adsdk.sdk.customevents.CustomEventBanner.CustomEventBannerListener;
@@ -45,6 +46,7 @@ public class AdView extends FrameLayout {
 	private boolean includeLocation = false;
 	private String publisherId;
 	private boolean animation;
+	private boolean shouldNotifyClose;
 
 	private int adspaceWidth;
 	private int adspaceHeight;
@@ -349,6 +351,54 @@ public class AdView extends FrameLayout {
 			}
 		});
 	}
+	
+	private void notifyAdClicked() {
+		this.updateHandler.post(new Runnable() {
+
+			@Override
+			public void run() {
+				if (adListener != null) {
+					adListener.adClicked();
+				}
+			}
+		});
+	}
+	
+	private void notifyAdShown() {
+		this.updateHandler.post(new Runnable() {
+
+			@Override
+			public void run() {
+				if (adListener != null) {
+					adListener.adShown(response, true);
+				}
+			}
+		});
+	}
+	
+	private void notifyAdClosed() {
+		this.updateHandler.post(new Runnable() {
+
+			@Override
+			public void run() {
+				if (adListener != null) {
+					adListener.adClosed(response, true);
+				}
+			}
+		});
+	}
+
+	private void notifyLoadAdSucceeded() {
+		this.updateHandler.post(new Runnable() {
+
+			@Override
+			public void run() {
+				if (adListener != null) {
+					adListener.adLoadSucceeded(response);
+				}
+			}
+		});
+	}
 
 	@Override
 	protected void onWindowVisibilityChanged(int visibility) {
@@ -376,6 +426,7 @@ public class AdView extends FrameLayout {
 	}
 
 	private void showContent() {
+		shouldNotifyClose = false;
 		if (mBannerView != null) {
 			this.removeView(mBannerView);
 			mBannerView = null;
@@ -394,7 +445,7 @@ public class AdView extends FrameLayout {
 		}
 		
 		if (response.getType() == Const.TEXT || response.getType() == Const.IMAGE) {
-			mBannerView = new BannerAdView(mContext, response, adspaceWidth, adspaceHeight, animation, adListener);
+			mBannerView = new BannerAdView(mContext, response, adspaceWidth, adspaceHeight, animation, createBannerAdViewListener());
 			if (response.getCustomEvents().isEmpty()) {
 				this.addView(mBannerView);
 			}
@@ -408,7 +459,7 @@ public class AdView extends FrameLayout {
 				addMRAIDBannerView();
 			}
 
-			mMRAIDView.setMraidListener(createMraidListener(adListener));
+			mMRAIDView.setMraidListener(createMraidListener());
 			mMRAIDView.loadHtmlData(response.getText());
 
 		}
@@ -431,6 +482,25 @@ public class AdView extends FrameLayout {
 		this.startReloadTimer();
 	}
 	
+
+
+
+	private BannerAdViewListener createBannerAdViewListener() {
+		return new BannerAdViewListener() {
+			
+			@Override
+			public void onLoad() {
+				notifyLoadAdSucceeded();
+			}
+			
+			@Override
+			public void onClick() {
+				shouldNotifyClose = true;
+				notifyAdClicked();
+				notifyAdShown();
+			}
+		};
+	}
 
 	private void addMRAIDBannerView() {
 		final float scale = mContext.getResources().getDisplayMetrics().density;
@@ -461,15 +531,13 @@ public class AdView extends FrameLayout {
 		
 	}
 
-	private CustomEventBannerListener createCustomAdListener(final AdListener listener) {
+	private CustomEventBannerListener createCustomAdListener() {
 		return new CustomEventBannerListener() {
 
 			@Override
 			public void onBannerLoaded(View bannerView) {
 				AdView.this.addView(bannerView);
-				if (listener != null) {
-					listener.adLoadSucceeded(null);
-				}
+				notifyLoadAdSucceeded();
 			}
 
 			@Override
@@ -488,51 +556,39 @@ public class AdView extends FrameLayout {
 
 			@Override
 			public void onBannerExpanded() {
-				if (listener != null) {
-					listener.adClicked();
-					listener.adShown(null, true);
-				}
+				notifyAdClicked();
+				notifyAdShown();
 			}
 
 			@Override
 			public void onBannerClosed() {
-				if (listener != null) {
-					listener.adClosed(null, true);
-				}
+				notifyAdClosed();
 			}
 		};
 	}
 
-	private MraidListener createMraidListener(final AdListener listener) {
+	private MraidListener createMraidListener() {
 		return new MraidListener() {
 
 			@Override
 			public void onReady(MraidView arg0) {
-				if (listener != null) {
-					listener.adLoadSucceeded(null);
-				}
+				notifyLoadAdSucceeded();
 			}
 
 			@Override
 			public void onFailure(MraidView arg0) {
-				if (listener != null) {
-					listener.noAdFound();
-				}
+				notifyNoAd();
 			}
 
 			@Override
 			public void onExpand(MraidView arg0) {
-				if (listener != null) {
-					listener.adClicked();
-					listener.adShown(null, true);
-				}
+				notifyAdClicked();
+				notifyAdShown();
 			}
 
 			@Override
 			public void onClose(MraidView arg0, ViewState arg1) {
-				if (listener != null) {
-					listener.adClosed(null, true);
-				}
+				notifyAdClosed();
 			}
 		};
 	}
@@ -557,6 +613,12 @@ public class AdView extends FrameLayout {
 			this.reloadTimer = null;
 		}
 		this.reloadTimer = new Timer();
+
+		if(shouldNotifyClose) {
+			shouldNotifyClose = false;
+			notifyAdClosed();
+		}
+		
 		Log.d(Const.TAG, "response: " + this.response);
 
 		if (this.response != null && this.response.getRefresh() > 0)
@@ -568,12 +630,12 @@ public class AdView extends FrameLayout {
 	public void setAdListener(final AdListener bannerListener) {
 		this.adListener = bannerListener;
 		if (mMRAIDView != null) {
-			mMRAIDView.setMraidListener(createMraidListener(bannerListener));
+			mMRAIDView.setMraidListener(createMraidListener());
 		}
 		if (mBannerView != null) {
-			mBannerView.setAdListener(bannerListener);
+			mBannerView.setAdListener(createBannerAdViewListener());
 		}
-		customAdListener = createCustomAdListener(adListener);
+		customAdListener = createCustomAdListener();
 	}
 
 	public void setInternalBrowser(final boolean isInternalBrowser) {
