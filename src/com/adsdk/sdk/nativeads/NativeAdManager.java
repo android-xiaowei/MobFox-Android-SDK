@@ -18,10 +18,15 @@ import com.adsdk.sdk.Const;
 import com.adsdk.sdk.Gender;
 import com.adsdk.sdk.Log;
 import com.adsdk.sdk.Util;
+import com.adsdk.sdk.customevents.CustomEvent;
+import com.adsdk.sdk.customevents.CustomEventNative;
+import com.adsdk.sdk.customevents.CustomEventNative.CustomEventNativeListener;
+import com.adsdk.sdk.customevents.CustomEventNativeFactory;
 
-public class NativeAdManager {
+public class NativeAdManager implements CustomEventNativeListener {
 
 	private NativeAd nativeAd;
+	private CustomEventNative customEventNative;
 	private String publisherId;
 	private boolean includeLocation = false;
 
@@ -65,9 +70,25 @@ public class NativeAdManager {
 					requestAd = new RequestNativeAd();
 
 					try {
+						customEventNative = null;
 						nativeAd = requestAd.sendRequest(NativeAdManager.this.getRequest());
 						if (nativeAd != null) {
-							notifyAdLoaded(nativeAd);
+							if(!nativeAd.getCustomEvents().isEmpty()) {
+								loadCustomEventNativeAd();
+								if(customEventNative == null) { //failed to create custom event native ad
+									if(nativeAd.isNativeAdValid()) {
+										notifyAdLoaded(nativeAd);	
+									} else {
+										notifyAdFailed(); //both custom event and normal native ad failed
+									}
+								}
+							} else {
+								if(nativeAd.isNativeAdValid()) {
+									notifyAdLoaded(nativeAd);	
+								} else {
+									notifyAdFailed();
+								}
+							}
 						} else {
 							notifyAdFailed();
 						}
@@ -86,6 +107,21 @@ public class NativeAdManager {
 				}
 			});
 			requestThread.start();
+	}
+	
+	private void loadCustomEventNativeAd() {
+		customEventNative = null;
+		while (!nativeAd.getCustomEvents().isEmpty() && customEventNative == null) {
+			try {
+				CustomEvent event = nativeAd.getCustomEvents().get(0);
+				nativeAd.getCustomEvents().remove(event);
+				customEventNative = CustomEventNativeFactory.create(event.getClassName());
+				customEventNative.createNativeAd(context, this, event.getOptionalParameter(), event.getPixelUrl());
+			} catch (Exception e) {
+				customEventNative = null;
+				Log.d("Failed to create Custom Event Native Ad.");
+			}
+		}
 	}
 
 	private NativeAdRequest getRequest() {
@@ -192,6 +228,23 @@ public class NativeAdManager {
 
 	public void setKeywords(List<String> keywords) {
 		this.keywords = keywords;
+	}
+
+	@Override
+	public void onCustomEventNativeFailed() {
+		loadCustomEventNativeAd();
+		if(customEventNative != null) {
+			return;
+		} else if (nativeAd.isNativeAdValid()) {
+			notifyAdLoaded(nativeAd);
+		} else {
+			notifyAdFailed();
+		}
+	}
+
+	@Override
+	public void onCustomEventNativeLoaded(NativeAd customNativeAd) {
+		notifyAdLoaded(customNativeAd);
 	}
 
 }

@@ -1,3 +1,4 @@
+
 package com.adsdk.sdk.nativeads;
 
 import java.io.BufferedReader;
@@ -6,7 +7,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -21,9 +21,6 @@ import org.apache.http.params.HttpProtocolParams;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 
 import com.adsdk.sdk.Const;
 import com.adsdk.sdk.Log;
@@ -62,10 +59,10 @@ public class RequestNativeAd {
 			throw new RequestException("Error in HTTP request", t);
 		}
 	}
-	
+
 	private List<CustomEvent> getCustomEvents(Header[] headers) {
 		List<CustomEvent> customEvents = new ArrayList<CustomEvent>();
-		if(headers == null) {
+		if (headers == null) {
 			return customEvents;
 		}
 
@@ -81,9 +78,9 @@ public class RequestNativeAd {
 					CustomEvent event = new CustomEvent(className, parameter, pixel);
 					customEvents.add(event);
 				} catch (JSONException e) {
-					Log.e("Cannot parse json with custom event: "+headers[i].getName());
+					Log.e("Cannot parse json with custom event: " + headers[i].getName());
 				}
-				
+
 			}
 		}
 
@@ -95,6 +92,9 @@ public class RequestNativeAd {
 		final NativeAd response = new NativeAd();
 
 		try {
+			List<CustomEvent> customEvents = this.getCustomEvents(headers);
+			response.setCustomEvents(customEvents);
+
 			BufferedReader reader;
 			reader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"), 8);
 			StringBuilder sb = new StringBuilder();
@@ -111,14 +111,12 @@ public class RequestNativeAd {
 				Iterator<String> keys = imageAssetsObject.keys();
 
 				while (keys.hasNext()) {
-					ImageAsset asset = new ImageAsset();
 					String type = keys.next();
 					JSONObject assetObject = imageAssetsObject.getJSONObject(type);
 					String url = assetObject.getString("url");
-					asset.url = url;
-					asset.bitmap = loadBitmap(url);
-					asset.width = assetObject.getInt("width");
-					asset.height = assetObject.getInt("height");
+					int width = assetObject.getInt("width");
+					int height = assetObject.getInt("height");
+					ImageAsset asset = new ImageAsset(url, width, height);
 					response.addImageAsset(type, asset);
 				}
 			}
@@ -140,39 +138,24 @@ public class RequestNativeAd {
 			if (trackersArray != null) {
 				for (int i = 0; i < trackersArray.length(); i++) {
 					JSONObject trackerObject = trackersArray.optJSONObject(i);
-					if(trackerObject != null) {
-						Tracker tracker = new Tracker();
-						tracker.type = trackerObject.getString("type");
-						tracker.url = trackerObject.getString("url");
+					if (trackerObject != null) {
+						String type = trackerObject.getString("type");
+						String url = trackerObject.getString("url");
+						Tracker tracker = new Tracker(type, url);
 						response.getTrackers().add(tracker);
 					}
 				}
 			}
-			
-			List<CustomEvent> customEvents = this.getCustomEvents(headers);
-			response.setCustomEvents(customEvents);
 
 		} catch (UnsupportedEncodingException e) {
 			throw new RequestException("Cannot parse Response", e);
 		} catch (IOException e) {
 			throw new RequestException("Cannot parse Response", e);
 		} catch (JSONException e) {
-			throw new RequestException("Cannot parse Response", e);
+			response.setNativeAdValid(false);
 		}
-
+		response.setNativeAdValid(true);
 		return response;
-	}
-	
-	private Bitmap loadBitmap (String url) {
-		Bitmap bitmap = null;
-		try {
-			InputStream in = new URL(url).openStream();
-			bitmap = BitmapFactory.decodeStream(in);
-		} catch (Exception e) {
-			Log.e("Decoding bitmap failed!");
-		}
-		
-		return bitmap;
 	}
 
 }

@@ -1,10 +1,12 @@
 package com.adsdk.sdk;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.net.URL;
 import java.util.Enumeration;
 import java.util.Locale;
 
@@ -13,6 +15,8 @@ import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
@@ -268,6 +272,18 @@ public class Util {
 			return "";
 		}
 		return androidAdId;
+	}
+	
+	public static Bitmap loadBitmap (String url) {
+		Bitmap bitmap = null;
+		try {
+			InputStream in = new URL(url).openStream();
+			bitmap = BitmapFactory.decodeStream(in);
+		} catch (Exception e) {
+			Log.e("Decoding bitmap failed!");
+		}
+		
+		return bitmap;
 	}
 
 }
