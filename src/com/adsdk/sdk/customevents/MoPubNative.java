@@ -29,7 +29,6 @@ public class MoPubNative extends CustomEventNative {
 			return;
 		}
 
-		nativeAd = new NativeAd();
 		addImpressionTracker(trackingPixel);
 
 		MoPubNativeListener moPubListener = createMoPubNativeListener();
@@ -42,7 +41,7 @@ public class MoPubNative extends CustomEventNative {
 
 			@Override
 			public void onNativeLoad(NativeResponse response) {
-				nativeAd.setClickUrl(response.getClickDestinationUrl());
+				setClickUrl(response.getClickDestinationUrl());
 				if (response.getImpressionTrackers() != null) {
 					for (String impressionTrackerUrl : response.getImpressionTrackers()) {
 						addImpressionTracker(impressionTrackerUrl);
@@ -62,8 +61,8 @@ public class MoPubNative extends CustomEventNative {
 					}
 		        }
 
-				if (isNativeAdValid(nativeAd)) {
-					listener.onCustomEventNativeLoaded(nativeAd);
+				if (isNativeAdValid(MoPubNative.this)) {
+					listener.onCustomEventNativeLoaded(MoPubNative.this);
 				} else {
 					listener.onCustomEventNativeFailed();
 				}

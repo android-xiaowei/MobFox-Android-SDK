@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import android.graphics.Bitmap;
+import android.view.View;
 
 import com.adsdk.sdk.Util;
 import com.adsdk.sdk.customevents.CustomEvent;
@@ -119,6 +120,14 @@ public class NativeAd {
 
 	public void setNativeAdValid(boolean nativeAdValid) {
 		this.nativeAdValid = nativeAdValid;
+	}
+
+	public void handleClick() {
+	//used for reporting clicks for custom events
+	}
+	
+	public void prepareImpression(View view) {
+	//used for reporting impressions for custom events
 	}
 
 }

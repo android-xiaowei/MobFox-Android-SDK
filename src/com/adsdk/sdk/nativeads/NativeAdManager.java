@@ -161,19 +161,21 @@ public class NativeAdManager implements CustomEventNativeListener {
 	public NativeAdView getNativeAdView(NativeAd ad, NativeViewBinder binder) {
 		NativeAdView view = new NativeAdView(context, ad, binder, listener);
 		if (ad != null) {
-			view.setOnClickListener(createOnNativeAdClickListener(ad.getClickUrl()));
+			ad.prepareImpression(view);
+			view.setOnClickListener(createOnNativeAdClickListener(ad));
 		}
 		return view;
 	}
 
-	private OnClickListener createOnNativeAdClickListener(final String clickUrl) {
+	private OnClickListener createOnNativeAdClickListener(final NativeAd ad) {
 		OnClickListener clickListener = new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
 				notifyAdClicked();
-				if (clickUrl != null && !clickUrl.equals("")) {
-					final Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(clickUrl));
+				ad.handleClick();
+				if (ad.getClickUrl() != null && !ad.getClickUrl().equals("")) {
+					final Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(ad.getClickUrl()));
 					context.startActivity(intent);
 				}
 

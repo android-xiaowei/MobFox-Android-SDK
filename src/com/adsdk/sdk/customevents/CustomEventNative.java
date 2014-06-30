@@ -4,13 +4,10 @@ package com.adsdk.sdk.customevents;
 import android.content.Context;
 
 import com.adsdk.sdk.nativeads.NativeAd;
-import com.adsdk.sdk.nativeads.NativeAd.ImageAsset;
-import com.adsdk.sdk.nativeads.NativeAd.Tracker;
 
-public abstract class CustomEventNative {
+public abstract class CustomEventNative extends NativeAd {
 
 	protected CustomEventNativeListener listener;
-	protected NativeAd nativeAd;
 
 	public abstract void createNativeAd(Context context, CustomEventNativeListener listener, String optionalParameters, String trackingPixel);
 
@@ -43,19 +40,15 @@ public abstract class CustomEventNative {
 	protected void addImageAsset(String type, String url) {
 		if (type != null && url != null) {
 			ImageAsset imageAsset = new ImageAsset(url, 0, 0); // width and height are ignored by SDK
-			nativeAd.addImageAsset(type, imageAsset);
+			addImageAsset(type, imageAsset);
 		}
 	}
 
 	protected void addImpressionTracker(String trackingUrl) {
 		if (trackingUrl != null) {
 			Tracker tracker = new Tracker(NativeAd.IMPRESSION_TRACKER_TYPE, trackingUrl);
-			nativeAd.getTrackers().add(tracker);
+			getTrackers().add(tracker);
 		}
-	}
-
-	protected void addTextAsset(String type, String text) {
-		nativeAd.addTextAsset(type, text);
 	}
 	
 	protected void addExtraAsset(String type, String asset) {
