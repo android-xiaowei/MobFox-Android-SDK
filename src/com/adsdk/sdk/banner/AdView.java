@@ -466,6 +466,7 @@ public class AdView extends FrameLayout {
 
 			@Override
 			public void onBannerLoaded(View bannerView) {
+				customEventBannerView = bannerView;
 				AdView.this.addView(bannerView);
 				if (listener != null) {
 					listener.adLoadSucceeded(null);
