@@ -13,7 +13,6 @@ public class AdRequest {
 	private String userAgent;
 	private String userAgent2;
 	private String headers;
-	private String deviceId;
 	private String listAds;
 	private String requestURL;
 	private String protocolVersion;
@@ -32,9 +31,6 @@ public class AdRequest {
 	private boolean isVideoRequest;
 
 	private String ipAddress;
-	private String deviceId2;
-	private String androidIMEI = "";
-	private String androidID = "";
 	private String androidAdId = "";
 	private String connectionType;
 	private long timestamp;
@@ -45,16 +41,6 @@ public class AdRequest {
 
 	public String getConnectionType() {
 		return this.connectionType;
-	}
-
-	public String getDeviceId() {
-		if (this.deviceId == null)
-			return "";
-		return this.deviceId;
-	}
-
-	public String getDeviceId2() {
-		return this.deviceId2;
 	}
 
 	public String getDeviceMode() {
@@ -125,13 +111,7 @@ public class AdRequest {
 		this.connectionType = connectionType;
 	}
 
-	public void setDeviceId(final String deviceId) {
-		this.deviceId = deviceId;
-	}
 
-	public void setDeviceId2(final String deviceId2) {
-		this.deviceId2 = deviceId2;
-	}
 
 	public void setHeaders(final String headers) {
 		this.headers = headers;
@@ -190,12 +170,8 @@ public class AdRequest {
 		b.appendQueryParameter("u", this.getUserAgent());
 		b.appendQueryParameter("u2", this.getUserAgent2());
 		b.appendQueryParameter("s", this.getPublisherId());
-		b.appendQueryParameter("o", this.getDeviceId()); 
-		b.appendQueryParameter("o_androidimei", androidIMEI);
-		b.appendQueryParameter("o_androidid", androidID);
 		b.appendQueryParameter("o_andadvid", androidAdId);
 		b.appendQueryParameter("r_random", Integer.toString(random));
-		b.appendQueryParameter("o2", this.getDeviceId2());
 		b.appendQueryParameter("t", Long.toString(this.getTimestamp()));
 		b.appendQueryParameter("connection_type", this.getConnectionType());
 		b.appendQueryParameter("listads", this.getListAds());
@@ -277,22 +253,6 @@ public class AdRequest {
 
 	public void setAdspaceHeight(int adspaceHeight) {
 		this.adspaceHeight = adspaceHeight;
-	}
-
-	public String getAndroidIMEI() {
-		return androidIMEI;
-	}
-
-	public void setAndroidIMEI(String androidIMEI) {
-		this.androidIMEI = androidIMEI;
-	}
-
-	public String getAndroidID() {
-		return androidID;
-	}
-
-	public void setAndroidID(String androidID) {
-		this.androidID = androidID;
 	}
 
 	public String getAndroidAdId() {

@@ -20,8 +20,6 @@ public class NativeAdRequest {
 	private String publisherId;
 	private String userAgent;
 	private String userAgent2;
-	private String androidIMEI = "";
-	private String androidID = "";
 	private String androidAdId = "";
 	private String protocolVersion;
 
@@ -57,8 +55,6 @@ public class NativeAdRequest {
 		b.appendQueryParameter("u", this.getUserAgent());
 		b.appendQueryParameter("u2", this.getUserAgent2());
 		b.appendQueryParameter("r_random", Integer.toString(random));
-		b.appendQueryParameter("o_androidid", androidID);
-		b.appendQueryParameter("o_androidimei", androidIMEI);
 		b.appendQueryParameter("o_andadvid", androidAdId);
 		b.appendQueryParameter("v", this.getProtocolVersion());
 
@@ -109,22 +105,6 @@ public class NativeAdRequest {
 
 	public void setUserAgent(String userAgent) {
 		this.userAgent = userAgent;
-	}
-
-	public String getAndroidIMEI() {
-		return androidIMEI;
-	}
-
-	public void setAndroidIMEI(String androidIMEI) {
-		this.androidIMEI = androidIMEI;
-	}
-
-	public String getAndroidID() {
-		return androidID;
-	}
-
-	public void setAndroidID(String androidID) {
-		this.androidID = androidID;
 	}
 
 	public String getAndroidAdId() {

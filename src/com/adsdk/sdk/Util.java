@@ -19,7 +19,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.provider.Settings.Secure;
 import android.telephony.TelephonyManager;
 
 import com.google.android.gms.ads.identifier.AdvertisingIdClient;
@@ -134,24 +133,6 @@ public class Util {
 			Log.e(ex.toString());
 		}
 		return null;
-	}
-
-	public static String getTelephonyDeviceId(Context context) {
-		int telephonyPermission = context.checkCallingOrSelfPermission(Manifest.permission.READ_PHONE_STATE);
-
-		if (telephonyPermission == PackageManager.PERMISSION_GRANTED) {
-			TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-			return tm.getDeviceId();
-		}
-		return "";
-	}
-
-	public static String getDeviceId(Context context) {
-		String androidId = Secure.getString(context.getContentResolver(), Secure.ANDROID_ID);
-		if ((androidId == null) || (androidId.equals("9774d56d682e549c")) || (androidId.equals("0000000000000000"))) {
-			androidId = "";
-		}
-		return androidId;
 	}
 
 	public static Location getLocation(Context context) {
