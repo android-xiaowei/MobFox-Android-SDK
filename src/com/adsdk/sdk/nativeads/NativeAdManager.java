@@ -3,14 +3,11 @@ package com.adsdk.sdk.nativeads;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.List;
 
-import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Handler;
-import android.telephony.TelephonyManager;
 import android.view.View;
 import android.view.View.OnClickListener;
 
@@ -42,7 +39,6 @@ public class NativeAdManager implements CustomEventNativeListener {
 	private String requestUrl;
 	private Handler handler;
 
-	private int telephonyPermission;
 	private List<String> adTypes;
 
 	public NativeAdManager(Context context, String requestUrl, boolean includeLocation, String publisherId, NativeAdListener listener, List<String> adTypes) {
@@ -57,7 +53,6 @@ public class NativeAdManager implements CustomEventNativeListener {
 		this.listener = listener;
 		this.adTypes = adTypes;
 		handler = new Handler();
-		telephonyPermission = context.checkCallingOrSelfPermission(Manifest.permission.READ_PHONE_STATE);
 		Util.prepareAndroidAdId(context);
 	}
 
@@ -127,11 +122,6 @@ public class NativeAdManager implements CustomEventNativeListener {
 	private NativeAdRequest getRequest() {
 		if (this.request == null) {
 			this.request = new NativeAdRequest();
-			if (this.telephonyPermission == PackageManager.PERMISSION_GRANTED) {
-				final TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-				this.request.setAndroidIMEI(tm.getDeviceId());
-			}
-			this.request.setAndroidID(Util.getDeviceId(context));
 			this.request.setAndroidAdId(Util.getAndroidAdId());
 			this.request.setPublisherId(this.publisherId);
 			this.request.setUserAgent(Util.getDefaultUserAgentString(context));

@@ -28,10 +28,6 @@ public class AdManager {
 	private static HashMap<Long, AdManager> sRunningAds = new HashMap<Long, AdManager>();
 
 	private String mPublisherId;
-	private String mUniqueId1;
-	private String mUniqueId2;
-	private String androidIMEI = "";
-	private String androidID = "";
 	private String androidAdId;
 	private boolean mIncludeLocation;
 	private static Context mContext;
@@ -390,22 +386,15 @@ public class AdManager {
 	private void initialize() throws IllegalArgumentException {
 		Log.LOGGING_ENABLED = Log.isLoggingEnabled(getmContext());
 		Log.d("Ad SDK Version:" + Const.VERSION);
-		this.mUniqueId1 = Util.getTelephonyDeviceId(getContext());
-		this.mUniqueId2 = Util.getDeviceId(getContext());
 
-		this.androidID = Util.getDeviceId(getContext());
-		this.androidIMEI = Util.getTelephonyDeviceId(getContext());
 		this.androidAdId = Util.getAndroidAdId();
 
 		if ((mPublisherId == null) || (mPublisherId.length() == 0)) {
 			Log.e("Publisher Id cannot be null or empty");
 			throw new IllegalArgumentException("User Id cannot be null or empty");
 		}
-		if ((mUniqueId2 == null)) {
-			Log.e("Cannot get system device Id");
-			throw new IllegalArgumentException("System Device Id cannot be null");
-		}
-		Log.d("AdManager Publisher Id:" + mPublisherId + " Device Id:" + mUniqueId1 + " DeviceId2:" + mUniqueId2);
+
+		Log.d("AdManager Publisher Id:" + mPublisherId + " Advertising Id:" + androidAdId);
 		mEnabled = (Util.getMemoryClass(getContext()) > 16);
 		customFullscreenListener = createCustomFullscreenListener();
 	}
@@ -517,10 +506,6 @@ public class AdManager {
 	private AdRequest getInterstitialRequest() {
 		if (this.request == null) {
 			this.request = new AdRequest();
-			request.setDeviceId(mUniqueId1);
-			request.setDeviceId2(mUniqueId2);
-			request.setAndroidID(androidID);
-			request.setAndroidIMEI(androidIMEI);
 			request.setAndroidAdId(androidAdId);
 			this.request.setPublisherId(this.mPublisherId);
 			this.request.setUserAgent(Util.getDefaultUserAgentString(mContext));
@@ -565,10 +550,6 @@ public class AdManager {
 	private AdRequest getVideoRequest() {
 		if (this.request == null) {
 			this.request = new AdRequest();
-			request.setDeviceId(mUniqueId1);
-			request.setDeviceId2(mUniqueId2);
-			request.setAndroidID(androidID);
-			request.setAndroidIMEI(androidIMEI);
 			request.setAndroidAdId(androidAdId);
 			this.request.setPublisherId(this.mPublisherId);
 			this.request.setUserAgent(Util.getDefaultUserAgentString(mContext));

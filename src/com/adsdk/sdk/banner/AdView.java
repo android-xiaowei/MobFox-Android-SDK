@@ -7,15 +7,12 @@ import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.List;
 import java.util.Timer;
 
-import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Handler;
-import android.telephony.TelephonyManager;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -68,7 +65,6 @@ public class AdView extends FrameLayout {
 
 	private String requestURL = null;
 
-	private int telephonyPermission;
 
 	private BroadcastReceiver mScreenStateReceiver;
 	private Context mContext = null;
@@ -203,14 +199,6 @@ public class AdView extends FrameLayout {
 	private AdRequest getRequest() {
 		if (this.request == null) {
 			this.request = new AdRequest();
-			if (this.telephonyPermission == PackageManager.PERMISSION_GRANTED) {
-				final TelephonyManager tm = (TelephonyManager) this.getContext().getSystemService(Context.TELEPHONY_SERVICE);
-				this.request.setDeviceId(tm.getDeviceId());
-				this.request.setAndroidIMEI(tm.getDeviceId());
-			} else {
-				this.request.setDeviceId(Util.getDeviceId(this.mContext));
-			}
-			this.request.setAndroidID(Util.getDeviceId(mContext));
 			this.request.setAndroidAdId(Util.getAndroidAdId());
 			this.request.setPublisherId(this.publisherId);
 			this.request.setUserAgent(Util.getDefaultUserAgentString(mContext));
@@ -244,7 +232,6 @@ public class AdView extends FrameLayout {
 		Log.LOGGING_ENABLED = Log.isLoggingEnabled(mContext);
 		Log.d(Const.TAG, "SDK Version:" + Const.VERSION);
 		registerScreenStateBroadcastReceiver();
-		telephonyPermission = context.checkCallingOrSelfPermission(Manifest.permission.READ_PHONE_STATE);
 		Util.prepareAndroidAdId(context);
 	}
 
