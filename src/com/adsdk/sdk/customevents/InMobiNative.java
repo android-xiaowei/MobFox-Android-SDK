@@ -52,7 +52,6 @@ public class InMobiNative extends CustomEventNative {
 				try {
 					jsonObject = new JSONObject(jsonTokener);
 
-					setClickUrl(jsonObject.optString("landing_url"));
 					addTextAsset(NativeAd.HEADLINE_TEXT_ASSET, jsonObject.getString("title"));
 					addTextAsset(NativeAd.DESCRIPTION_TEXT_ASSET, jsonObject.getString("description"));
 					addTextAsset(NativeAd.CALL_TO_ACTION_TEXT_ASSET, jsonObject.optString("cta"));
