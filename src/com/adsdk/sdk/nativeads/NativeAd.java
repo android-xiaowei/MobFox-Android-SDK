@@ -123,11 +123,15 @@ public class NativeAd {
 	}
 
 	public void handleClick() {
-	//used for reporting clicks for custom events
+		//used for reporting clicks for custom events
 	}
 	
 	public void prepareImpression(View view) {
-	//used for reporting impressions for custom events
+		//used for reporting impressions for custom events
+	}
+	
+	public void handleImpression() {
+		//used for reporting impressions for custom events	
 	}
 
 }

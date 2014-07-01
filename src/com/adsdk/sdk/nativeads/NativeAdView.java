@@ -30,6 +30,7 @@ public class NativeAdView extends FrameLayout {
 	private boolean impressionReported;
 	private View adView;
 	private NativeAdListener listener;
+	private NativeAd nativeAd;
 	private Handler handler;
 	private List<Tracker> trackers;
 
@@ -87,6 +88,7 @@ public class NativeAdView extends FrameLayout {
 				Log.e("Cannot fill view for " + key);
 			}
 		}
+		nativeAd = ad;
 
 	}
 
@@ -94,6 +96,7 @@ public class NativeAdView extends FrameLayout {
 	protected void dispatchDraw(Canvas canvas) {
 		if (!impressionReported) {
 			impressionReported = true;
+			nativeAd.handleImpression();
 			notifyImpression();
 
 			for (Tracker t : trackers) {
