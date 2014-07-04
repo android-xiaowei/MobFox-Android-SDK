@@ -1,6 +1,8 @@
 
 package com.adsdk.sdk.customevents;
 
+import java.util.Locale;
+
 import android.content.Context;
 
 import com.adsdk.sdk.nativeads.NativeAd;
@@ -52,7 +54,7 @@ public abstract class CustomEventNative extends NativeAd {
 	}
 	
 	protected void addExtraAsset(String type, String asset) {
-		if(type.contains("image")) {
+		if(type.toLowerCase(Locale.US).contains("image")) {
 			addImageAsset(type, asset);
 		} else {
 			addTextAsset(type, asset);
