@@ -1,17 +1,16 @@
 package com.adsdk.sdk.customevents;
 
+import android.app.Activity;
+import android.os.Handler;
+
 import com.jirbo.adcolony.AdColony;
 import com.jirbo.adcolony.AdColonyAd;
-import com.jirbo.adcolony.AdColonyAdAvailabilityListener;
 import com.jirbo.adcolony.AdColonyAdListener;
 import com.jirbo.adcolony.AdColonyVideoAd;
-
-import android.app.Activity;
 
 public class AdColonyFullscreen extends CustomEventFullscreen {
 	
 	private static boolean initialized;
-	private AdColonyAdAvailabilityListener availabilityListener;
 	private AdColonyVideoAd videoAd;
 	
 
@@ -42,26 +41,31 @@ public class AdColonyFullscreen extends CustomEventFullscreen {
 			AdColony.configure(activity, clientOptions, appId, zoneIds);
 			initialized = true;
 		}
-		availabilityListener = createAvailabilityListener();
-		AdColony.addAdAvailabilityListener(availabilityListener);
 		
 		videoAd = new AdColonyVideoAd().withListener(createListener());
-	}
-
-	private AdColonyAdAvailabilityListener createAvailabilityListener() { //TODO: make sure listener methods work properly!
-		return new AdColonyAdAvailabilityListener() {
-			
-			@Override
-			public void onAdColonyAdAvailabilityChange(boolean available, String arg1) {
-				if(available) {
-					AdColony.removeAdAvailabilityListener(availabilityListener);
-					if (listener != null) {
-						listener.onFullscreenLoaded(AdColonyFullscreen.this);
-					}
-				}
-				
+		if(videoAd.isReady()) {
+			if (listener != null) {
+				listener.onFullscreenLoaded(AdColonyFullscreen.this);
 			}
-		};
+		} else {
+			Handler h = new Handler();
+			h.postDelayed(new Runnable() {
+				
+				@Override
+				public void run() {
+					if(videoAd.isReady()) {
+						if (listener != null) {
+							listener.onFullscreenLoaded(AdColonyFullscreen.this);
+						}
+					} else {
+						if (listener != null) {
+							listener.onFullscreenFailed();
+						}
+					}
+					
+				}
+			}, 5000);
+		}
 	}
 
 	private AdColonyAdListener createListener() {
@@ -78,7 +82,6 @@ public class AdColonyFullscreen extends CustomEventFullscreen {
 			@Override
 			public void onAdColonyAdAttemptFinished(AdColonyAd ad) {
 				if(ad.notShown() || ad.noFill()) {
-					AdColony.removeAdAvailabilityListener(availabilityListener);
 					if (listener != null) {
 						listener.onFullscreenFailed();
 					}
