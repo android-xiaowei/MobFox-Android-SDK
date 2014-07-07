@@ -132,8 +132,10 @@ public class RequestGeneralAd extends RequestAd<AdResponse> {
 		final AdResponse response = new AdResponse();
 
 		try {
+			List<CustomEvent> customEvents = this.getCustomEvents(headers);
+			response.setCustomEvents(customEvents);
+
 			if (isVideo) {
-				response.setCustomEvents(new ArrayList<CustomEvent>());
 
 				VAST vast = VASTParser.createVastFromStream(inputStream);
 				VideoData video = VASTParser.fillVideoDataFromVast(vast);
@@ -218,8 +220,6 @@ public class RequestGeneralAd extends RequestAd<AdResponse> {
 					throw new RequestException("Unknown response type " + type);
 				}
 
-				List<CustomEvent> customEvents = this.getCustomEvents(headers);
-				response.setCustomEvents(customEvents);
 			}
 
 		} catch (final ParserConfigurationException e) {
