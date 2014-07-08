@@ -53,6 +53,9 @@ public abstract class CustomEventFullscreen {
 		task.execute();
 	}
 	
+    public void finish() {
+    	listener = null;
+    }
 	
 	public interface CustomEventFullscreenListener {
         void onFullscreenLoaded(CustomEventFullscreen fullscreen);

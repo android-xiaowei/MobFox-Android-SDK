@@ -420,6 +420,7 @@ public class AdManager {
 
 			@Override
 			public void onFullscreenFailed() {
+				finishCustomEventFullscreen();
 				loadCustomEventFullscreen();
 				if (customEventFullscreen != null) {
 					return;
@@ -436,9 +437,16 @@ public class AdManager {
 
 			@Override
 			public void onFullscreenClosed() {
+				finishCustomEventFullscreen();
 				notifyAdClose(mResponse, true);
 			}
 		};
+	}
+	
+	private void finishCustomEventFullscreen() {
+		if(customEventFullscreen != null) {
+			customEventFullscreen.finish();
+		}
 	}
 
 	private void notifyNoAdFound() {
