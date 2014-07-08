@@ -18,6 +18,7 @@ import com.inmobi.monetization.IMNativeListener;
 public class InMobiNative extends CustomEventNative {
 	
 	private IMNative loadedNative;
+	private static boolean isInitialized;
 
 	@Override
 	public void createNativeAd(Context context, CustomEventNativeListener listener, String optionalParameters, String trackingPixel) {
@@ -37,7 +38,10 @@ public class InMobiNative extends CustomEventNative {
 
 		addImpressionTracker(trackingPixel);
 
-		InMobi.initialize(context, optionalParameters);
+		if(!isInitialized) {
+			InMobi.initialize(context, optionalParameters);
+			isInitialized = true;
+		}
 		IMNative inMobiNative = new IMNative(optionalParameters, createListener());
 		inMobiNative.loadAd();
 	}
