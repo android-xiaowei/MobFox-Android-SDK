@@ -1,12 +1,21 @@
 package com.adsdk.sdk.nativeads;
 
+import java.io.IOException;
 import java.lang.Thread.UncaughtExceptionHandler;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
+import org.apache.http.HttpStatus;
 
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -165,14 +174,89 @@ public class NativeAdManager implements CustomEventNativeListener {
 				notifyAdClicked();
 				ad.handleClick();
 				if (ad.getClickUrl() != null && !ad.getClickUrl().equals("")) {
-					final Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(ad.getClickUrl()));
-					context.startActivity(intent);
+					new LoadUrlTask().execute(ad.getClickUrl());
 				}
 
 			}
 		};
 		return clickListener;
 	}
+	
+	
+	private class LoadUrlTask extends AsyncTask<String, Void, String> {
+
+		String userAgent;
+
+		public LoadUrlTask(){
+			userAgent = Util.getDefaultUserAgentString(context);
+		}
+
+		@Override
+		protected String doInBackground(String... urls) {
+			String loadingUrl = urls[0];
+			URL url = null;
+			try {
+				url = new URL(loadingUrl);
+			} catch (MalformedURLException e) {
+				return (loadingUrl != null) ? loadingUrl : "";
+			}
+			Log.d("Checking URL redirect:" + loadingUrl);
+
+			int statusCode = -1;
+			HttpURLConnection connection = null;
+			String nextLocation = url.toString();
+
+			Set<String> redirectLocations = new HashSet<String>();
+			redirectLocations.add(nextLocation);
+
+			try {
+				do {
+					connection = (HttpURLConnection) url.openConnection();
+					connection.setRequestProperty("User-Agent",
+							userAgent);
+					connection.setInstanceFollowRedirects(false);
+
+					statusCode = connection.getResponseCode();
+					if (statusCode == HttpStatus.SC_OK) {
+						connection.disconnect();
+						break;
+					} else {
+						nextLocation = connection.getHeaderField("location");
+						connection.disconnect();
+						if (!redirectLocations.add(nextLocation)) {
+							Log.d("URL redirect cycle detected");
+							return "";
+						}
+
+						url = new URL(nextLocation);
+					}
+				} while (statusCode == HttpStatus.SC_MOVED_TEMPORARILY
+						|| statusCode == HttpStatus.SC_MOVED_PERMANENTLY
+						|| statusCode == HttpStatus.SC_TEMPORARY_REDIRECT
+						|| statusCode == HttpStatus.SC_SEE_OTHER);
+			} catch (IOException e) {
+				return (nextLocation != null) ? nextLocation : "";
+			} finally {
+				if (connection != null)
+					connection.disconnect();
+			}
+
+			return nextLocation;
+		}
+
+		@Override
+		protected void onPostExecute(String url) {
+			if (url == null || url.equals("")) {
+				url = "about:blank";
+				return;
+			}
+			
+			final Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			context.startActivity(intent);
+		}
+	}
+
 
 	private void notifyAdLoaded(final NativeAd ad) {
 		if (listener != null) {
