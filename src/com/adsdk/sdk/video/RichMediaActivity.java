@@ -761,7 +761,7 @@ public class RichMediaActivity extends Activity {
 		this.mVideoView.setOnCompletionListener(this.mOnVideoCompletionListener);
 		this.mVideoView.setOnErrorListener(this.mOnVideoErrorListener);
 		this.mVideoView.setOnInfoListener(this.mOnVideoInfoListener);
-		if (!this.mVideoData.startEvents.isEmpty())
+		if (!this.mVideoData.startEvents.isEmpty() || !this.mVideoData.impressionEvents.isEmpty())
 			this.mVideoView.setOnStartListener(this.mOnVideoStartListener);
 		if (!this.mVideoData.timeTrackingEvents.isEmpty()) {
 			final Set<Integer> keys = this.mVideoData.timeTrackingEvents.keySet();
