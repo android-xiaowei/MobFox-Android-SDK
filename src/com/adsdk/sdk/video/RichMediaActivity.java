@@ -136,6 +136,7 @@ public class RichMediaActivity extends Activity {
 	private boolean mCanClose;
 	protected boolean mInterstitialAutocloseReset;
 	private int mType;
+	private boolean wasClicked;
 
 	private boolean mResult;
 
@@ -613,6 +614,7 @@ public class RichMediaActivity extends Activity {
 	}
 
 	private void notifyAdClicked() {
+		wasClicked = true;
 		AdManager.notifyAdClick(mAd);
 	}
 
@@ -978,6 +980,11 @@ public class RichMediaActivity extends Activity {
 
 	@Override
 	protected void onResume() {
+		if(wasClicked) { //close after coming back from click.
+			RichMediaActivity.this.mResult = true;
+			RichMediaActivity.this.setResult(Activity.RESULT_OK);
+			RichMediaActivity.this.finish();
+		}
 
 		Log.d("RichMediaActivity onResume");
 		super.onResume();
