@@ -925,7 +925,8 @@ public class RichMediaActivity extends Activity {
 	@Override
 	protected void onDestroy() {
 		mMediaController = null;
-		mResourceManager.releaseInstance();
+		if (mResourceManager != null)
+			mResourceManager.releaseInstance();
 		if (this.mVideoView != null)
 			this.mVideoView.destroy();
 		Log.d("RichMediaActivity onDestroy");
