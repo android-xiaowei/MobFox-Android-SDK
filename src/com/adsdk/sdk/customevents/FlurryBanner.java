@@ -55,10 +55,16 @@ public class FlurryBanner extends CustomEventBanner implements FlurryAdListener 
 
 	@Override
 	protected void finalize() throws Throwable {
+		destroy();
+		super.finalize();
+	}
+	
+	@Override
+	public void destroy() {
 		FlurryAds.setAdListener(null);
 		FlurryAds.removeAd(context, adSpace, bannerLayout);
 		FlurryAgent.onEndSession(context);
-		super.finalize();
+		super.destroy();
 	}
 
 	@Override

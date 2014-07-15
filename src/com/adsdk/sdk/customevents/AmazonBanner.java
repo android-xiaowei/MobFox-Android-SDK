@@ -49,7 +49,6 @@ public class AmazonBanner extends CustomEventBanner {
 		banner = new AdLayout(activity, size);
 		banner.setListener(createListener());
 		banner.loadAd();
-
 	}
 
 	private AdListener createListener() {
@@ -88,6 +87,14 @@ public class AmazonBanner extends CustomEventBanner {
 				}
 			}
 		};
+	}
+
+	@Override
+	public void destroy() {
+		if (banner != null) {
+			banner.destroy();
+		}
+		super.destroy();
 	}
 
 }

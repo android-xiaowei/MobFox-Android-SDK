@@ -1,3 +1,4 @@
+
 package com.adsdk.sdk.banner;
 
 import static com.adsdk.sdk.Const.TAG;
@@ -65,7 +66,6 @@ public class AdView extends FrameLayout {
 
 	private String requestURL = null;
 
-
 	private BroadcastReceiver mScreenStateReceiver;
 	private Context mContext = null;
 	protected boolean mIsInForeground;
@@ -81,7 +81,7 @@ public class AdView extends FrameLayout {
 	private final Runnable showContent = new Runnable() {
 		@Override
 		public void run() {
-			try{
+			try {
 				AdView.this.showContent();
 			} catch (Exception e) {
 				notifyLoadAdFailed(e);
@@ -303,7 +303,7 @@ public class AdView extends FrameLayout {
 				}
 			});
 			this.loadContentThread.start();
-		} 
+		}
 
 	}
 
@@ -338,7 +338,7 @@ public class AdView extends FrameLayout {
 			}
 		});
 	}
-	
+
 	private void notifyAdClicked() {
 		this.updateHandler.post(new Runnable() {
 
@@ -350,7 +350,7 @@ public class AdView extends FrameLayout {
 			}
 		});
 	}
-	
+
 	private void notifyAdShown() {
 		this.updateHandler.post(new Runnable() {
 
@@ -362,7 +362,7 @@ public class AdView extends FrameLayout {
 			}
 		});
 	}
-	
+
 	private void notifyAdClosed() {
 		this.updateHandler.post(new Runnable() {
 
@@ -429,8 +429,9 @@ public class AdView extends FrameLayout {
 		}
 		if (customEventBannerView != null) {
 			this.removeView(customEventBannerView);
+			destroyCustomEventBanner();
 		}
-		
+
 		if (response.getType() == Const.TEXT || response.getType() == Const.IMAGE) {
 			mBannerView = new BannerAdView(mContext, response, adspaceWidth, adspaceHeight, animation, createBannerAdViewListener());
 			if (response.getCustomEvents().isEmpty()) {
@@ -455,31 +456,30 @@ public class AdView extends FrameLayout {
 				notifyNoAd();
 			}
 		}
-		
-		if(!response.getCustomEvents().isEmpty()) {
+
+		if (!response.getCustomEvents().isEmpty()) {
 			loadCustomEventBanner();
-			if(customEventBanner == null) {
+			if (customEventBanner == null) {
 				response.getCustomEvents().clear();
 				customAdListener.onBannerFailed();
 			} else {
 				response.setRefresh(CUSTOM_EVENT_RELOAD_INTERVAL);
 			}
 		}
-		
+
 		this.startReloadTimer();
 	}
-	
-
-
 
 	private BannerAdViewListener createBannerAdViewListener() {
 		return new BannerAdViewListener() {
-			
+
 			@Override
 			public void onLoad() {
-				notifyLoadAdSucceeded();
+				if (response.getCustomEvents().isEmpty()) {
+					notifyLoadAdSucceeded();
+				}
 			}
-			
+
 			@Override
 			public void onClick() {
 				shouldNotifyClose = true;
@@ -515,7 +515,7 @@ public class AdView extends FrameLayout {
 				Log.d("Failed to create Custom Event Banner.");
 			}
 		}
-		
+
 	}
 
 	private CustomEventBannerListener createCustomAdListener() {
@@ -530,10 +530,12 @@ public class AdView extends FrameLayout {
 
 			@Override
 			public void onBannerFailed() {
+				destroyCustomEventBanner();
 				loadCustomEventBanner();
-				if(customEventBanner != null) {
+				if (customEventBanner != null) {
 					return;
 				} else if (mBannerView != null) {
+					notifyLoadAdSucceeded();
 					AdView.this.addView(mBannerView);
 				} else if (mMRAIDView != null) {
 					addMRAIDBannerView();
@@ -544,15 +546,25 @@ public class AdView extends FrameLayout {
 
 			@Override
 			public void onBannerExpanded() {
+				shouldNotifyClose = true; // for custom events not notifying about ad close
 				notifyAdClicked();
 				notifyAdShown();
 			}
 
 			@Override
 			public void onBannerClosed() {
-				notifyAdClosed();
+				if (shouldNotifyClose) {
+					shouldNotifyClose = false;
+					notifyAdClosed();
+				}
 			}
 		};
+	}
+
+	private void destroyCustomEventBanner() {
+		if (customEventBanner != null) {
+			customEventBanner.destroy();
+		}
 	}
 
 	private MraidListener createMraidListener() {
@@ -602,11 +614,11 @@ public class AdView extends FrameLayout {
 		}
 		this.reloadTimer = new Timer();
 
-		if(shouldNotifyClose) {
+		if (shouldNotifyClose) {
 			shouldNotifyClose = false;
 			notifyAdClosed();
 		}
-		
+
 		Log.d(Const.TAG, "response: " + this.response);
 
 		if (this.response != null && this.response.getRefresh() > 0)
@@ -641,7 +653,7 @@ public class AdView extends FrameLayout {
 		final ReloadTask reloadTask = new ReloadTask(AdView.this);
 		this.reloadTimer.schedule(reloadTask, refreshTime);
 	}
-	
+
 	public void setUserGender(Gender userGender) {
 		this.userGender = userGender;
 	}
@@ -653,6 +665,5 @@ public class AdView extends FrameLayout {
 	public void setKeywords(List<String> keywords) {
 		this.keywords = keywords;
 	}
-
 
 }

@@ -1,12 +1,12 @@
 package com.adsdk.sdk.customevents;
 
+import android.content.Context;
+
 import com.facebook.ads.Ad;
 import com.facebook.ads.AdError;
 import com.facebook.ads.AdListener;
 import com.facebook.ads.AdSize;
 import com.facebook.ads.AdView;
-
-import android.content.Context;
 
 public class FacebookBanner extends CustomEventBanner {
 	
@@ -61,7 +61,16 @@ public class FacebookBanner extends CustomEventBanner {
 					listener.onBannerExpanded();
 				}
 			}
+			
 		};
+	}
+	
+	@Override
+	public void destroy() {
+		if(banner != null) {
+			banner.destroy();
+		}
+		super.destroy();
 	}
 
 }

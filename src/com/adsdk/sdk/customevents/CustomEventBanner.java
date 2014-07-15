@@ -54,6 +54,15 @@ public abstract class CustomEventBanner {
 		task.execute();
 	}
     
+    @Override
+    protected void finalize() throws Throwable {
+    	destroy();
+    	super.finalize();
+    }
+    
+    public void destroy() {
+    	listener = null;
+    }
     
     public interface CustomEventBannerListener {
        

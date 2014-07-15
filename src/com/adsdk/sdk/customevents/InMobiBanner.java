@@ -99,4 +99,12 @@ public class InMobiBanner extends CustomEventBanner {
 		};
 	}
 
+	@Override
+	public void destroy() {
+		if (banner != null) {
+			banner.destroy();
+		}
+		super.destroy();
+	}
+
 }
