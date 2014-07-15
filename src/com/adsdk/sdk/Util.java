@@ -260,7 +260,8 @@ public class Util {
 		try {
 			InputStream in = new URL(url).openStream();
 			bitmap = BitmapFactory.decodeStream(in);
-		} catch (Exception e) {
+		} catch (Throwable t) { //to catch also out of memory error when decoding bitmap.
+			bitmap = null;
 			Log.e("Decoding bitmap failed!");
 		}
 		

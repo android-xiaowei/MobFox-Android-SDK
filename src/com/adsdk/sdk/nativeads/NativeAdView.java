@@ -130,13 +130,9 @@ public class NativeAdView extends FrameLayout {
 					request.setHeader("User-Agent", System.getProperty("http.agent"));
 					request.setURI(new URI(url));
 					client.execute(request);
-				} catch (URISyntaxException e) {
+				} catch (Exception e) {
 					e.printStackTrace();
-				} catch (ClientProtocolException e) {
-					e.printStackTrace();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+				} 
 				return null;
 			}
 

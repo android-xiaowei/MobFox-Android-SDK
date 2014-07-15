@@ -10,7 +10,7 @@ import com.adsdk.sdk.nativeads.NativeAd;
 public abstract class CustomEventNative extends NativeAd {
 
 	protected CustomEventNativeListener listener;
-
+	
 	public abstract void createNativeAd(Context context, CustomEventNativeListener listener, String optionalParameters, String trackingPixel);
 
 	protected boolean isNativeAdValid(NativeAd ad) {
@@ -47,7 +47,7 @@ public abstract class CustomEventNative extends NativeAd {
 	}
 
 	protected void addImpressionTracker(String trackingUrl) {
-		if (trackingUrl != null) {
+		if (trackingUrl != null && trackingUrl.length() > 0) {
 			Tracker tracker = new Tracker(NativeAd.IMPRESSION_TRACKER_TYPE, trackingUrl);
 			getTrackers().add(tracker);
 		}

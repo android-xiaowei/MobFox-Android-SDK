@@ -40,32 +40,39 @@ public class MoPubNative extends CustomEventNative {
 		return new MoPubNativeListener() {
 
 			@Override
-			public void onNativeLoad(NativeResponse response) {
-				setClickUrl(response.getClickDestinationUrl());
-				if (response.getImpressionTrackers() != null) {
-					for (String impressionTrackerUrl : response.getImpressionTrackers()) {
-						addImpressionTracker(impressionTrackerUrl);
-					}
-				}
+			public void onNativeLoad(final NativeResponse response) {
+				Thread t = new Thread(new Runnable() {
 
-				addImageAsset(NativeAd.MAIN_IMAGE_ASSET, response.getMainImageUrl());
-				addImageAsset(NativeAd.ICON_IMAGE_ASSET, response.getIconImageUrl());
-				addTextAsset(NativeAd.CALL_TO_ACTION_TEXT_ASSET,response.getCallToAction());
-				addTextAsset(NativeAd.DESCRIPTION_TEXT_ASSET, response.getSubtitle());
-				addTextAsset(NativeAd.HEADLINE_TEXT_ASSET, response.getTitle());
-				
-				Map<String, Object> extras = response.getExtras();
-				for (Entry<String, Object> entry : extras.entrySet()) {
-					if(entry.getValue() != null && entry.getValue() instanceof String) {
-						addExtraAsset(entry.getKey(), (String)entry.getValue());
-					}
-		        }
+					@Override
+					public void run() {
+						setClickUrl(response.getClickDestinationUrl());
+						if (response.getImpressionTrackers() != null) {
+							for (String impressionTrackerUrl : response.getImpressionTrackers()) {
+								addImpressionTracker(impressionTrackerUrl);
+							}
+						}
 
-				if (isNativeAdValid(MoPubNative.this)) {
-					listener.onCustomEventNativeLoaded(MoPubNative.this);
-				} else {
-					listener.onCustomEventNativeFailed();
-				}
+						addImageAsset(NativeAd.MAIN_IMAGE_ASSET, response.getMainImageUrl());
+						addImageAsset(NativeAd.ICON_IMAGE_ASSET, response.getIconImageUrl());
+						addTextAsset(NativeAd.CALL_TO_ACTION_TEXT_ASSET, response.getCallToAction());
+						addTextAsset(NativeAd.DESCRIPTION_TEXT_ASSET, response.getSubtitle());
+						addTextAsset(NativeAd.HEADLINE_TEXT_ASSET, response.getTitle());
+
+						Map<String, Object> extras = response.getExtras();
+						for (Entry<String, Object> entry : extras.entrySet()) {
+							if (entry.getValue() != null && entry.getValue() instanceof String) {
+								addExtraAsset(entry.getKey(), (String) entry.getValue());
+							}
+						}
+
+						if (isNativeAdValid(MoPubNative.this)) {
+							listener.onCustomEventNativeLoaded(MoPubNative.this);
+						} else {
+							listener.onCustomEventNativeFailed();
+						}
+					}
+				});
+				t.start();
 			}
 
 			@Override

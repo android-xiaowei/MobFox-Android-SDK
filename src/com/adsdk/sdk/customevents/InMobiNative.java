@@ -16,7 +16,7 @@ import com.inmobi.monetization.IMNative;
 import com.inmobi.monetization.IMNativeListener;
 
 public class InMobiNative extends CustomEventNative {
-	
+
 	private IMNative loadedNative;
 	private static boolean isInitialized;
 
@@ -38,7 +38,7 @@ public class InMobiNative extends CustomEventNative {
 
 		addImpressionTracker(trackingPixel);
 
-		if(!isInitialized) {
+		if (!isInitialized) {
 			InMobi.initialize(context, optionalParameters);
 			isInitialized = true;
 		}
@@ -50,39 +50,46 @@ public class InMobiNative extends CustomEventNative {
 		return new IMNativeListener() {
 
 			@Override
-			public void onNativeRequestSucceeded(IMNative response) {
-				final JSONTokener jsonTokener = new JSONTokener(response.getContent());
-				JSONObject jsonObject;
-				try {
-					jsonObject = new JSONObject(jsonTokener);
+			public void onNativeRequestSucceeded(final IMNative response) {
+				Thread t = new Thread(new Runnable() {
 
-					addTextAsset(NativeAd.HEADLINE_TEXT_ASSET, jsonObject.getString("title"));
-					addTextAsset(NativeAd.DESCRIPTION_TEXT_ASSET, jsonObject.getString("description"));
-					addTextAsset(NativeAd.CALL_TO_ACTION_TEXT_ASSET, jsonObject.optString("cta"));
-					addTextAsset(NativeAd.RATING_TEXT_ASSET, jsonObject.optString("rating"));
+					@Override
+					public void run() {
+						final JSONTokener jsonTokener = new JSONTokener(response.getContent());
+						JSONObject jsonObject;
+						try {
+							jsonObject = new JSONObject(jsonTokener);
 
-					JSONObject screenshotJsonObject = jsonObject.getJSONObject("screenshots");
-					if (screenshotJsonObject != null) {
-						String imgUrl = screenshotJsonObject.getString("url");
-						addImageAsset(NativeAd.MAIN_IMAGE_ASSET, imgUrl);
+							addTextAsset(NativeAd.HEADLINE_TEXT_ASSET, jsonObject.getString("title"));
+							addTextAsset(NativeAd.DESCRIPTION_TEXT_ASSET, jsonObject.getString("description"));
+							addTextAsset(NativeAd.CALL_TO_ACTION_TEXT_ASSET, jsonObject.optString("cta"));
+							addTextAsset(NativeAd.RATING_TEXT_ASSET, jsonObject.optString("rating"));
+
+							JSONObject screenshotJsonObject = jsonObject.getJSONObject("screenshots");
+							if (screenshotJsonObject != null) {
+								String imgUrl = screenshotJsonObject.getString("url");
+								addImageAsset(NativeAd.MAIN_IMAGE_ASSET, imgUrl);
+							}
+
+							JSONObject iconJsonObject = jsonObject.getJSONObject("icon");
+							if (iconJsonObject != null) {
+								String imgUrl = iconJsonObject.getString("url");
+								addImageAsset(NativeAd.ICON_IMAGE_ASSET, imgUrl);
+							}
+							loadedNative = response;
+
+						} catch (JSONException e) {
+							listener.onCustomEventNativeFailed();
+							return;
+						}
+						if (isNativeAdValid(InMobiNative.this)) {
+							listener.onCustomEventNativeLoaded(InMobiNative.this);
+						} else {
+							listener.onCustomEventNativeFailed();
+						}
 					}
-
-					JSONObject iconJsonObject = jsonObject.getJSONObject("icon");
-					if (iconJsonObject != null) {
-						String imgUrl = iconJsonObject.getString("url");
-						addImageAsset(NativeAd.ICON_IMAGE_ASSET, imgUrl);
-					}
-					loadedNative = response;
-
-				} catch (JSONException e) {
-					listener.onCustomEventNativeFailed();
-					return;
-				}
-				if (isNativeAdValid(InMobiNative.this)) {
-					listener.onCustomEventNativeLoaded(InMobiNative.this);
-				} else {
-					listener.onCustomEventNativeFailed();
-				}
+				});
+				t.start();
 			}
 
 			@Override
@@ -91,16 +98,16 @@ public class InMobiNative extends CustomEventNative {
 			}
 		};
 	}
-	
+
 	@Override
 	public void prepareImpression(View view) {
 		if (view != null && view instanceof ViewGroup) {
-            loadedNative.attachToView((ViewGroup) view);
-        } else if (view != null && view.getParent() instanceof ViewGroup) {
-            loadedNative.attachToView((ViewGroup) view.getParent());
-        } 
+			loadedNative.attachToView((ViewGroup) view);
+		} else if (view != null && view.getParent() instanceof ViewGroup) {
+			loadedNative.attachToView((ViewGroup) view.getParent());
+		}
 	}
-	
+
 	@Override
 	public void handleClick() {
 		loadedNative.handleClick(null);

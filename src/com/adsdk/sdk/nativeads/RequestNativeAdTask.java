@@ -68,11 +68,18 @@ public class RequestNativeAdTask extends Thread implements CustomEventNativeList
 	private void loadCustomEventNativeAd() {
 		customEventNative = null;
 		while (!nativeAd.getCustomEvents().isEmpty() && customEventNative == null) {
+
 			try {
-				CustomEvent event = nativeAd.getCustomEvents().get(0);
+				final CustomEvent event = nativeAd.getCustomEvents().get(0);
 				nativeAd.getCustomEvents().remove(event);
 				customEventNative = CustomEventNativeFactory.create(event.getClassName());
-				customEventNative.createNativeAd(context, this, event.getOptionalParameter(), event.getPixelUrl());
+				handler.post(new Runnable() {
+
+					@Override
+					public void run() {
+						customEventNative.createNativeAd(context, RequestNativeAdTask.this, event.getOptionalParameter(), event.getPixelUrl());
+					}
+				});
 			} catch (Exception e) {
 				customEventNative = null;
 				Log.d("Failed to create Custom Event Native Ad.");

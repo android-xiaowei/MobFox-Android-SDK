@@ -1,6 +1,7 @@
 package com.adsdk.sdk.customevents;
 
 import android.content.Context;
+import android.view.View;
 
 import com.facebook.ads.Ad;
 import com.facebook.ads.AdError;
@@ -13,7 +14,7 @@ public class FacebookNative extends CustomEventNative {
 	private NativeAd facebookNative;
 
 	@Override
-	public void createNativeAd(Context context, CustomEventNativeListener listener, String optionalParameters, String trackingPixel) {
+	public void createNativeAd(final Context context, CustomEventNativeListener listener, final String optionalParameters, String trackingPixel) {
 		this.listener = listener;
 
 		try {
@@ -21,7 +22,6 @@ public class FacebookNative extends CustomEventNative {
 			Class.forName("com.facebook.ads.AdError");
 			Class.forName("com.facebook.ads.AdListener");
 			Class.forName("com.facebook.ads.NativeAd");
-			Class.forName("com.facebook.ads.NativeAd.Rating");
 		} catch (ClassNotFoundException e) {
 			if (listener != null) {
 				listener.onCustomEventNativeFailed();
@@ -30,12 +30,10 @@ public class FacebookNative extends CustomEventNative {
 		}
 
 		addImpressionTracker(trackingPixel);
-		
+
 		facebookNative = new NativeAd(context, optionalParameters);
 		facebookNative.setAdListener(createListener());
 		facebookNative.loadAd();
-		
-
 	}
 
 	private AdListener createListener() {
@@ -47,25 +45,33 @@ public class FacebookNative extends CustomEventNative {
 			}
 			
 			@Override
-			public void onAdLoaded(Ad ad) {
-				if (!facebookNative.equals(ad) || !facebookNative.isAdLoaded()) {
-					listener.onCustomEventNativeFailed();
-		            return;
-		        }
-				addTextAsset(HEADLINE_TEXT_ASSET, facebookNative.getAdTitle());
-				addTextAsset(DESCRIPTION_TEXT_ASSET,facebookNative.getAdBody());
-				addTextAsset(CALL_TO_ACTION_TEXT_ASSET, facebookNative.getAdCallToAction());
-				addTextAsset(RATING_TEXT_ASSET,readRating(facebookNative.getAdStarRating()));
-				addTextAsset("socialContextForAd",facebookNative.getAdSocialContext());
-				
-				addImageAsset(ICON_IMAGE_ASSET, facebookNative.getAdIcon().getUrl());
-				addImageAsset(MAIN_IMAGE_ASSET, facebookNative.getAdCoverImage().getUrl());
-				
-				if (isNativeAdValid(FacebookNative.this)) {
-					listener.onCustomEventNativeLoaded(FacebookNative.this);
-				} else {
-					listener.onCustomEventNativeFailed();
-				}
+			public void onAdLoaded(final Ad ad) {
+				Thread t = new Thread(new Runnable() {
+					
+					@Override
+					public void run() {
+						if (!facebookNative.equals(ad) || !facebookNative.isAdLoaded()) {
+							listener.onCustomEventNativeFailed();
+							return;
+						}
+						addTextAsset(HEADLINE_TEXT_ASSET, facebookNative.getAdTitle());
+						addTextAsset(DESCRIPTION_TEXT_ASSET,facebookNative.getAdBody());
+						addTextAsset(CALL_TO_ACTION_TEXT_ASSET, facebookNative.getAdCallToAction());
+						addTextAsset(RATING_TEXT_ASSET,readRating(facebookNative.getAdStarRating()));
+						addTextAsset("socialContextForAd",facebookNative.getAdSocialContext());
+						
+						addImageAsset(ICON_IMAGE_ASSET, facebookNative.getAdIcon().getUrl());
+						addImageAsset(MAIN_IMAGE_ASSET, facebookNative.getAdCoverImage().getUrl());
+						
+						if (isNativeAdValid(FacebookNative.this)) {
+							listener.onCustomEventNativeLoaded(FacebookNative.this);
+						} else {
+							listener.onCustomEventNativeFailed();
+						}
+						
+					}
+				});
+				t.start();
 			}
 			
 
@@ -83,12 +89,9 @@ public class FacebookNative extends CustomEventNative {
 		return null;
 	}
 	
-	public void handleClick() {
-		facebookNative.handleClick();
-	};
-	
 	@Override
-	public void handleImpression() {
-		facebookNative.logImpression();
+	public void prepareImpression(View view) {
+		facebookNative.registerViewForInteraction(view);
 	}
+	
 }
