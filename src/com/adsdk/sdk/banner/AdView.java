@@ -391,6 +391,7 @@ public class AdView extends FrameLayout {
 		}
 		if (customEventBannerView != null) {
 			this.removeView(customEventBannerView);
+			customEventBannerView = null;
 		}
 		
 		if (response.getType() == Const.TEXT || response.getType() == Const.IMAGE) {
@@ -466,6 +467,9 @@ public class AdView extends FrameLayout {
 
 			@Override
 			public void onBannerLoaded(View bannerView) {
+				if (customEventBannerView != null) {
+					AdView.this.removeView(customEventBannerView);
+				}
 				customEventBannerView = bannerView;
 				AdView.this.addView(bannerView);
 				if (listener != null) {
