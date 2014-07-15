@@ -11,9 +11,9 @@ public class CustomEventNativeFactory {
 
     protected CustomEventNative internalCreate(String className) throws Exception {
     	className = "com.adsdk.sdk.customevents." + className + "Native";
-        Class<? extends CustomEventFullscreen> fullscreenClass = Class.forName(className)
-                .asSubclass(CustomEventFullscreen.class);
-        Constructor<?> nativeConstructor = fullscreenClass.getDeclaredConstructor((Class[]) null);
+        Class<? extends CustomEventNative> nativeClass = Class.forName(className)
+                .asSubclass(CustomEventNative.class);
+        Constructor<?> nativeConstructor = nativeClass.getDeclaredConstructor((Class[]) null);
         nativeConstructor.setAccessible(true);
         return (CustomEventNative) nativeConstructor.newInstance();
     }

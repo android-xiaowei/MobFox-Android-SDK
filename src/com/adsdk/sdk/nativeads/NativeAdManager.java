@@ -8,6 +8,8 @@ import java.net.URL;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.apache.http.HttpStatus;
 
@@ -24,18 +26,14 @@ import com.adsdk.sdk.Const;
 import com.adsdk.sdk.Gender;
 import com.adsdk.sdk.Log;
 import com.adsdk.sdk.Util;
-import com.adsdk.sdk.customevents.CustomEvent;
-import com.adsdk.sdk.customevents.CustomEventNative;
-import com.adsdk.sdk.customevents.CustomEventNative.CustomEventNativeListener;
-import com.adsdk.sdk.customevents.CustomEventNativeFactory;
 
-public class NativeAdManager implements CustomEventNativeListener {
+public class NativeAdManager {
 
-	private NativeAd nativeAd;
-	private CustomEventNative customEventNative;
 	private String publisherId;
 	private boolean includeLocation = false;
-
+	private String requestUrl;
+	private NativeAdRequest request;
+	
 	private Gender userGender;
 	private int userAge;
 	private List<String> keywords;
@@ -43,10 +41,9 @@ public class NativeAdManager implements CustomEventNativeListener {
 	private NativeAdListener listener;
 
 	private Context context;
-	private NativeAdRequest request;
-
-	private String requestUrl;
+	
 	private Handler handler;
+	ExecutorService executor = Executors.newSingleThreadExecutor();
 
 	private List<String> adTypes;
 
@@ -66,68 +63,18 @@ public class NativeAdManager implements CustomEventNativeListener {
 	}
 
 	public void requestAd() {
-			Thread requestThread = new Thread(new Runnable() {
-				@Override
-				public void run() {
-					Log.d(Const.TAG, "starting request thread");
-					final RequestNativeAd requestAd;
-					requestAd = new RequestNativeAd();
-
-					try {
-						customEventNative = null;
-						nativeAd = requestAd.sendRequest(NativeAdManager.this.getRequest());
-						if (nativeAd != null) {
-							if(!nativeAd.getCustomEvents().isEmpty()) {
-								loadCustomEventNativeAd();
-								if(customEventNative == null) { //failed to create custom event native ad
-									if(nativeAd.isNativeAdValid()) {
-										notifyAdLoaded(nativeAd);	
-									} else {
-										notifyAdFailed(); //both custom event and normal native ad failed
-									}
-								}
-							} else {
-								if(nativeAd.isNativeAdValid()) {
-									notifyAdLoaded(nativeAd);	
-								} else {
-									notifyAdFailed();
-								}
-							}
-						} else {
-							notifyAdFailed();
-						}
-					} catch (final Throwable e) {
-						notifyAdFailed();
-					}
-					Log.d(Const.TAG, "finishing request thread");
-				}
-
-			});
+		request = getRequest();
+			Thread requestThread = new RequestNativeAdTask(context, request, handler, listener);
 			requestThread.setUncaughtExceptionHandler(new UncaughtExceptionHandler() {
-
 				@Override
 				public void uncaughtException(final Thread thread, final Throwable ex) {
 					Log.e(Const.TAG, "Exception in request thread", ex);
 				}
 			});
-			requestThread.start();
+			
+			executor.submit(requestThread);
 	}
 	
-	private void loadCustomEventNativeAd() {
-		customEventNative = null;
-		while (!nativeAd.getCustomEvents().isEmpty() && customEventNative == null) {
-			try {
-				CustomEvent event = nativeAd.getCustomEvents().get(0);
-				nativeAd.getCustomEvents().remove(event);
-				customEventNative = CustomEventNativeFactory.create(event.getClassName());
-				customEventNative.createNativeAd(context, this, event.getOptionalParameter(), event.getPixelUrl());
-			} catch (Exception e) {
-				customEventNative = null;
-				Log.d("Failed to create Custom Event Native Ad.");
-			}
-		}
-	}
-
 	private NativeAdRequest getRequest() {
 		if (this.request == null) {
 			this.request = new NativeAdRequest();
@@ -156,6 +103,7 @@ public class NativeAdManager implements CustomEventNativeListener {
 		}
 		return this.request;
 	}
+	
 
 	public NativeAdView getNativeAdView(NativeAd ad, NativeViewBinder binder) {
 		NativeAdView view = new NativeAdView(context, ad, binder, listener);
@@ -257,31 +205,6 @@ public class NativeAdManager implements CustomEventNativeListener {
 		}
 	}
 
-
-	private void notifyAdLoaded(final NativeAd ad) {
-		if (listener != null) {
-			handler.post(new Runnable() {
-
-				@Override
-				public void run() {
-					listener.adLoaded(ad);
-				}
-			});
-		}
-	}
-
-	private void notifyAdFailed() {
-		if (listener != null) {
-			handler.post(new Runnable() {
-
-				@Override
-				public void run() {
-					listener.adFailedToLoad();
-				}
-			});
-		}
-	}
-
 	private void notifyAdClicked() {
 		if (listener != null) {
 			handler.post(new Runnable() {
@@ -305,22 +228,5 @@ public class NativeAdManager implements CustomEventNativeListener {
 	public void setKeywords(List<String> keywords) {
 		this.keywords = keywords;
 	}
-
-	@Override
-	public void onCustomEventNativeFailed() {
-		loadCustomEventNativeAd();
-		if(customEventNative != null) {
-			return;
-		} else if (nativeAd.isNativeAdValid()) {
-			notifyAdLoaded(nativeAd);
-		} else {
-			notifyAdFailed();
-		}
-	}
-
-	@Override
-	public void onCustomEventNativeLoaded(NativeAd customNativeAd) {
-		notifyAdLoaded(customNativeAd);
-	}
-
+	
 }
