@@ -1,19 +1,16 @@
 package com.adsdk.sdk.nativeads;
 
-import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.List;
 
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.net.http.AndroidHttpClient;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.view.View;
@@ -122,16 +119,12 @@ public class NativeAdView extends FrameLayout {
 			@Override
 			protected Void doInBackground(Void... params) {
 				try {
-					HttpClient client = new DefaultHttpClient();
+					HttpClient client = AndroidHttpClient.newInstance(System.getProperty("http.agent"));
 					HttpGet request = new HttpGet();
 					request.setHeader("User-Agent", System.getProperty("http.agent"));
 					request.setURI(new URI(url));
 					client.execute(request);
-				} catch (URISyntaxException e) {
-					e.printStackTrace();
-				} catch (ClientProtocolException e) {
-					e.printStackTrace();
-				} catch (IOException e) {
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
 				return null;
