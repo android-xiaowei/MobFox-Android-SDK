@@ -6,11 +6,12 @@ import android.view.View;
 import com.facebook.ads.Ad;
 import com.facebook.ads.AdError;
 import com.facebook.ads.AdListener;
+import com.facebook.ads.AdSettings;
 import com.facebook.ads.NativeAd;
 import com.facebook.ads.NativeAd.Rating;
 
 public class FacebookNative extends CustomEventNative {
-	
+
 	private NativeAd facebookNative;
 
 	@Override
@@ -38,42 +39,49 @@ public class FacebookNative extends CustomEventNative {
 
 	private AdListener createListener() {
 		return new AdListener() {
-			
+
 			@Override
 			public void onError(Ad arg0, AdError arg1) {
-				listener.onCustomEventNativeFailed();
+				if (listener != null) {
+					listener.onCustomEventNativeFailed();
+				}
 			}
-			
+
 			@Override
 			public void onAdLoaded(final Ad ad) {
 				Thread t = new Thread(new Runnable() {
-					
+
 					@Override
 					public void run() {
 						if (!facebookNative.equals(ad) || !facebookNative.isAdLoaded()) {
-							listener.onCustomEventNativeFailed();
+							if (listener != null) {
+								listener.onCustomEventNativeFailed();
+							}
 							return;
 						}
 						addTextAsset(HEADLINE_TEXT_ASSET, facebookNative.getAdTitle());
-						addTextAsset(DESCRIPTION_TEXT_ASSET,facebookNative.getAdBody());
+						addTextAsset(DESCRIPTION_TEXT_ASSET, facebookNative.getAdBody());
 						addTextAsset(CALL_TO_ACTION_TEXT_ASSET, facebookNative.getAdCallToAction());
-						addTextAsset(RATING_TEXT_ASSET,readRating(facebookNative.getAdStarRating()));
-						addTextAsset("socialContextForAd",facebookNative.getAdSocialContext());
-						
+						addTextAsset(RATING_TEXT_ASSET, readRating(facebookNative.getAdStarRating()));
+						addTextAsset("socialContextForAd", facebookNative.getAdSocialContext());
+
 						addImageAsset(ICON_IMAGE_ASSET, facebookNative.getAdIcon().getUrl());
 						addImageAsset(MAIN_IMAGE_ASSET, facebookNative.getAdCoverImage().getUrl());
-						
+
 						if (isNativeAdValid(FacebookNative.this)) {
-							listener.onCustomEventNativeLoaded(FacebookNative.this);
+							if (listener != null) {
+								listener.onCustomEventNativeLoaded(FacebookNative.this);
+							}
 						} else {
-							listener.onCustomEventNativeFailed();
+							{
+								listener.onCustomEventNativeFailed();
+							}
 						}
-						
+
 					}
 				});
 				t.start();
 			}
-			
 
 			@Override
 			public void onAdClicked(Ad arg0) {
@@ -82,16 +90,16 @@ public class FacebookNative extends CustomEventNative {
 	}
 
 	private String readRating(Rating rating) {
-		if(rating != null) {
-			int stars = (int) Math.round(5 * rating.getValue()/rating.getScale());
+		if (rating != null) {
+			int stars = (int) Math.round(5 * rating.getValue() / rating.getScale());
 			return Integer.toString(stars);
 		}
 		return null;
 	}
-	
+
 	@Override
 	public void prepareImpression(View view) {
 		facebookNative.registerViewForInteraction(view);
 	}
-	
+
 }

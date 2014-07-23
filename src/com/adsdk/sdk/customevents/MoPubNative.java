@@ -1,4 +1,3 @@
-
 package com.adsdk.sdk.customevents;
 
 import java.util.Map;
@@ -66,9 +65,13 @@ public class MoPubNative extends CustomEventNative {
 						}
 
 						if (isNativeAdValid(MoPubNative.this)) {
-							listener.onCustomEventNativeLoaded(MoPubNative.this);
+							if (listener != null) {
+								listener.onCustomEventNativeLoaded(MoPubNative.this);
+							}
 						} else {
-							listener.onCustomEventNativeFailed();
+							if (listener != null) {
+								listener.onCustomEventNativeFailed();
+							}
 						}
 					}
 				});
@@ -81,7 +84,9 @@ public class MoPubNative extends CustomEventNative {
 
 			@Override
 			public void onNativeFail(NativeErrorCode arg0) {
-				listener.onCustomEventNativeFailed();
+				if (listener != null) {
+					listener.onCustomEventNativeFailed();
+				}
 			}
 
 			@Override

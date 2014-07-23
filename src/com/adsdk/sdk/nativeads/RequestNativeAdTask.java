@@ -98,6 +98,9 @@ public class RequestNativeAdTask extends Thread implements CustomEventNativeList
 				}
 			});
 		}
+		if(customEventNative != null) {
+			customEventNative.unregisterListener();
+		}
 	}
 
 	private void notifyAdFailed() {
@@ -111,6 +114,9 @@ public class RequestNativeAdTask extends Thread implements CustomEventNativeList
 				}
 			});
 		}
+		if(customEventNative != null) {
+			customEventNative.unregisterListener();
+		}
 	}
 
 	@Override
@@ -123,6 +129,7 @@ public class RequestNativeAdTask extends Thread implements CustomEventNativeList
 		} else {
 			notifyAdFailed();
 		}
+		
 	}
 
 	@Override

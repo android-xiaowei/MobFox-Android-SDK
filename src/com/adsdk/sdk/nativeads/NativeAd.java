@@ -134,4 +134,8 @@ public class NativeAd {
 		//used for reporting impressions for custom events	
 	}
 
+	public void unregisterListener() {
+		//to be used by custom events
+	}
+	
 }

@@ -1,4 +1,3 @@
-
 package com.adsdk.sdk.customevents;
 
 import org.json.JSONException;
@@ -79,13 +78,20 @@ public class InMobiNative extends CustomEventNative {
 							loadedNative = response;
 
 						} catch (JSONException e) {
-							listener.onCustomEventNativeFailed();
+							if (listener != null) {
+
+								listener.onCustomEventNativeFailed();
+							}
 							return;
 						}
 						if (isNativeAdValid(InMobiNative.this)) {
-							listener.onCustomEventNativeLoaded(InMobiNative.this);
+							if (listener != null) {
+								listener.onCustomEventNativeLoaded(InMobiNative.this);
+							}
 						} else {
-							listener.onCustomEventNativeFailed();
+							if (listener != null) {
+								listener.onCustomEventNativeFailed();
+							}
 						}
 					}
 				});
@@ -94,7 +100,9 @@ public class InMobiNative extends CustomEventNative {
 
 			@Override
 			public void onNativeRequestFailed(IMErrorCode arg0) {
-				listener.onCustomEventNativeFailed();
+				if (listener != null) {
+					listener.onCustomEventNativeFailed();
+				}
 			}
 		};
 	}

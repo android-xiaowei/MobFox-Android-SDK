@@ -60,4 +60,10 @@ public abstract class CustomEventNative extends NativeAd {
 			addTextAsset(type, asset);
 		}
 	}
+	
+	@Override
+	public void unregisterListener() {
+		listener = null;
+		super.unregisterListener();
+	}
 }
