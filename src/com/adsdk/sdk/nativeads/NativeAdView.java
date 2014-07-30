@@ -36,6 +36,7 @@ import com.adsdk.sdk.nativeads.NativeAd.Tracker;
 public class NativeAdView extends FrameLayout {
 	private boolean impressionReported;
 	private View adView;
+	private View overlayView;
 	private NativeAdListener listener;
 	private NativeAd nativeAd;
 	private Handler handler;
@@ -49,13 +50,15 @@ public class NativeAdView extends FrameLayout {
 		}
 		this.context = context;
 		adView = inflate(context, binder.getAdLayoutId(), null);
+		overlayView = new View(context);
 		trackers = ad.getTrackers();
 		handler = new Handler();
 		this.listener = listener;
 		fillAdView(ad, binder);
-		ad.prepareImpression(this);
-		adView.setOnClickListener(createOnNativeAdClickListener(ad));
+		ad.prepareImpression(adView);
+		overlayView.setOnClickListener(createOnNativeAdClickListener(ad));
 		this.addView(adView);
+		this.addView(overlayView);
 	}
 
 	public void fillAdView(NativeAd ad, NativeViewBinder binder) {
@@ -110,7 +113,7 @@ public class NativeAdView extends FrameLayout {
 			public void onClick(View v) {
 				notifyAdClicked();
 				ad.handleClick();
-				NativeAdView.this.performClick();
+				adView.performClick();
 				if (ad.getClickUrl() != null && !ad.getClickUrl().equals("")) {
 					new LoadUrlTask().execute(ad.getClickUrl());
 				}
