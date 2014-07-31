@@ -11,10 +11,12 @@ import android.app.Activity;
 public class ChartboostFullscreen extends CustomEventFullscreen {
 	
 	private Chartboost chartboost;
+	private Activity activity;
 	private boolean shouldDisplay;
 
 	@Override
 	public void loadFullscreen(Activity activity, CustomEventFullscreenListener customEventFullscreenListener, String optionalParameters, String trackingPixel) {
+		this.activity = activity;
 		String[] adIdParts = optionalParameters.split(";");
 		String appId = adIdParts[0];
 		String appSignature = adIdParts[1];		
@@ -24,9 +26,7 @@ public class ChartboostFullscreen extends CustomEventFullscreen {
 		try {
 			Class.forName("com.chartboost.sdk.Chartboost");
 			Class.forName("com.chartboost.sdk.ChartboostDelegate");
-			Class.forName("com.chartboost.sdk.Chartboost.CBAgeGateConfirmation");
-			Class.forName("com.chartboost.sdk.Model.CBError.CBClickError");
-			Class.forName("com.chartboost.sdk.Model.CBError.CBImpressionError");
+			Class.forName("com.chartboost.sdk.Model.CBError");
 		} catch (ClassNotFoundException e) {
 			if (listener != null) {
 				listener.onFullscreenFailed();
@@ -35,10 +35,11 @@ public class ChartboostFullscreen extends CustomEventFullscreen {
 		}
 		chartboost = Chartboost.sharedChartboost();
 		chartboost.onCreate(activity, appId, appSignature, createListener());
+		chartboost.onStart(activity);
 
 		chartboost.cacheInterstitial();
 	}
-
+	
 	private ChartboostDelegate createListener() {
 		return new ChartboostDelegate() {
 			
@@ -111,6 +112,9 @@ public class ChartboostFullscreen extends CustomEventFullscreen {
 			
 			@Override
 			public void didDismissInterstitial(String arg0) {
+				if (listener != null) {
+					listener.onFullscreenClosed();
+				}
 			}
 			
 			@Override
@@ -119,9 +123,6 @@ public class ChartboostFullscreen extends CustomEventFullscreen {
 			
 			@Override
 			public void didCloseInterstitial(String arg0) {
-				if (listener != null) {
-					listener.onFullscreenClosed();
-				}
 			}
 			
 			@Override
@@ -154,6 +155,17 @@ public class ChartboostFullscreen extends CustomEventFullscreen {
 			shouldDisplay = true;
 			chartboost.showInterstitial();
 		}
+	}
+	
+	@Override
+	public void finish() {
+		if(chartboost != null) {			
+			chartboost.onStop(activity);
+			chartboost.onDestroy(activity);
+		}
+		chartboost = null;
+		activity = null;
+		super.finish();
 	}
 
 }
