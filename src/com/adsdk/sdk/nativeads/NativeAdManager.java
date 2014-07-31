@@ -12,6 +12,7 @@ import android.os.Handler;
 import com.adsdk.sdk.Const;
 import com.adsdk.sdk.Gender;
 import com.adsdk.sdk.Log;
+import com.adsdk.sdk.RequestException;
 import com.adsdk.sdk.Util;
 
 public class NativeAdManager {
@@ -20,7 +21,7 @@ public class NativeAdManager {
 	private boolean includeLocation = false;
 	private String requestUrl;
 	private NativeAdRequest request;
-	
+
 	private Gender userGender;
 	private int userAge;
 	private List<String> keywords;
@@ -28,7 +29,7 @@ public class NativeAdManager {
 	private NativeAdListener listener;
 
 	private Context context;
-	
+
 	private Handler handler;
 	ExecutorService executor = Executors.newSingleThreadExecutor();
 
@@ -51,17 +52,32 @@ public class NativeAdManager {
 
 	public void requestAd() {
 		request = getRequest();
-			Thread requestThread = new RequestNativeAdTask(context, request, handler, listener);
-			requestThread.setUncaughtExceptionHandler(new UncaughtExceptionHandler() {
-				@Override
-				public void uncaughtException(final Thread thread, final Throwable ex) {
-					Log.e(Const.TAG, "Exception in request thread", ex);
+		Thread requestThread = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				final RequestNativeAd requestAd;
+				requestAd = new RequestNativeAd();
+
+				try {
+					requestAd.sendRequest(request, handler, listener, context);
+				} catch (RequestException e) {
+					Log.e(Const.TAG, "Exception in native ad request thread", e);
 				}
-			});
-			
-			executor.submit(requestThread);
+
+			}
+		});
+
+		requestThread.setUncaughtExceptionHandler(new UncaughtExceptionHandler() {
+			@Override
+			public void uncaughtException(final Thread thread, final Throwable ex) {
+				Log.e(Const.TAG, "Exception in native ad request thread", ex);
+			}
+		});
+
+		executor.submit(requestThread);
 	}
-	
+
 	private NativeAdRequest getRequest() {
 		if (this.request == null) {
 			this.request = new NativeAdRequest();
@@ -90,13 +106,11 @@ public class NativeAdManager {
 		}
 		return this.request;
 	}
-	
 
 	public NativeAdView getNativeAdView(NativeAd ad, NativeViewBinder binder) {
 		NativeAdView view = new NativeAdView(context, ad, binder, listener);
 		return view;
 	}
-	
 
 	public void setUserGender(Gender userGender) {
 		this.userGender = userGender;
@@ -109,5 +123,5 @@ public class NativeAdManager {
 	public void setKeywords(List<String> keywords) {
 		this.keywords = keywords;
 	}
-	
+
 }

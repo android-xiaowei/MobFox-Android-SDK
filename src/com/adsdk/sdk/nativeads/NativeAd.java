@@ -68,7 +68,6 @@ public class NativeAd {
 	private Map<String, String> textAssets = new HashMap<String, String>();
 	private List<Tracker> trackers = new ArrayList<NativeAd.Tracker>();
 	private List<CustomEvent> customEvents;
-	private boolean nativeAdValid;
 
 	public String getClickUrl() {
 		return clickUrl;
@@ -112,14 +111,6 @@ public class NativeAd {
 
 	public void setCustomEvents(List<CustomEvent> customEvents) {
 		this.customEvents = customEvents;
-	}
-
-	public boolean isNativeAdValid() {
-		return nativeAdValid;
-	}
-
-	public void setNativeAdValid(boolean nativeAdValid) {
-		this.nativeAdValid = nativeAdValid;
 	}
 
 	public void handleClick() {

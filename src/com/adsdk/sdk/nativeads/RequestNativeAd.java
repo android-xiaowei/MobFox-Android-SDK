@@ -1,4 +1,3 @@
-
 package com.adsdk.sdk.nativeads;
 
 import java.io.BufferedReader;
@@ -13,7 +12,6 @@ import java.util.List;
 
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.HttpConnectionParams;
@@ -22,17 +20,35 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.content.Context;
+import android.os.Handler;
+
 import com.adsdk.sdk.Const;
 import com.adsdk.sdk.Log;
 import com.adsdk.sdk.RequestException;
 import com.adsdk.sdk.customevents.CustomEvent;
+import com.adsdk.sdk.customevents.CustomEventNative;
+import com.adsdk.sdk.customevents.CustomEventNative.CustomEventNativeListener;
+import com.adsdk.sdk.customevents.CustomEventNativeFactory;
 import com.adsdk.sdk.nativeads.NativeAd.ImageAsset;
 import com.adsdk.sdk.nativeads.NativeAd.Tracker;
 
-public class RequestNativeAd {
+public class RequestNativeAd implements CustomEventNativeListener {
+	private NativeAd nativeAd;
+	private CustomEventNative customEventNative;
+	private Context context;
+	private boolean reportedAvailability;
+	private Handler handler;
+	private String requestResultJson;
+	private NativeAdListener listener;
 
-	public NativeAd sendRequest(NativeAdRequest request) throws RequestException {
+	public void sendRequest(NativeAdRequest request, Handler handler, NativeAdListener listener, Context context) throws RequestException {
+		this.handler = handler;
+		this.listener = listener;
+		this.context = context;
+		customEventNative = null;
 		String url = request.toString();
+		reportedAvailability = false;
 		Log.d("Ad RequestPerform HTTP Get Url: " + url);
 		DefaultHttpClient client = new DefaultHttpClient();
 		HttpConnectionParams.setSoTimeout(client.getParams(), Const.SOCKET_TIMEOUT);
@@ -45,17 +61,21 @@ public class RequestNativeAd {
 			response = client.execute(get);
 			int responseCode = response.getStatusLine().getStatusCode();
 			if (responseCode == HttpURLConnection.HTTP_OK) {
-				return parse(response.getEntity().getContent(), response.getAllHeaders());
+				nativeAd = parse(response.getEntity().getContent(), response.getAllHeaders());
+				if (!nativeAd.getCustomEvents().isEmpty()) {
+					loadCustomEventNativeAd();
+					if (customEventNative == null) { // failed to create custom event native ad
+						loadOriginalNativeAd();
+					}
+				} else {
+					loadOriginalNativeAd();
+				}
 			} else {
+				notifyAdFailed();
 				throw new RequestException("Server Error. Response code:" + responseCode);
 			}
-		} catch (RequestException e) {
-			throw e;
-		} catch (ClientProtocolException e) {
-			throw new RequestException("Error in HTTP request", e);
-		} catch (IOException e) {
-			throw new RequestException("Error in HTTP request", e);
 		} catch (Throwable t) {
+			notifyAdFailed();
 			throw new RequestException("Error in HTTP request", t);
 		}
 	}
@@ -103,59 +123,145 @@ public class RequestNativeAd {
 			while ((line = reader.readLine()) != null) {
 				sb.append(line + "\n");
 			}
-			String result = sb.toString();
-			JSONObject mainObject = new JSONObject(result);
-			JSONObject imageAssetsObject = mainObject.optJSONObject("imageassets");
-			if (imageAssetsObject != null) {
-				@SuppressWarnings("unchecked")
-				Iterator<String> keys = imageAssetsObject.keys();
-
-				while (keys.hasNext()) {
-					String type = keys.next();
-					JSONObject assetObject = imageAssetsObject.getJSONObject(type);
-					String url = assetObject.getString("url");
-					int width = assetObject.getInt("width");
-					int height = assetObject.getInt("height");
-					ImageAsset asset = new ImageAsset(url, width, height);
-					response.addImageAsset(type, asset);
-				}
-			}
-
-			JSONObject textAssetsObject = mainObject.optJSONObject("textassets");
-			if (textAssetsObject != null) {
-				@SuppressWarnings("unchecked")
-				Iterator<String> keys = textAssetsObject.keys();
-				while (keys.hasNext()) {
-					String type = keys.next();
-					String text = textAssetsObject.getString(type);
-					response.addTextAsset(type, text);
-				}
-			}
-
-			response.setClickUrl(mainObject.optString("click_url", null));
-
-			JSONArray trackersArray = mainObject.optJSONArray("trackers");
-			if (trackersArray != null) {
-				for (int i = 0; i < trackersArray.length(); i++) {
-					JSONObject trackerObject = trackersArray.optJSONObject(i);
-					if (trackerObject != null) {
-						String type = trackerObject.getString("type");
-						String url = trackerObject.getString("url");
-						Tracker tracker = new Tracker(type, url);
-						response.getTrackers().add(tracker);
-					}
-				}
-			}
+			requestResultJson = sb.toString();
 
 		} catch (UnsupportedEncodingException e) {
 			throw new RequestException("Cannot parse Response", e);
 		} catch (IOException e) {
 			throw new RequestException("Cannot parse Response", e);
-		} catch (JSONException e) {
-			response.setNativeAdValid(false);
 		}
-		response.setNativeAdValid(true);
 		return response;
+	}
+
+	private void loadOriginalNativeAd() {
+		Thread t = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				boolean valid = true;
+				try {
+
+					JSONObject mainObject = new JSONObject(requestResultJson);
+					JSONObject imageAssetsObject = mainObject.optJSONObject("imageassets");
+					if (imageAssetsObject != null) {
+						@SuppressWarnings("unchecked")
+						Iterator<String> keys = imageAssetsObject.keys();
+
+						while (keys.hasNext()) {
+							String type = keys.next();
+							JSONObject assetObject = imageAssetsObject.getJSONObject(type);
+							String url = assetObject.getString("url");
+							int width = assetObject.getInt("width");
+							int height = assetObject.getInt("height");
+							ImageAsset asset = new ImageAsset(url, width, height);
+							nativeAd.addImageAsset(type, asset);
+						}
+					}
+
+					JSONObject textAssetsObject = mainObject.optJSONObject("textassets");
+					if (textAssetsObject != null) {
+						@SuppressWarnings("unchecked")
+						Iterator<String> keys = textAssetsObject.keys();
+						while (keys.hasNext()) {
+							String type = keys.next();
+							String text = textAssetsObject.getString(type);
+							nativeAd.addTextAsset(type, text);
+						}
+					}
+
+					nativeAd.setClickUrl(mainObject.optString("click_url", null));
+
+					JSONArray trackersArray = mainObject.optJSONArray("trackers");
+					if (trackersArray != null) {
+						for (int i = 0; i < trackersArray.length(); i++) {
+							JSONObject trackerObject = trackersArray.optJSONObject(i);
+							if (trackerObject != null) {
+								String type = trackerObject.getString("type");
+								String url = trackerObject.getString("url");
+								Tracker tracker = new Tracker(type, url);
+								nativeAd.getTrackers().add(tracker);
+							}
+						}
+					}
+				} catch (JSONException e) {
+					valid = false;
+				}
+
+				if (valid) {
+					notifyAdLoaded(nativeAd);
+				} else {
+					notifyAdFailed();
+				}
+			}
+		});
+		t.start();
+	}
+
+	private void loadCustomEventNativeAd() {
+		customEventNative = null;
+		while (!nativeAd.getCustomEvents().isEmpty() && customEventNative == null) {
+
+			try {
+				final CustomEvent event = nativeAd.getCustomEvents().get(0);
+				nativeAd.getCustomEvents().remove(event);
+				customEventNative = CustomEventNativeFactory.create(event.getClassName());
+				handler.post(new Runnable() {
+
+					@Override
+					public void run() {
+						customEventNative.createNativeAd(context, RequestNativeAd.this, event.getOptionalParameter(), event.getPixelUrl());
+					}
+				});
+			} catch (Exception e) {
+				customEventNative = null;
+				Log.d("Failed to create Custom Event Native Ad.");
+			}
+		}
+	}
+
+	private void notifyAdLoaded(final NativeAd ad) {
+		if (listener != null && !reportedAvailability) {
+			reportedAvailability = true;
+			handler.post(new Runnable() {
+
+				@Override
+				public void run() {
+					listener.adLoaded(ad);
+				}
+			});
+		}
+		if (customEventNative != null) {
+			customEventNative.unregisterListener();
+		}
+	}
+
+	private void notifyAdFailed() {
+		if (listener != null && !reportedAvailability) {
+			reportedAvailability = true;
+			handler.post(new Runnable() {
+
+				@Override
+				public void run() {
+					listener.adFailedToLoad();
+				}
+			});
+		}
+		if (customEventNative != null) {
+			customEventNative.unregisterListener();
+		}
+	}
+
+	@Override
+	public void onCustomEventNativeFailed() {
+		loadCustomEventNativeAd();
+		if (customEventNative != null) {
+			return;
+		}
+		loadOriginalNativeAd();
+	}
+
+	@Override
+	public void onCustomEventNativeLoaded(NativeAd customNativeAd) {
+		notifyAdLoaded(customNativeAd);
 	}
 
 }
