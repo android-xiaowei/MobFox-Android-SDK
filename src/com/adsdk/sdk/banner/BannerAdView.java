@@ -261,7 +261,6 @@ public class BannerAdView extends RelativeLayout {
 	private void initialize(final Context context) {
 		initCompatibility();
 		buildBannerView();
-		showContent();
 	}
 
 	public boolean isInternalBrowser() {
@@ -283,7 +282,7 @@ public class BannerAdView extends RelativeLayout {
 		this.isInternalBrowser = isInternalBrowser;
 	}
 
-	private void showContent() {
+	public void showContent() {
 
 		try {
 			if (this.response.getType() == Const.IMAGE) {

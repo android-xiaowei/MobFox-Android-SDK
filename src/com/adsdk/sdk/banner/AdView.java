@@ -76,7 +76,7 @@ public class AdView extends FrameLayout {
 
 	private InputStream xml;
 
-	private final Handler updateHandler = new Handler();
+	private final Handler handler = new Handler();
 
 	private final Runnable showContent = new Runnable() {
 		@Override
@@ -284,7 +284,7 @@ public class AdView extends FrameLayout {
 						if (AdView.this.response != null) {
 							Log.d(Const.TAG, "response received");
 							Log.d(Const.TAG, "getVisibility: " + AdView.this.getVisibility());
-							AdView.this.updateHandler.post(AdView.this.showContent);
+							AdView.this.handler.post(AdView.this.showContent);
 						}
 					} catch (final Throwable e) {
 						AdView.this.notifyLoadAdFailed(e);
@@ -313,7 +313,7 @@ public class AdView extends FrameLayout {
 	}
 
 	private void notifyNoAd() {
-		this.updateHandler.post(new Runnable() {
+		this.handler.post(new Runnable() {
 
 			@Override
 			public void run() {
@@ -326,7 +326,7 @@ public class AdView extends FrameLayout {
 	}
 
 	private void notifyLoadAdFailed(final Throwable e) {
-		this.updateHandler.post(new Runnable() {
+		this.handler.post(new Runnable() {
 
 			@Override
 			public void run() {
@@ -340,7 +340,7 @@ public class AdView extends FrameLayout {
 	}
 
 	private void notifyAdClicked() {
-		this.updateHandler.post(new Runnable() {
+		this.handler.post(new Runnable() {
 
 			@Override
 			public void run() {
@@ -352,7 +352,7 @@ public class AdView extends FrameLayout {
 	}
 
 	private void notifyAdShown() {
-		this.updateHandler.post(new Runnable() {
+		this.handler.post(new Runnable() {
 
 			@Override
 			public void run() {
@@ -364,7 +364,7 @@ public class AdView extends FrameLayout {
 	}
 
 	private void notifyAdClosed() {
-		this.updateHandler.post(new Runnable() {
+		this.handler.post(new Runnable() {
 
 			@Override
 			public void run() {
@@ -376,7 +376,7 @@ public class AdView extends FrameLayout {
 	}
 
 	private void notifyLoadAdSucceeded() {
-		this.updateHandler.post(new Runnable() {
+		this.handler.post(new Runnable() {
 
 			@Override
 			public void run() {
@@ -435,6 +435,7 @@ public class AdView extends FrameLayout {
 		if (response.getType() == Const.TEXT || response.getType() == Const.IMAGE) {
 			mBannerView = new BannerAdView(mContext, response, adspaceWidth, adspaceHeight, animation, createBannerAdViewListener());
 			if (response.getCustomEvents().isEmpty()) {
+				mBannerView.showContent();
 				this.addView(mBannerView);
 			}
 		}
@@ -475,9 +476,7 @@ public class AdView extends FrameLayout {
 
 			@Override
 			public void onLoad() {
-				if (response.getCustomEvents().isEmpty()) {
-					notifyLoadAdSucceeded();
-				}
+				notifyLoadAdSucceeded();
 			}
 
 			@Override
@@ -502,14 +501,21 @@ public class AdView extends FrameLayout {
 		customEventBanner = null;
 		while (!response.getCustomEvents().isEmpty() && customEventBanner == null) {
 			try {
-				CustomEvent event = response.getCustomEvents().get(0);
+				final CustomEvent event = response.getCustomEvents().get(0);
 				response.getCustomEvents().remove(event);
 				customEventBanner = CustomEventBannerFactory.create(event.getClassName());
-				if (adspaceHeight != 0 && adspaceWidth != 0) {
-					customEventBanner.loadBanner(mContext, customAdListener, event.getOptionalParameter(), event.getPixelUrl(), adspaceWidth, adspaceHeight);
-				} else {
-					customEventBanner.loadBanner(mContext, customAdListener, event.getOptionalParameter(), event.getPixelUrl(), 300, 50);
-				}
+				handler.post(new Runnable() {
+					@Override
+					public void run() {
+						if (adspaceHeight != 0 && adspaceWidth != 0) {
+							customEventBanner.loadBanner(mContext, customAdListener, event.getOptionalParameter(), event.getPixelUrl(), adspaceWidth, adspaceHeight);
+						} else {
+							customEventBanner.loadBanner(mContext, customAdListener, event.getOptionalParameter(), event.getPixelUrl(), 300, 50);
+						}
+						
+					}
+				});
+				
 			} catch (Exception e) {
 				customEventBanner = null;
 				Log.d("Failed to create Custom Event Banner.");
@@ -535,7 +541,7 @@ public class AdView extends FrameLayout {
 				if (customEventBanner != null) {
 					return;
 				} else if (mBannerView != null) {
-					notifyLoadAdSucceeded();
+					mBannerView.showContent();
 					AdView.this.addView(mBannerView);
 				} else if (mMRAIDView != null) {
 					addMRAIDBannerView();

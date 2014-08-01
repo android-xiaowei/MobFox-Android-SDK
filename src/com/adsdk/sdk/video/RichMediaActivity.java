@@ -537,7 +537,7 @@ public class RichMediaActivity extends Activity {
 
 			BannerAdView banner = new BannerAdView(this, mAd, width, height, false, createLocalAdListener());
 			banner.setLayoutParams(new FrameLayout.LayoutParams((int) (width * scale + 0.5f), (int) (height * scale + 0.5f), Gravity.CENTER));
-
+			banner.showContent();
 			layout.addView(banner);
 		}
 		if (mAd.getType() == Const.MRAID) {
