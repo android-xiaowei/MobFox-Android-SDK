@@ -3,7 +3,6 @@ package com.adsdk.sdk.nativeads;
 import java.net.URI;
 import java.util.List;
 
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 
 import android.annotation.SuppressLint;
@@ -119,11 +118,12 @@ public class NativeAdView extends FrameLayout {
 			@Override
 			protected Void doInBackground(Void... params) {
 				try {
-					HttpClient client = AndroidHttpClient.newInstance(System.getProperty("http.agent"));
+					AndroidHttpClient client = AndroidHttpClient.newInstance(System.getProperty("http.agent"));
 					HttpGet request = new HttpGet();
 					request.setHeader("User-Agent", System.getProperty("http.agent"));
 					request.setURI(new URI(url));
 					client.execute(request);
+					client.close();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
