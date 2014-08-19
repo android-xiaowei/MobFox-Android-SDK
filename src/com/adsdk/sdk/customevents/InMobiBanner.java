@@ -1,4 +1,3 @@
-
 package com.adsdk.sdk.customevents;
 
 import java.util.Map;
@@ -15,6 +14,7 @@ public class InMobiBanner extends CustomEventBanner {
 
 	private IMBanner banner;
 	private static boolean isInitialized;
+	private boolean reportedClick;
 
 	@Override
 	public void loadBanner(Context context, CustomEventBannerListener customEventBannerListener, String optionalParameters, String trackingPixel, int width, int height) {
@@ -38,6 +38,7 @@ public class InMobiBanner extends CustomEventBanner {
 			}
 			return;
 		}
+
 		if (!isInitialized) {
 			InMobi.initialize(context, optionalParameters);
 			isInitialized = true;
@@ -62,17 +63,23 @@ public class InMobiBanner extends CustomEventBanner {
 
 			@Override
 			public void onShowBannerScreen(IMBanner arg0) {
-				if (listener != null) {
+				if (listener != null && !reportedClick) {
+					reportedClick = true;
 					listener.onBannerExpanded();
 				}
 			}
 
 			@Override
 			public void onLeaveApplication(IMBanner arg0) {
+				if (listener != null && !reportedClick) {
+					reportedClick = true;
+					listener.onBannerExpanded();
+				}
 			}
 
 			@Override
 			public void onDismissBannerScreen(IMBanner arg0) {
+				reportedClick = false;
 				if (listener != null) {
 					listener.onBannerClosed();
 				}
