@@ -18,7 +18,7 @@ public class MoPubNative extends CustomEventNative {
 		this.listener = listener;
 
 		try {
-			Class.forName("com.mopub.nativeads.MoPubNative.MoPubNativeListener");
+			Class.forName("com.mopub.nativeads.MoPubNative");
 			Class.forName("com.mopub.nativeads.NativeErrorCode");
 			Class.forName("com.mopub.nativeads.NativeResponse");
 		} catch (ClassNotFoundException e) {

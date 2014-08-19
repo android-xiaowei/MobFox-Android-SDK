@@ -19,7 +19,6 @@ public class MoPubFullscreen extends CustomEventFullscreen {
 		try {
 			Class.forName("com.mopub.mobileads.MoPubErrorCode");
 			Class.forName("com.mopub.mobileads.MoPubInterstitial");
-			Class.forName("com.mopub.mobileads.MoPubInterstitial.InterstitialAdListener");
 		} catch (ClassNotFoundException e) {
 			if (listener != null) {
 				listener.onFullscreenFailed();
@@ -79,6 +78,14 @@ public class MoPubFullscreen extends CustomEventFullscreen {
 		if(interstitial != null && interstitial.isReady()) {
 			interstitial.show();
 		}
+	}
+	
+	@Override
+	public void finish() {
+		if (interstitial != null) {
+			interstitial.destroy();
+		}
+		super.finish();
 	}
 
 }

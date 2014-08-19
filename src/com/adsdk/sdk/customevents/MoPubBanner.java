@@ -1,16 +1,16 @@
 
 package com.adsdk.sdk.customevents;
 
+import android.content.Context;
+
 import com.mopub.mobileads.MoPubErrorCode;
 import com.mopub.mobileads.MoPubView;
 import com.mopub.mobileads.MoPubView.BannerAdListener;
 
-import android.content.Context;
-import android.view.ViewGroup.LayoutParams;
-
 public class MoPubBanner extends CustomEventBanner {
 
 	private MoPubView banner;
+	private boolean reportedClick;
 
 	@Override
 	public void loadBanner(Context context, CustomEventBannerListener customEventBannerListener, String optionalParameters, String trackingPixel, int width, int height) {
@@ -20,7 +20,6 @@ public class MoPubBanner extends CustomEventBanner {
 
 		try {
 			Class.forName("com.mopub.mobileads.MoPubView");
-			Class.forName("com.mopub.mobileads.MoPubView.BannerAdListener");
 			Class.forName("com.mopub.mobileads.MoPubErrorCode");
 		} catch (ClassNotFoundException e) {
 			if (listener != null) {
@@ -32,7 +31,6 @@ public class MoPubBanner extends CustomEventBanner {
 		banner = new MoPubView(context);
 		banner.setAdUnitId(adId);
 		banner.setAutorefreshEnabled(false);
-		banner.setLayoutParams(new LayoutParams(width, height));
 		banner.setBannerAdListener(createListener());
 		banner.loadAd();
 	}
@@ -57,7 +55,8 @@ public class MoPubBanner extends CustomEventBanner {
 
 			@Override
 			public void onBannerExpanded(MoPubView arg0) {
-				if (listener != null) {
+				if (listener != null && !reportedClick) {
+					reportedClick = true;
 					listener.onBannerExpanded();
 				}
 			}
@@ -65,12 +64,17 @@ public class MoPubBanner extends CustomEventBanner {
 			@Override
 			public void onBannerCollapsed(MoPubView arg0) {
 				if (listener != null) {
+					reportedClick = false;
 					listener.onBannerClosed();
 				}
 			}
 
 			@Override
 			public void onBannerClicked(MoPubView arg0) {
+				if (listener != null && !reportedClick) {
+					reportedClick = true;
+					listener.onBannerExpanded();
+				}
 			}
 		};
 	}
