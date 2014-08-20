@@ -78,6 +78,16 @@ public class RequestNativeAd implements CustomEventNativeListener {
 			notifyAdFailed();
 			throw new RequestException("Error in HTTP request", t);
 		}
+		
+		while(!reportedAvailability) { //prevent deallocation of RequestNativeAd until loading failed or successful load was reported
+			try {
+				Thread.sleep(10);
+			} catch (InterruptedException e) {
+				notifyAdFailed();
+			}
+		}
+		
+		
 	}
 
 	private List<CustomEvent> getCustomEvents(Header[] headers) {
@@ -220,7 +230,6 @@ public class RequestNativeAd implements CustomEventNativeListener {
 
 	private void notifyAdLoaded(final NativeAd ad) {
 		if (listener != null && !reportedAvailability) {
-			reportedAvailability = true;
 			handler.post(new Runnable() {
 
 				@Override
@@ -232,11 +241,11 @@ public class RequestNativeAd implements CustomEventNativeListener {
 		if (customEventNative != null) {
 			customEventNative.unregisterListener();
 		}
+		reportedAvailability = true;
 	}
 
 	private void notifyAdFailed() {
 		if (listener != null && !reportedAvailability) {
-			reportedAvailability = true;
 			handler.post(new Runnable() {
 
 				@Override
@@ -248,6 +257,7 @@ public class RequestNativeAd implements CustomEventNativeListener {
 		if (customEventNative != null) {
 			customEventNative.unregisterListener();
 		}
+		reportedAvailability = true;
 	}
 
 	@Override

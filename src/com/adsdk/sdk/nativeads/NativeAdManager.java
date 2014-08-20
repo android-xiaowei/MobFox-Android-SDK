@@ -52,12 +52,12 @@ public class NativeAdManager {
 
 	public void requestAd() {
 		request = getRequest();
+		
 		Thread requestThread = new Thread(new Runnable() {
 
 			@Override
 			public void run() {
-				final RequestNativeAd requestAd;
-				requestAd = new RequestNativeAd();
+				final RequestNativeAd requestAd = new RequestNativeAd();
 
 				try {
 					requestAd.sendRequest(request, handler, listener, context);
@@ -74,7 +74,6 @@ public class NativeAdManager {
 				Log.e(Const.TAG, "Exception in native ad request thread", ex);
 			}
 		});
-
 		executor.submit(requestThread);
 	}
 
