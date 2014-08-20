@@ -1,4 +1,3 @@
-
 package com.adsdk.sdk.customevents;
 
 import android.app.Activity;
@@ -12,7 +11,6 @@ import com.flurry.android.FlurryAds;
 import com.flurry.android.FlurryAgent;
 
 public class FlurryFullscreen extends CustomEventFullscreen implements FlurryAdListener {
-	private static boolean isInitialized;
 	private Context context;
 	private FrameLayout layout;
 	private String adSpace;
@@ -46,10 +44,7 @@ public class FlurryFullscreen extends CustomEventFullscreen implements FlurryAdL
 			return;
 		}
 		layout = new FrameLayout(context);
-		if (!isInitialized) {
-			FlurryAgent.onStartSession(activity, apiKey);
-			isInitialized = true;
-		}
+		FlurryAgent.onStartSession(activity, apiKey);
 		FlurryAds.setAdListener(this);
 		FlurryAds.fetchAd(context, adSpace, layout, FlurryAdSize.FULLSCREEN);
 	}
@@ -90,7 +85,7 @@ public class FlurryFullscreen extends CustomEventFullscreen implements FlurryAdL
 
 	@Override
 	public void onApplicationExit(String arg0) {
-		if(listener != null && arg0.equals(adSpace)) {
+		if (listener != null && arg0.equals(adSpace)) {
 			listener.onFullscreenLeftApplication();
 		}
 	}

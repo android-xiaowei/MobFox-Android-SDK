@@ -1,4 +1,3 @@
-
 package com.adsdk.sdk.customevents;
 
 import android.content.Context;
@@ -12,7 +11,6 @@ import com.flurry.android.FlurryAgent;
 
 public class FlurryBanner extends CustomEventBanner implements FlurryAdListener {
 
-	private static boolean isInitialized;
 	private String adSpace;
 	private Context context;
 	private FrameLayout bannerLayout;
@@ -45,10 +43,8 @@ public class FlurryBanner extends CustomEventBanner implements FlurryAdListener 
 			return;
 		}
 
-		if (!isInitialized) {
-			FlurryAgent.onStartSession(context, apiKey);
-			isInitialized = true;
-		}
+		FlurryAgent.onStartSession(context, apiKey);
+		bannerLayout = new FrameLayout(context);
 		FlurryAds.setAdListener(this);
 		FlurryAds.fetchAd(context, adSpace, bannerLayout, FlurryAdSize.BANNER_BOTTOM);
 	}
@@ -58,7 +54,7 @@ public class FlurryBanner extends CustomEventBanner implements FlurryAdListener 
 		destroy();
 		super.finalize();
 	}
-	
+
 	@Override
 	public void destroy() {
 		FlurryAds.setAdListener(null);
