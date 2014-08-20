@@ -187,6 +187,7 @@ public class AdView extends FrameLayout {
 	@Override
 	protected void finalize() throws Throwable {
 		unregisterScreenStateBroadcastReceiver();
+		destroyCustomEventBanner();
 		super.finalize();
 	}
 
@@ -601,6 +602,7 @@ public class AdView extends FrameLayout {
 
 	public void release() {
 		unregisterScreenStateBroadcastReceiver();
+		destroyCustomEventBanner();
 		if (mMRAIDView != null)
 			mMRAIDView.destroy();
 	}

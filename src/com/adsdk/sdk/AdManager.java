@@ -79,6 +79,7 @@ public class AdManager {
 
 	public void release() {
 		TrackerService.release();
+		finishCustomEventFullscreen();
 		ResourceManager.cancel();
 	}
 
