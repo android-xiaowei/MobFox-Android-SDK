@@ -3,6 +3,7 @@ package com.adsdk.sdk.customevents;
 
 import android.app.Activity;
 import android.content.Context;
+import android.view.ViewGroup.LayoutParams;
 
 import com.amazon.device.ads.Ad;
 import com.amazon.device.ads.AdError;
@@ -48,6 +49,7 @@ public class AmazonBanner extends CustomEventBanner {
 		AdSize size = new AdSize(width, height);
 		banner = new AdLayout(activity, size);
 		banner.setListener(createListener());
+		banner.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 		banner.loadAd();
 	}
 
