@@ -430,8 +430,8 @@ public class AdView extends FrameLayout {
 		}
 		if (customEventBannerView != null) {
 			this.removeView(customEventBannerView);
-			destroyCustomEventBanner();
 		}
+		destroyCustomEventBanner();
 
 		if (response.getType() == Const.TEXT || response.getType() == Const.IMAGE) {
 			mBannerView = new BannerAdView(mContext, response, adspaceWidth, adspaceHeight, animation, createBannerAdViewListener());

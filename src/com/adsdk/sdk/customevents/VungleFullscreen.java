@@ -7,10 +7,10 @@ import com.vungle.publisher.VunglePub;
 import android.app.Activity;
 import android.os.Handler;
 
-//Uses Vungle SDK 3.0.7
+//Uses Vungle SDK 3.2.0
 public class VungleFullscreen extends CustomEventFullscreen {
 
-	final VunglePub vunglePub = VunglePub.getInstance();
+	private VunglePub vunglePub;
 	private boolean alreadyReportedAdLoadStatus;
 
 	@Override
@@ -29,6 +29,7 @@ public class VungleFullscreen extends CustomEventFullscreen {
 			}
 			return;
 		}
+		vunglePub = VunglePub.getInstance();
 		vunglePub.init(activity, adId);
 		vunglePub.setEventListener(createListener());
 		if (vunglePub.isCachedAdAvailable()) {
@@ -63,8 +64,11 @@ public class VungleFullscreen extends CustomEventFullscreen {
 		return new EventListener() {
 
 			@Override
-			public void onAdEnd() {
+			public void onAdEnd(boolean wasAdClicked) {
 				if (listener != null) {
+					if(wasAdClicked) {
+						listener.onFullscreenLeftApplication();
+					}
 					listener.onFullscreenClosed();
 				}
 			}
