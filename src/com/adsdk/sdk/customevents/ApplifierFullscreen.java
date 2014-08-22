@@ -1,17 +1,19 @@
-
 package com.adsdk.sdk.customevents;
+
+import android.app.Activity;
 
 import com.unity3d.ads.android.IUnityAdsListener;
 import com.unity3d.ads.android.UnityAds;
 
-import android.app.Activity;
-
 public class ApplifierFullscreen extends CustomEventFullscreen {
+	private static boolean initialized;
+	private boolean shouldReportAvailability;
 
 	@Override
 	public void loadFullscreen(Activity activity, CustomEventFullscreenListener customEventFullscreenListener, String optionalParameters, String trackingPixel) {
 		String adId = optionalParameters;
 		listener = customEventFullscreenListener;
+		shouldReportAvailability = true;
 		this.trackingPixel = trackingPixel;
 
 		try {
@@ -24,7 +26,21 @@ public class ApplifierFullscreen extends CustomEventFullscreen {
 			return;
 		}
 
-		UnityAds.init(activity, adId, createListener());
+		if (!initialized) {
+			UnityAds.init(activity, adId, createListener());
+			initialized = true;
+		} else if (UnityAds.canShowAds()){
+			shouldReportAvailability = false;
+			if (listener != null) {
+				listener.onFullscreenLoaded(this);
+			}
+			UnityAds.setListener(createListener());
+		} else {
+			shouldReportAvailability = false;
+			if (listener != null) {
+				listener.onFullscreenFailed();
+			}
+		}
 
 	}
 
@@ -56,14 +72,14 @@ public class ApplifierFullscreen extends CustomEventFullscreen {
 
 			@Override
 			public void onFetchFailed() {
-				if (listener != null) {
+				if (listener != null && shouldReportAvailability) {
 					listener.onFullscreenFailed();
 				}
 			}
 
 			@Override
 			public void onFetchCompleted() {
-				if (listener != null) {
+				if (listener != null && shouldReportAvailability) {
 					listener.onFullscreenLoaded(ApplifierFullscreen.this);
 				}
 			}
@@ -72,7 +88,8 @@ public class ApplifierFullscreen extends CustomEventFullscreen {
 
 	@Override
 	public void showFullscreen() {
-		if (UnityAds.canShowAds()) {
+
+		if (UnityAds.canShow() && UnityAds.canShowAds()) {
 			UnityAds.show();
 		}
 
