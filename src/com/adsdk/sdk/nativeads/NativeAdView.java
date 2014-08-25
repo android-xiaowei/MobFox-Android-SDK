@@ -71,9 +71,14 @@ public class NativeAdView extends FrameLayout {
 				if (key.equals("rating")) { // rating is special, not displayed as normal text view.
 					RatingBar bar = (RatingBar) adView.findViewById(resId);
 					if (bar != null) {
-						int rating = Integer.parseInt(ad.getTextAsset(key));
-						bar.setIsIndicator(true);
-						bar.setRating(rating);
+						String ratingString = ad.getTextAsset(key);
+						if (ratingString != null) {
+							int rating = Integer.parseInt(ratingString);
+							bar.setIsIndicator(true);
+							bar.setRating(rating);
+						} else {
+							bar.setVisibility(INVISIBLE);
+						}
 					}
 				} else {
 					TextView view = (TextView) adView.findViewById(resId);
