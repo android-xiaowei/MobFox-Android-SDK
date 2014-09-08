@@ -72,10 +72,15 @@ public class NativeAdView extends FrameLayout {
 					RatingBar bar = (RatingBar) adView.findViewById(resId);
 					if (bar != null) {
 						String ratingString = ad.getTextAsset(key);
-						if (ratingString != null) {
-							int rating = Integer.parseInt(ratingString);
-							bar.setIsIndicator(true);
-							bar.setRating(rating);
+						if (ratingString != null && ratingString.length() > 0) {
+							try {
+								int rating = Integer.parseInt(ratingString);
+								bar.setIsIndicator(true);
+								bar.setRating(rating);
+							} catch (NumberFormatException e) {
+								Log.d("Cannot parse rating string: " + ratingString);
+								bar.setVisibility(INVISIBLE);
+							}
 						} else {
 							bar.setVisibility(INVISIBLE);
 						}
