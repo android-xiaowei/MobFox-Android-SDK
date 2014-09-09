@@ -75,6 +75,8 @@ public class InMobiNative extends CustomEventNative {
 								String imgUrl = iconJsonObject.getString("url");
 								addImageAsset(NativeAd.ICON_IMAGE_ASSET, imgUrl);
 							}
+							setClickUrl(jsonObject.optString("landingURL"));
+							
 							loadedNative = response;
 
 						} catch (JSONException e) {
