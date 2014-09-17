@@ -1,35 +1,26 @@
 package com.adsdk.sdk.nativeads;
 
-import java.io.IOException;
 import java.lang.Thread.UncaughtExceptionHandler;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-
-import org.apache.http.HttpStatus;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import android.content.Context;
-import android.content.Intent;
 import android.location.Location;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Handler;
-import android.view.View;
-import android.view.View.OnClickListener;
 
 import com.adsdk.sdk.Const;
 import com.adsdk.sdk.Gender;
 import com.adsdk.sdk.Log;
+import com.adsdk.sdk.RequestException;
 import com.adsdk.sdk.Util;
 
 public class NativeAdManager {
 
-	private NativeAd nativeAd;
 	private String publisherId;
 	private boolean includeLocation = false;
+	private String requestUrl;
+	private NativeAdRequest request;
 
 	private Gender userGender;
 	private int userAge;
@@ -38,10 +29,9 @@ public class NativeAdManager {
 	private NativeAdListener listener;
 
 	private Context context;
-	private NativeAdRequest request;
 
-	private String requestUrl;
 	private Handler handler;
+	ExecutorService executor = Executors.newSingleThreadExecutor();
 
 	private List<String> adTypes;
 
@@ -61,35 +51,30 @@ public class NativeAdManager {
 	}
 
 	public void requestAd() {
-			Thread requestThread = new Thread(new Runnable() {
-				@Override
-				public void run() {
-					Log.d(Const.TAG, "starting request thread");
-					final RequestNativeAd requestAd;
-					requestAd = new RequestNativeAd();
+		request = getRequest();
+		
+		Thread requestThread = new Thread(new Runnable() {
 
-					try {
-						nativeAd = requestAd.sendRequest(NativeAdManager.this.getRequest());
-						if (nativeAd != null) {
-							notifyAdLoaded(nativeAd);
-						} else {
-							notifyAdFailed();
-						}
-					} catch (final Throwable e) {
-						notifyAdFailed();
-					}
-					Log.d(Const.TAG, "finishing request thread");
+			@Override
+			public void run() {
+				final RequestNativeAd requestAd = new RequestNativeAd();
+
+				try {
+					requestAd.sendRequest(request, handler, listener, context);
+				} catch (RequestException e) {
+					Log.e(Const.TAG, "Exception in native ad request thread", e);
 				}
 
-			});
-			requestThread.setUncaughtExceptionHandler(new UncaughtExceptionHandler() {
+			}
+		});
 
-				@Override
-				public void uncaughtException(final Thread thread, final Throwable ex) {
-					Log.e(Const.TAG, "Exception in request thread", ex);
-				}
-			});
-			requestThread.start();
+		requestThread.setUncaughtExceptionHandler(new UncaughtExceptionHandler() {
+			@Override
+			public void uncaughtException(final Thread thread, final Throwable ex) {
+				Log.e(Const.TAG, "Exception in native ad request thread", ex);
+			}
+		});
+		executor.submit(requestThread);
 	}
 
 	private NativeAdRequest getRequest() {
@@ -123,137 +108,7 @@ public class NativeAdManager {
 
 	public NativeAdView getNativeAdView(NativeAd ad, NativeViewBinder binder) {
 		NativeAdView view = new NativeAdView(context, ad, binder, listener);
-		if (ad != null) {
-			view.setOnClickListener(createOnNativeAdClickListener(ad.getClickUrl()));
-		}
 		return view;
-	}
-
-	private OnClickListener createOnNativeAdClickListener(final String clickUrl) {
-		OnClickListener clickListener = new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				notifyAdClicked();
-				if (clickUrl != null && !clickUrl.equals("")) {
-					new LoadUrlTask().execute(clickUrl);
-				}
-
-			}
-		};
-		return clickListener;
-	}
-	
-	
-	private class LoadUrlTask extends AsyncTask<String, Void, String> {
-
-		String userAgent;
-
-		public LoadUrlTask(){
-			userAgent = Util.getDefaultUserAgentString(context);
-		}
-
-		@Override
-		protected String doInBackground(String... urls) {
-			String loadingUrl = urls[0];
-			URL url = null;
-			try {
-				url = new URL(loadingUrl);
-			} catch (MalformedURLException e) {
-				return (loadingUrl != null) ? loadingUrl : "";
-			}
-			Log.d("Checking URL redirect:" + loadingUrl);
-
-			int statusCode = -1;
-			HttpURLConnection connection = null;
-			String nextLocation = url.toString();
-
-			Set<String> redirectLocations = new HashSet<String>();
-			redirectLocations.add(nextLocation);
-
-			try {
-				do {
-					connection = (HttpURLConnection) url.openConnection();
-					connection.setRequestProperty("User-Agent",
-							userAgent);
-					connection.setInstanceFollowRedirects(false);
-
-					statusCode = connection.getResponseCode();
-					if (statusCode == HttpStatus.SC_OK) {
-						connection.disconnect();
-						break;
-					} else {
-						nextLocation = connection.getHeaderField("location");
-						connection.disconnect();
-						if (!redirectLocations.add(nextLocation)) {
-							Log.d("URL redirect cycle detected");
-							return "";
-						}
-
-						url = new URL(nextLocation);
-					}
-				} while (statusCode == HttpStatus.SC_MOVED_TEMPORARILY
-						|| statusCode == HttpStatus.SC_MOVED_PERMANENTLY
-						|| statusCode == HttpStatus.SC_TEMPORARY_REDIRECT
-						|| statusCode == HttpStatus.SC_SEE_OTHER);
-			} catch (IOException e) {
-				return (nextLocation != null) ? nextLocation : "";
-			} finally {
-				if (connection != null)
-					connection.disconnect();
-			}
-
-			return nextLocation;
-		}
-
-		@Override
-		protected void onPostExecute(String url) {
-			if (url == null || url.equals("")) {
-				url = "about:blank";
-				return;
-			}
-			
-			final Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-			context.startActivity(intent);
-		}
-	}
-
-
-	private void notifyAdLoaded(final NativeAd ad) {
-		if (listener != null) {
-			handler.post(new Runnable() {
-
-				@Override
-				public void run() {
-					listener.adLoaded(ad);
-				}
-			});
-		}
-	}
-
-	private void notifyAdFailed() {
-		if (listener != null) {
-			handler.post(new Runnable() {
-
-				@Override
-				public void run() {
-					listener.adFailedToLoad();
-				}
-			});
-		}
-	}
-
-	private void notifyAdClicked() {
-		if (listener != null) {
-			handler.post(new Runnable() {
-
-				@Override
-				public void run() {
-					listener.adClicked();
-				}
-			});
-		}
 	}
 
 	public void setUserGender(Gender userGender) {

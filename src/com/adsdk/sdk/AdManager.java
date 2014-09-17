@@ -1,3 +1,4 @@
+
 package com.adsdk.sdk;
 
 import static com.adsdk.sdk.Const.AD_EXTRA;
@@ -78,6 +79,7 @@ public class AdManager {
 
 	public void release() {
 		TrackerService.release();
+		finishCustomEventFullscreen();
 		ResourceManager.cancel();
 	}
 
@@ -365,7 +367,8 @@ public class AdManager {
 					@Override
 					public void run() {
 						try {
-							customEventFullscreen.loadFullscreen(mContext, customFullscreenListener, event.getOptionalParameter(), event.getPixelUrl());
+							Activity activity = (Activity) getContext();
+							customEventFullscreen.loadFullscreen(activity, customFullscreenListener, event.getOptionalParameter(), event.getPixelUrl());
 						} catch (Exception e) {
 							customEventFullscreen = null;
 							Log.d("Failed to create Custom Event Fullscreen.");
@@ -418,6 +421,7 @@ public class AdManager {
 
 			@Override
 			public void onFullscreenFailed() {
+				finishCustomEventFullscreen();
 				loadCustomEventFullscreen();
 				if (customEventFullscreen != null) {
 					return;
@@ -434,9 +438,16 @@ public class AdManager {
 
 			@Override
 			public void onFullscreenClosed() {
+				finishCustomEventFullscreen();
 				notifyAdClose(mResponse, true);
 			}
 		};
+	}
+	
+	private void finishCustomEventFullscreen() {
+		if(customEventFullscreen != null) {
+			customEventFullscreen.finish();
+		}
 	}
 
 	private void notifyNoAdFound() {

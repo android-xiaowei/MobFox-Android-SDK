@@ -42,13 +42,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.VideoView;
 
-import com.adsdk.sdk.Ad;
-import com.adsdk.sdk.AdListener;
 import com.adsdk.sdk.AdManager;
 import com.adsdk.sdk.AdResponse;
 import com.adsdk.sdk.Const;
 import com.adsdk.sdk.Log;
 import com.adsdk.sdk.banner.BannerAdView;
+import com.adsdk.sdk.banner.BannerAdView.BannerAdViewListener;
 import com.adsdk.sdk.mraid.MraidView;
 import com.adsdk.sdk.mraid.MraidView.MraidListener;
 import com.adsdk.sdk.mraid.MraidView.ViewState;
@@ -137,6 +136,7 @@ public class RichMediaActivity extends Activity {
 	private boolean mCanClose;
 	protected boolean mInterstitialAutocloseReset;
 	private int mType;
+	private boolean wasClicked;
 
 	private boolean mResult;
 
@@ -537,7 +537,7 @@ public class RichMediaActivity extends Activity {
 
 			BannerAdView banner = new BannerAdView(this, mAd, width, height, false, createLocalAdListener());
 			banner.setLayoutParams(new FrameLayout.LayoutParams((int) (width * scale + 0.5f), (int) (height * scale + 0.5f), Gravity.CENTER));
-
+			banner.showContent();
 			layout.addView(banner);
 		}
 		if (mAd.getType() == Const.MRAID) {
@@ -577,27 +577,15 @@ public class RichMediaActivity extends Activity {
 		this.mRootLayout.addView(layout);
 	}
 
-	private AdListener createLocalAdListener() {
-		return new AdListener() {
+	private BannerAdViewListener createLocalAdListener() {
+		return new BannerAdViewListener() {
 
 			@Override
-			public void noAdFound() {
+			public void onLoad() {
 			}
 
 			@Override
-			public void adShown(Ad ad, boolean succeeded) {
-			}
-
-			@Override
-			public void adLoadSucceeded(Ad ad) {
-			}
-
-			@Override
-			public void adClosed(Ad ad, boolean completed) {
-			}
-
-			@Override
-			public void adClicked() {
+			public void onClick() {
 				notifyAdClicked();
 			}
 		};
@@ -626,6 +614,7 @@ public class RichMediaActivity extends Activity {
 	}
 
 	private void notifyAdClicked() {
+		wasClicked = true;
 		AdManager.notifyAdClick(mAd);
 	}
 
@@ -774,7 +763,7 @@ public class RichMediaActivity extends Activity {
 		this.mVideoView.setOnCompletionListener(this.mOnVideoCompletionListener);
 		this.mVideoView.setOnErrorListener(this.mOnVideoErrorListener);
 		this.mVideoView.setOnInfoListener(this.mOnVideoInfoListener);
-		if (!this.mVideoData.startEvents.isEmpty())
+		if (!this.mVideoData.startEvents.isEmpty() || !this.mVideoData.impressionEvents.isEmpty())
 			this.mVideoView.setOnStartListener(this.mOnVideoStartListener);
 		if (!this.mVideoData.timeTrackingEvents.isEmpty()) {
 			final Set<Integer> keys = this.mVideoData.timeTrackingEvents.keySet();
@@ -991,6 +980,11 @@ public class RichMediaActivity extends Activity {
 
 	@Override
 	protected void onResume() {
+		if(wasClicked) { //close after coming back from click.
+			RichMediaActivity.this.mResult = true;
+			RichMediaActivity.this.setResult(Activity.RESULT_OK);
+			RichMediaActivity.this.finish();
+		}
 
 		Log.d("RichMediaActivity onResume");
 		super.onResume();
