@@ -324,7 +324,6 @@ public class AdManager {
 	}
 
 	public void showAd() {
-		Activity activity = (Activity) getContext();
 
 		if (((mResponse == null) || (mResponse.getType() == Const.NO_AD) || (mResponse.getType() == Const.AD_FAILED)) && customEventFullscreen == null) {
 			notifyAdShown(mResponse, false);
@@ -338,9 +337,9 @@ public class AdManager {
 				ad.setHorizontalOrientationRequested(requestedHorizontalAd);
 				Log.v("Showing Ad:" + ad);
 				if (customEventFullscreen == null) {
-					Intent intent = new Intent(activity, RichMediaActivity.class);
+					Intent intent = new Intent(getContext(), RichMediaActivity.class);
 					intent.putExtra(AD_EXTRA, ad);
-					activity.startActivityForResult(intent, 0);
+					getContext().startActivity(intent);
 				} else {
 					customEventFullscreen.showFullscreen();
 				}
