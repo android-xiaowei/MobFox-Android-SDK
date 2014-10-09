@@ -1,19 +1,18 @@
 package com.adsdk.sdk.customevents;
 
+import android.app.Activity;
+
+import com.chartboost.sdk.CBLocation;
 import com.chartboost.sdk.Chartboost;
 import com.chartboost.sdk.ChartboostDelegate;
-import com.chartboost.sdk.Chartboost.CBAgeGateConfirmation;
-import com.chartboost.sdk.Model.CBError.CBClickError;
 import com.chartboost.sdk.Model.CBError.CBImpressionError;
-
-import android.app.Activity;
 
 public class ChartboostFullscreen extends CustomEventFullscreen {
 
-	private Chartboost chartboost;
 	private Activity activity;
 	private boolean shouldDisplay;
 	private boolean shouldReportAvailability;
+	private String locationName = CBLocation.LOCATION_DEFAULT;
 
 	@Override
 	public void loadFullscreen(Activity activity, CustomEventFullscreenListener customEventFullscreenListener, String optionalParameters, String trackingPixel) {
@@ -35,45 +34,22 @@ public class ChartboostFullscreen extends CustomEventFullscreen {
 			}
 			return;
 		}
-		chartboost = Chartboost.sharedChartboost();
-		chartboost.onCreate(activity, appId, appSignature, createListener());
-		chartboost.onStart(activity);
+		Chartboost.startWithAppId(activity, appId, appSignature);
+		Chartboost.setDelegate(createListener());
+		Chartboost.setAutoCacheAds(false);
+
+		Chartboost.onCreate(activity);
+
+		Chartboost.onStart(activity);
+
+		Chartboost.onResume(activity);
+
 		shouldReportAvailability = true;
-		chartboost.cacheInterstitial();
+		Chartboost.cacheInterstitial(locationName);
 	}
 
 	private ChartboostDelegate createListener() {
 		return new ChartboostDelegate() {
-
-			@Override
-			public boolean shouldRequestMoreApps() {
-				return false;
-			}
-
-			@Override
-			public boolean shouldRequestInterstitialsInFirstSession() {
-				return true;
-			}
-
-			@Override
-			public boolean shouldRequestInterstitial(String arg0) {
-				return true;
-			}
-
-			@Override
-			public boolean shouldPauseClickForConfirmation(CBAgeGateConfirmation arg0) {
-				return false;
-			}
-
-			@Override
-			public boolean shouldDisplayMoreApps() {
-				return false;
-			}
-
-			@Override
-			public boolean shouldDisplayLoadingViewForMoreApps() {
-				return false;
-			}
 
 			@Override
 			public boolean shouldDisplayInterstitial(String arg0) {
@@ -81,24 +57,12 @@ public class ChartboostFullscreen extends CustomEventFullscreen {
 			}
 
 			@Override
-			public void didShowMoreApps() {
-			}
-
-			@Override
-			public void didShowInterstitial(String arg0) {
+			public void didDisplayInterstitial(String arg0) {
 				reportImpression();
 				if (listener != null) {
 					listener.onFullscreenOpened();
 				}
 				shouldDisplay = false;
-			}
-
-			@Override
-			public void didFailToRecordClick(String arg0, CBClickError arg1) {
-			}
-
-			@Override
-			public void didFailToLoadMoreApps(CBImpressionError arg0) {
 			}
 
 			@Override
@@ -110,10 +74,6 @@ public class ChartboostFullscreen extends CustomEventFullscreen {
 			}
 
 			@Override
-			public void didDismissMoreApps() {
-			}
-
-			@Override
 			public void didDismissInterstitial(String arg0) {
 				if (listener != null) {
 					listener.onFullscreenClosed();
@@ -121,26 +81,10 @@ public class ChartboostFullscreen extends CustomEventFullscreen {
 			}
 
 			@Override
-			public void didCloseMoreApps() {
-			}
-
-			@Override
-			public void didCloseInterstitial(String arg0) {
-			}
-
-			@Override
-			public void didClickMoreApps() {
-			}
-
-			@Override
 			public void didClickInterstitial(String arg0) {
 				if (listener != null) {
 					listener.onFullscreenLeftApplication();
 				}
-			}
-
-			@Override
-			public void didCacheMoreApps() {
 			}
 
 			@Override
@@ -155,21 +99,21 @@ public class ChartboostFullscreen extends CustomEventFullscreen {
 
 	@Override
 	public void showFullscreen() {
-		if (chartboost != null && chartboost.hasCachedInterstitial()) {
+		if (Chartboost.hasInterstitial(locationName)) {
 			shouldDisplay = true;
-			chartboost.showInterstitial();
+			Chartboost.showInterstitial(locationName);
 		}
 	}
 
 	@Override
-	protected void finalize() throws Throwable {
-		if (chartboost != null) {
-			chartboost.onStop(activity);
-			chartboost.onDestroy(activity);
+	public void finish() {
+		if (activity != null) {
+			Chartboost.onPause(activity);
+			Chartboost.onStop(activity);
+			Chartboost.onDestroy(activity);
 		}
-		chartboost = null;
 		activity = null;
-		super.finalize();
+		super.finish();
 	}
 
 }
