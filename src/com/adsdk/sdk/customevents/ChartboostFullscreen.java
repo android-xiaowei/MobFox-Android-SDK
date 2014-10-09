@@ -16,7 +16,6 @@ public class ChartboostFullscreen extends CustomEventFullscreen {
 
 	@Override
 	public void loadFullscreen(Activity activity, CustomEventFullscreenListener customEventFullscreenListener, String optionalParameters, String trackingPixel) {
-		this.activity = activity;
 
 		String[] adIdParts = optionalParameters.split(";");
 		String appId = adIdParts[0];
@@ -28,12 +27,15 @@ public class ChartboostFullscreen extends CustomEventFullscreen {
 			Class.forName("com.chartboost.sdk.Chartboost");
 			Class.forName("com.chartboost.sdk.ChartboostDelegate");
 			Class.forName("com.chartboost.sdk.Model.CBError");
+			Class.forName("com.chartboost.sdk.CBLocation");
 		} catch (ClassNotFoundException e) {
 			if (listener != null) {
 				listener.onFullscreenFailed();
 			}
 			return;
 		}
+		this.activity = activity;
+		
 		Chartboost.startWithAppId(activity, appId, appSignature);
 		Chartboost.setDelegate(createListener());
 		Chartboost.setAutoCacheAds(false);
