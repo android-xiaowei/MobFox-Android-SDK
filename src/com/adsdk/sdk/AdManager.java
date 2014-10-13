@@ -1,4 +1,3 @@
-
 package com.adsdk.sdk;
 
 import static com.adsdk.sdk.Const.AD_EXTRA;
@@ -156,15 +155,13 @@ public class AdManager {
 							}
 						}
 
-						if (mResponse.getVideoData() != null && android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.FROYO
-								&& (mResponse.getCustomEvents() == null || mResponse.getCustomEvents().isEmpty())) {
+						if (mResponse.getVideoData() != null && android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.FROYO && (mResponse.getCustomEvents() == null || mResponse.getCustomEvents().isEmpty())) {
 							Log.d("Not capable of video");
 							notifyNoAdFound();
 						} else if (mResponse.getType() == Const.VIDEO && mResponse.getCustomEvents().isEmpty()) {
 							Log.d("response OK received");
 							notifyAdLoaded(mResponse);
-						} else if (mResponse.getCustomEvents().isEmpty()
-								&& (mResponse.getType() == Const.TEXT || mResponse.getType() == Const.MRAID || mResponse.getType() == Const.IMAGE)) {
+						} else if (mResponse.getCustomEvents().isEmpty() && (mResponse.getType() == Const.TEXT || mResponse.getType() == Const.MRAID || mResponse.getType() == Const.IMAGE)) {
 							notifyAdLoaded(mResponse);
 						} else if (mResponse.getType() == Const.NO_AD && mResponse.getCustomEvents() != null && mResponse.getCustomEvents().isEmpty()) {
 							Log.d("response NO AD received");
@@ -357,6 +354,10 @@ public class AdManager {
 
 	private void loadCustomEventFullscreen() {
 		customEventFullscreen = null;
+		if (mResponse == null || mResponse.getCustomEvents() == null) {
+			return;
+		}
+
 		while (!mResponse.getCustomEvents().isEmpty() && customEventFullscreen == null) {
 			try {
 				final CustomEvent event = mResponse.getCustomEvents().get(0);
@@ -442,9 +443,9 @@ public class AdManager {
 			}
 		};
 	}
-	
+
 	private void finishCustomEventFullscreen() {
-		if(customEventFullscreen != null) {
+		if (customEventFullscreen != null) {
 			customEventFullscreen.finish();
 		}
 	}
