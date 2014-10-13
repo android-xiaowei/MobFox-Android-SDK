@@ -12,6 +12,7 @@ public class AdColonyFullscreen extends CustomEventFullscreen {
 	
 	private static boolean initialized;
 	private AdColonyVideoAd videoAd;
+	private boolean reported;
 	
 
 	@Override
@@ -23,6 +24,7 @@ public class AdColonyFullscreen extends CustomEventFullscreen {
 		
 		listener = customEventFullscreenListener;
 		this.trackingPixel = trackingPixel;
+		reported = false;
 
 		try {
 			Class.forName("com.jirbo.adcolony.AdColony");
@@ -44,7 +46,8 @@ public class AdColonyFullscreen extends CustomEventFullscreen {
 		
 		videoAd = new AdColonyVideoAd().withListener(createListener());
 		if(videoAd.isReady()) {
-			if (listener != null) {
+			if (listener != null && !reported) {
+				reported = true;
 				listener.onFullscreenLoaded(AdColonyFullscreen.this);
 			}
 		} else {
@@ -54,11 +57,13 @@ public class AdColonyFullscreen extends CustomEventFullscreen {
 				@Override
 				public void run() {
 					if(videoAd.isReady()) {
-						if (listener != null) {
+						if (listener != null && !reported) {
+							reported = true;
 							listener.onFullscreenLoaded(AdColonyFullscreen.this);
 						}
 					} else {
-						if (listener != null) {
+						if (listener != null && !reported) {
+							reported = true;
 							listener.onFullscreenFailed();
 						}
 					}
@@ -82,7 +87,8 @@ public class AdColonyFullscreen extends CustomEventFullscreen {
 			@Override
 			public void onAdColonyAdAttemptFinished(AdColonyAd ad) {
 				if(ad.notShown() || ad.noFill()) {
-					if (listener != null) {
+					if (listener != null && !reported) {
+						reported = true;
 						listener.onFullscreenFailed();
 					}
 				} else if (listener != null) {
