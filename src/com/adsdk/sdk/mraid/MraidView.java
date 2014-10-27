@@ -341,11 +341,14 @@ public class MraidView extends BaseWebView implements UserClickListener {
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
             Uri uri = Uri.parse(url);
             String scheme = uri.getScheme();
-            
-            if (scheme.equals("mopub")) return true;
-            if (scheme.equals("mraid")) {
-                tryCommand(URI.create(url)); // java.net.URI, not android.net.Uri
-                return true;
+            if(scheme != null) {
+            	if (scheme.equals("mopub")) {
+            		return true;
+            	}
+            	if (scheme.equals("mraid")) {
+                	tryCommand(URI.create(url)); // java.net.URI, not android.net.Uri
+                	return true;
+            	}
             }
 
             if (wasClicked()) {
