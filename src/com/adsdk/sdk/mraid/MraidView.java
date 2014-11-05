@@ -71,6 +71,7 @@ public class MraidView extends BaseWebView implements UserClickListener {
 
     private boolean mHasFiredReadyEvent;
     private boolean mClicked;
+    private boolean mTouched;
     private final PlacementType mPlacementType;
     private ViewGestureDetector mViewGestureDetector;
 
@@ -145,6 +146,7 @@ public class MraidView extends BaseWebView implements UserClickListener {
         setOnTouchListener(new View.OnTouchListener() {
             public boolean onTouch(View v, MotionEvent event) {
                 mViewGestureDetector.sendTouchEvent(event);
+                mTouched = true;
 
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
@@ -321,7 +323,7 @@ public class MraidView extends BaseWebView implements UserClickListener {
         if (command == null) {
             fireNativeCommandCompleteEvent(commandType);
             return false;
-        } else if (command.isCommandDependentOnUserClick(mPlacementType) && !wasClicked()) {
+        } else if (command.isCommandDependentOnUserClick(mPlacementType) && !(wasClicked() || mTouched)) {
             return false;
         } else {
             command.execute();
