@@ -1,3 +1,15 @@
 bin
 gen/*
 org.eclipse.jdt.core.prefs
+libs/adcolony.jar
+libs/amazon-ads-5.3.22.jar
+libs/AudienceNetwork.jar
+libs/chartboost.jar
+libs/dagger-1.2.1.jar
+libs/FlurryAds-4.1.0.jar
+libs/FlurryAnalytics-4.1.0.jar
+libs/InMobi-4.5.1.jar
+libs/javax.inject.jar
+libs/MMSDK.jar
+libs/nineoldandroids-2.4.0.jar
+libs/vungle-publisher-3.2.0.jar

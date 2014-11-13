@@ -4,6 +4,8 @@ import java.util.Map;
 
 import android.app.Activity;
 import android.content.Context;
+import android.view.ViewGroup.LayoutParams;
+import android.widget.FrameLayout;
 
 import com.inmobi.commons.InMobi;
 import com.inmobi.monetization.IMBanner;
@@ -13,6 +15,7 @@ import com.inmobi.monetization.IMErrorCode;
 public class InMobiBanner extends CustomEventBanner {
 
 	private IMBanner banner;
+	private FrameLayout bannerLayout;
 	private static boolean isInitialized;
 	private boolean reportedClick;
 
@@ -38,6 +41,8 @@ public class InMobiBanner extends CustomEventBanner {
 			}
 			return;
 		}
+		
+		bannerLayout = new FrameLayout(context);
 
 		if (!isInitialized) {
 			InMobi.initialize(context, optionalParameters);
@@ -54,7 +59,12 @@ public class InMobiBanner extends CustomEventBanner {
 		}
 		banner.setIMBannerListener(createListener());
 		banner.setRefreshInterval(IMBanner.REFRESH_INTERVAL_OFF);
+		
+		final float scale = context.getResources().getDisplayMetrics().density;
+		bannerLayout.addView(banner, new LayoutParams((int) (width * scale + 0.5f), (int) (height * scale + 0.5f)));
+		
 		banner.loadBanner();
+		
 
 	}
 
@@ -89,7 +99,7 @@ public class InMobiBanner extends CustomEventBanner {
 			public void onBannerRequestSucceeded(IMBanner arg0) {
 				reportImpression();
 				if (listener != null) {
-					listener.onBannerLoaded(banner);
+					listener.onBannerLoaded(bannerLayout);
 				}
 			}
 
@@ -108,9 +118,12 @@ public class InMobiBanner extends CustomEventBanner {
 
 	@Override
 	public void destroy() {
-		if (banner != null) {
-			banner.destroy();
+		if(bannerLayout != null) {
+			bannerLayout.removeAllViews();
+			bannerLayout = null;
 		}
+		
+		banner = null;
 		super.destroy();
 	}
 
