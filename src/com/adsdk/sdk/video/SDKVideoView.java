@@ -320,7 +320,6 @@ public class SDKVideoView extends SurfaceView implements MediaPlayerControl {
 			}
 			if (mOnCompletionListener != null) {
 				mOnCompletionListener.onCompletion(mMediaPlayer);
-				mOnCompletionListener = null;
 			}
 		}
 	};
