@@ -407,8 +407,7 @@ public class RichMediaActivity extends Activity {
 
 			Log.d("###########CAN CLOSE VIDEO:" + time);
 			RichMediaActivity.this.mCanClose = true;
-			if (RichMediaActivity.this.mSkipButton.getVisibility() != View.VISIBLE && RichMediaActivity.this.mVideoData.showSkipButton
-					&& RichMediaActivity.this.mSkipButton != null) {
+			if (RichMediaActivity.this.mSkipButton != null && RichMediaActivity.this.mSkipButton.getVisibility() != View.VISIBLE && RichMediaActivity.this.mVideoData.showSkipButton) {
 
 				RichMediaActivity.this.mSkipButton.setImageDrawable(mResourceManager.getResource(RichMediaActivity.this, ResourceManager.DEFAULT_SKIP_IMAGE_RESOURCE_ID));
 
