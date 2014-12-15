@@ -18,7 +18,6 @@ import android.os.ConditionVariable;
 import android.os.Handler;
 import android.util.SparseArray;
 import android.view.KeyEvent;
-import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
@@ -63,13 +62,11 @@ public class SDKVideoView extends SurfaceView implements MediaPlayerControl {
 	private Context mContext;
 	private Thread mTimeEventThread;
 	private Runnable mTimeEventRunnable;
-	private ConditionVariable mTimeEventThreadDone = new ConditionVariable(
-			false);
+	private ConditionVariable mTimeEventThreadDone = new ConditionVariable(false);
 	private SparseArray<Vector<OnTimeEventListener>> mTimeEventListeners = new SparseArray<Vector<OnTimeEventListener>>();
 	public Handler mHandler;
 
-	public SDKVideoView(Context context, int width, int height,
-			int displayMode) {
+	public SDKVideoView(Context context, int width, int height, int displayMode) {
 		super(context);
 		this.mContext = context;
 		mWidth = width;
@@ -78,7 +75,7 @@ public class SDKVideoView extends SurfaceView implements MediaPlayerControl {
 		initVideoView();
 	}
 
-	public void destroy(){
+	public void destroy() {
 		mTimeEventThreadDone.open();
 	}
 
@@ -88,10 +85,10 @@ public class SDKVideoView extends SurfaceView implements MediaPlayerControl {
 		int width = getDefaultSize(mVideoWidth, widthMeasureSpec);
 		int height = getDefaultSize(mVideoHeight, heightMeasureSpec);
 		if (mVideoWidth > 0 && mVideoHeight > 0) {
-			if ( mVideoWidth * height  > width * mVideoHeight ) {
+			if (mVideoWidth * height > width * mVideoHeight) {
 
 				height = width * mVideoHeight / mVideoWidth;
-			} else if ( mVideoWidth * height  < width * mVideoHeight ) {
+			} else if (mVideoWidth * height < width * mVideoHeight) {
 
 				width = height * mVideoWidth / mVideoHeight;
 			} else {
@@ -101,10 +98,7 @@ public class SDKVideoView extends SurfaceView implements MediaPlayerControl {
 
 		setMeasuredDimension(width, height);
 
-		Log.d("SDKVideoView onMeasure video size (" + mVideoWidth
-				+ "," + mVideoHeight + ") surface:(" + mSurfaceWidth + ","
-				+ mSurfaceHeight + ") Setting size:(" + width + ","
-				+ height + ")");
+		Log.d("SDKVideoView onMeasure video size (" + mVideoWidth + "," + mVideoHeight + ") surface:(" + mSurfaceWidth + "," + mSurfaceHeight + ") Setting size:(" + width + "," + height + ")");
 	}
 
 	@SuppressWarnings("deprecation")
@@ -178,17 +172,13 @@ public class SDKVideoView extends SurfaceView implements MediaPlayerControl {
 				public void run() {
 					Log.d("Time Event Thread started");
 					do {
-						if ((mMediaPlayer != null)
-								&& (mCurrentState == STATE_PLAYING)) {
+						if ((mMediaPlayer != null) && (mCurrentState == STATE_PLAYING)) {
 							try {
-								final int time = mMediaPlayer
-										.getCurrentPosition() / 1000;
-								Vector<OnTimeEventListener> listeners = mTimeEventListeners
-										.get(time);
+								final int time = mMediaPlayer.getCurrentPosition() / 1000;
+								Vector<OnTimeEventListener> listeners = mTimeEventListeners.get(time);
 								if (listeners != null) {
 									for (int i = 0; i < listeners.size(); i++) {
-										final OnTimeEventListener l = listeners
-												.elementAt(i);
+										final OnTimeEventListener l = listeners.elementAt(i);
 										mHandler.post(new Runnable() {
 
 											@Override
@@ -215,15 +205,13 @@ public class SDKVideoView extends SurfaceView implements MediaPlayerControl {
 			Log.w(TAG, "Unable to open content: " + mUri, ex);
 			mCurrentState = STATE_ERROR;
 			mTargetState = STATE_ERROR;
-			mErrorListener.onError(mMediaPlayer,
-					MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+			mErrorListener.onError(mMediaPlayer, MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 			return;
 		} catch (IllegalArgumentException ex) {
 			Log.w(TAG, "Unable to open content: " + mUri, ex);
 			mCurrentState = STATE_ERROR;
 			mTargetState = STATE_ERROR;
-			mErrorListener.onError(mMediaPlayer,
-					MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+			mErrorListener.onError(mMediaPlayer, MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 			return;
 		}
 	}
@@ -250,10 +238,7 @@ public class SDKVideoView extends SurfaceView implements MediaPlayerControl {
 			mVideoWidth = mMediaPlayer.getVideoWidth();
 			mVideoHeight = mMediaPlayer.getVideoHeight();
 		}
-		Log.d("SDKVideoView setVideoDisplaySize View Size ("
-				+ mWidth + "," + mHeight + ") Video size (" + mVideoWidth
-				+ "," + mVideoHeight + ") surface:(" + mSurfaceWidth + ","
-				+ mSurfaceHeight + ")");
+		Log.d("SDKVideoView setVideoDisplaySize View Size (" + mWidth + "," + mHeight + ") Video size (" + mVideoWidth + "," + mVideoHeight + ") surface:(" + mSurfaceWidth + "," + mSurfaceHeight + ")");
 		if ((mSurfaceReady) && (mVideoWidth > 0 && mVideoHeight > 0)) {
 			if (mDisplayMode == VideoData.DISPLAY_NORMAL) {
 				if (mVideoWidth * mHeight > mWidth * mVideoHeight) {
@@ -301,8 +286,7 @@ public class SDKVideoView extends SurfaceView implements MediaPlayerControl {
 			setVideoDisplaySize();
 			if (mTargetState == STATE_PLAYING) {
 				start();
-			} else if (!isPlaying()
-					&& (seekToPosition != 0 || getCurrentPosition() > 0)) {
+			} else if (!isPlaying() && (seekToPosition != 0 || getCurrentPosition() > 0)) {
 				if (mMediaController != null) {
 					mMediaController.show(0);
 				}
@@ -334,8 +318,7 @@ public class SDKVideoView extends SurfaceView implements MediaPlayerControl {
 				mMediaController.hide();
 			}
 			if (mOnErrorListener != null) {
-				if (mOnErrorListener.onError(mMediaPlayer, framework_err,
-						impl_err)) {
+				if (mOnErrorListener.onError(mMediaPlayer, framework_err, impl_err)) {
 					return true;
 				}
 			}
@@ -350,8 +333,7 @@ public class SDKVideoView extends SurfaceView implements MediaPlayerControl {
 			Log.d("Info/Warning: " + what + "," + extra);
 
 			if (mOnInfoListener != null) {
-				if (mOnInfoListener.onInfo(mMediaPlayer, what,
-						extra)) {
+				if (mOnInfoListener.onInfo(mMediaPlayer, what, extra)) {
 					return true;
 				}
 			}
@@ -369,8 +351,7 @@ public class SDKVideoView extends SurfaceView implements MediaPlayerControl {
 
 	SurfaceHolder.Callback mSHCallback = new SurfaceHolder.Callback() {
 		@Override
-		public void surfaceChanged(SurfaceHolder holder, int format, int w,
-				int h) {
+		public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
 			Log.d("SDKVideoView surfaceChanged");
 			mSurfaceWidth = w;
 			mSurfaceHeight = h;
@@ -414,55 +395,22 @@ public class SDKVideoView extends SurfaceView implements MediaPlayerControl {
 	}
 
 	@Override
-	public boolean onTouchEvent(MotionEvent ev) {
-		if ((isInPlaybackState()) && (mMediaController != null)
-				&& (ev.getAction() == MotionEvent.ACTION_DOWN)) {
-			toggleMediaControlsVisiblity();
-		}
-		return super.onTouchEvent(ev);
-	}
-
-	@Override
-	public boolean onTrackballEvent(MotionEvent ev) {
-		if (isInPlaybackState() && mMediaController != null) {
-			toggleMediaControlsVisiblity();
-		}
-		return false;
-	}
-
-	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		boolean isKeyCodeSupported = keyCode != KeyEvent.KEYCODE_BACK
-				&& keyCode != KeyEvent.KEYCODE_VOLUME_UP
-				&& keyCode != KeyEvent.KEYCODE_VOLUME_DOWN
-				&& keyCode != KeyEvent.KEYCODE_MENU
-				&& keyCode != KeyEvent.KEYCODE_CALL
-				&& keyCode != KeyEvent.KEYCODE_ENDCALL;
-		if (isInPlaybackState() && isKeyCodeSupported
-				&& mMediaController != null) {
-			if (keyCode == KeyEvent.KEYCODE_HEADSETHOOK
-					|| keyCode == KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE) {
+		boolean isKeyCodeSupported = keyCode != KeyEvent.KEYCODE_BACK && keyCode != KeyEvent.KEYCODE_VOLUME_UP && keyCode != KeyEvent.KEYCODE_VOLUME_DOWN && keyCode != KeyEvent.KEYCODE_MENU && keyCode != KeyEvent.KEYCODE_CALL && keyCode != KeyEvent.KEYCODE_ENDCALL;
+		if (isInPlaybackState() && isKeyCodeSupported && mMediaController != null) {
+			if (keyCode == KeyEvent.KEYCODE_HEADSETHOOK || keyCode == KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE) {
 				if (mMediaPlayer.isPlaying()) {
 					pause();
 				} else {
 					start();
 				}
 				return true;
-			} else if (keyCode == KeyEvent.KEYCODE_MEDIA_STOP
-					&& mMediaPlayer.isPlaying()) {
+			} else if (keyCode == KeyEvent.KEYCODE_MEDIA_STOP && mMediaPlayer.isPlaying()) {
 				pause();
-			} else {
-				toggleMediaControlsVisiblity();
 			}
 		}
 
 		return super.onKeyDown(keyCode, event);
-	}
-
-	private void toggleMediaControlsVisiblity() {
-		if (mMediaController != null) {
-			mMediaController.toggle();
-		}
 	}
 
 	@Override
@@ -546,8 +494,7 @@ public class SDKVideoView extends SurfaceView implements MediaPlayerControl {
 	}
 
 	private boolean isInPlaybackState() {
-		return (mMediaPlayer != null && mCurrentState != STATE_ERROR
-				&& mCurrentState != STATE_IDLE && mCurrentState != STATE_PREPARING);
+		return (mMediaPlayer != null && mCurrentState != STATE_ERROR && mCurrentState != STATE_IDLE && mCurrentState != STATE_PREPARING);
 	}
 
 	public void setOnPreparedListener(MediaPlayer.OnPreparedListener l) {
@@ -570,8 +517,7 @@ public class SDKVideoView extends SurfaceView implements MediaPlayerControl {
 		mOnStartListener = l;
 	}
 
-	public void setOnTimeEventListener(int time,
-			OnTimeEventListener onTimeEventListener) {
+	public void setOnTimeEventListener(int time, OnTimeEventListener onTimeEventListener) {
 		Vector<OnTimeEventListener> listeners = mTimeEventListeners.get(time);
 		if (listeners == null) {
 			listeners = new Vector<OnTimeEventListener>();
@@ -611,7 +557,7 @@ public class SDKVideoView extends SurfaceView implements MediaPlayerControl {
 
 	@Override
 	public int getAudioSessionId() {
-		if (mMediaPlayer != null) {			
+		if (mMediaPlayer != null) {
 			return mMediaPlayer.getAudioSessionId();
 		}
 		return 0;

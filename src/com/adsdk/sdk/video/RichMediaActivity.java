@@ -218,8 +218,6 @@ public class RichMediaActivity extends Activity {
 			}
 
 			Log.d(Const.TAG, "RichMediaActivity mOverlayClickListener");
-			if (RichMediaActivity.this.mMediaController != null)
-				RichMediaActivity.this.mMediaController.toggle();
 		}
 	};
 
@@ -274,8 +272,9 @@ public class RichMediaActivity extends Activity {
 			}
 			if (RichMediaActivity.this.mLoadingView != null)
 				RichMediaActivity.this.mLoadingView.setVisibility(View.GONE);
-			if (mVideoData.showNavigationBars)
-				mMediaController.setVisibility(View.VISIBLE);
+			
+			mMediaController.setVisibility(View.VISIBLE);
+			
 			RichMediaActivity.this.mVideoView.requestFocus();
 		}
 	};
@@ -556,12 +555,11 @@ public class RichMediaActivity extends Activity {
 		this.mSkipButton.setAdjustViewBounds(false);
 
 		int buttonSize;
-		if(mAd.isHorizontalOrientationRequested()) {
+		if (mAd.isHorizontalOrientationRequested()) {
 			buttonSize = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, this.skipButtonSizeLand, this.getResources().getDisplayMetrics());
 		} else {
 			buttonSize = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, this.skipButtonSizePort, this.getResources().getDisplayMetrics());
 		}
-
 
 		FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(buttonSize, buttonSize, Gravity.TOP | Gravity.RIGHT);
 
@@ -683,34 +681,21 @@ public class RichMediaActivity extends Activity {
 			final FrameLayout.LayoutParams overlayParams = new FrameLayout.LayoutParams((int) (mVideoData.overlayWidth * scale + 0.5f),
 					(int) (mVideoData.overlayHeight * scale + 0.5f));
 			// final FrameLayout.LayoutParams overlayParams = new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
-			if (this.mVideoData.showBottomNavigationBar && this.mVideoData.showTopNavigationBar) {
-				overlayParams.bottomMargin = (int) (this.mWindowWidth * 0.11875);
-				overlayParams.topMargin = (int) (this.mWindowWidth * 0.11875);
-				overlayParams.gravity = Gravity.CENTER;
-			} else if (this.mVideoData.showBottomNavigationBar && !this.mVideoData.showTopNavigationBar) {
-				overlayParams.bottomMargin = (int) (this.mWindowWidth * 0.11875);
-				overlayParams.gravity = Gravity.TOP;
-
-			} else if (this.mVideoData.showTopNavigationBar && !this.mVideoData.showBottomNavigationBar) {
-
-				overlayParams.topMargin = (int) (this.mWindowWidth * 0.11875);
-				overlayParams.gravity = Gravity.BOTTOM;
-			} else {
 				overlayParams.gravity = Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL;
-			}
 			this.mVideoLayout.addView(this.mOverlayView, overlayParams);
 		}
 		this.mMediaController = new MediaController(this, this.mVideoData);
 		this.mVideoView.setMediaController(this.mMediaController);
-		if (this.mVideoData.showNavigationBars)
-			mMediaController.toggle();
 		if (!this.mVideoData.pauseEvents.isEmpty())
 			this.mMediaController.setOnPauseListener(this.mOnVideoPauseListener);
 		if (!this.mVideoData.resumeEvents.isEmpty())
 			this.mMediaController.setOnUnpauseListener(this.mOnVideoUnpauseListener);
 		if (!this.mVideoData.replayEvents.isEmpty())
 			this.mMediaController.setOnReplayListener(this.mOnVideoReplayListener);
-		this.mVideoLayout.addView(this.mMediaController, new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT, Gravity.FILL_HORIZONTAL));
+		
+		this.mVideoLayout.addView(this.mMediaController, new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)); //TODO: bottom of video frame
+		
+		
 		if (this.mVideoData.showSkipButton) {
 
 			this.mSkipButton = new ImageView(this);
@@ -1029,7 +1014,7 @@ public class RichMediaActivity extends Activity {
 
 	@Override
 	protected void onResume() {
-		if(wasClicked) { //close after coming back from click.
+		if (wasClicked) { // close after coming back from click.
 			RichMediaActivity.this.mResult = true;
 			RichMediaActivity.this.setResult(Activity.RESULT_OK);
 			RichMediaActivity.this.finish();

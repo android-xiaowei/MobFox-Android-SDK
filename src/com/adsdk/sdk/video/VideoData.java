@@ -37,20 +37,6 @@ public class VideoData implements Serializable {
 	int showSkipButtonAfter;
 	String skipButtonImage;
 
-	boolean showNavigationBars;
-	boolean allowTapNavigationBars;
-
-	boolean showTopNavigationBar;
-	String topNavigationBarBackground;
-
-	boolean showBottomNavigationBar;
-	String bottomNavigationBarBackground;
-	boolean showPauseButton;
-	boolean showReplayButton;
-	boolean showTimer;
-	String pauseButtonImage;
-	String playButtonImage;
-	String replayButtonImage;
 
 	Vector<NavIconData> icons = new Vector<NavIconData>();
 
@@ -86,18 +72,6 @@ public class VideoData implements Serializable {
 				+ duration + ",\nshowSkipButton=" + showSkipButton
 				+ ",\nshowSkipButtonAfter=" + showSkipButtonAfter
 				+ ",\nskipButtonImage=" + skipButtonImage
-				+ ",\nshowNavigationBars=" + showNavigationBars
-				+ ",\nallowTapNavigationBars=" + allowTapNavigationBars
-				+ ",\nshowTopNavigationBar=" + showTopNavigationBar
-				+ ",\ntopNavigationBarBackground=" + topNavigationBarBackground
-				+ ",\nshowBottomNavigationBar=" + showBottomNavigationBar
-				+ ",\nbottomNavigationBarBackground="
-				+ bottomNavigationBarBackground + ",\nshowPauseButton="
-				+ showPauseButton + ",\npauseButtonImage=" + pauseButtonImage
-				+ ",\nplayButtonImage=" + playButtonImage
-				+ ",\nshowReplayButton=" + showReplayButton
-				+ ",\nreplayButtonImage=" + replayButtonImage + ",\nshowTimer="
-				+ showTimer + ",\nicons=" + icons + ",\ntimeTrackingEvents="
 				+ timeTrackingEvents + ",\nstartEvents=" + getStartEvents()
 				+ ",\ncompleteEvents=" + getCompleteEvents() + ",\nmuteEvents="
 				+ muteEvents + ",\nunmuteEvents=" + unmuteEvents
