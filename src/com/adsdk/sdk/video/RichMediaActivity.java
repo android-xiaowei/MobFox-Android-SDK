@@ -119,6 +119,8 @@ public class RichMediaActivity extends Activity {
 	private FrameLayout mVideoLayout;
 	private FrameLayout mLoadingView;
 	private FrameLayout mCustomView;
+	private FrameLayout videoFrame;
+	
 	private VideoView mCustomVideoView;
 	private WebChromeClient.CustomViewCallback mCustomViewCallback;
 	private SDKVideoView mVideoView;
@@ -275,7 +277,7 @@ public class RichMediaActivity extends Activity {
 			
 			mMediaController.setVisibility(View.VISIBLE);
 			
-			RichMediaActivity.this.mVideoView.requestFocus();
+			RichMediaActivity.this.videoFrame.requestFocus();
 		}
 	};
 
@@ -319,6 +321,7 @@ public class RichMediaActivity extends Activity {
 			RichMediaActivity.this.mResult = true;
 			RichMediaActivity.this.setResult(Activity.RESULT_OK);
 			
+			mMediaController.hide();
 			buttonsLayout.setVisibility(View.VISIBLE);
 		}
 	};
@@ -660,8 +663,12 @@ public class RichMediaActivity extends Activity {
 		Log.d("Video size (" + this.mVideoWidth + "," + this.mVideoHeight + ")");
 
 		this.mVideoLayout = new FrameLayout(this);
+		videoFrame = new FrameLayout(this);
+		
 		this.mVideoView = new SDKVideoView(this, this.mVideoWidth, this.mVideoHeight, this.mVideoData.display);
-		this.mVideoLayout.addView(this.mVideoView, new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT, Gravity.CENTER));
+		videoFrame.addView(mVideoView, new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+		
+		this.mVideoLayout.addView(videoFrame, new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER));
 		if (this.mVideoData.showHtmlOverlay) {
 			this.mOverlayView = new WebFrame(this, false, false, false);
 			this.mOverlayView.setEnableZoom(false);
@@ -693,8 +700,7 @@ public class RichMediaActivity extends Activity {
 		if (!this.mVideoData.replayEvents.isEmpty())
 			this.mMediaController.setOnReplayListener(this.mOnVideoReplayListener);
 		
-		this.mVideoLayout.addView(this.mMediaController, new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)); //TODO: bottom of video frame
-		
+		this.videoFrame.addView(this.mMediaController, new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.BOTTOM | Gravity.RIGHT));
 		
 		if (this.mVideoData.showSkipButton) {
 
@@ -748,7 +754,7 @@ public class RichMediaActivity extends Activity {
 		buttonsLayout.setOrientation(LinearLayout.VERTICAL);
 		
 		Button clickButton = new Button(RichMediaActivity.this);
-		clickButton.setText("Click for more information");
+		clickButton.setText("Click here");
 		clickButton.setTextColor(Color.BLACK);
 		clickButton.setTextSize(18);
 		clickButton.setTypeface(null, Typeface.BOLD);
@@ -771,7 +777,7 @@ public class RichMediaActivity extends Activity {
 		buttonsLayout.addView(separator, separatorParams);
 		
 		Button replayButton = new Button(RichMediaActivity.this);
-		replayButton.setText("Play Again");
+		replayButton.setText("↻");
 		replayButton.setTypeface(null, Typeface.BOLD);
 		replayButton.setTextColor(Color.BLACK);
 		replayButton.setBackgroundColor(0xEFE7E8E9);
@@ -781,6 +787,7 @@ public class RichMediaActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				replayVideo();
+				mMediaController.show();
 				buttonsLayout.setVisibility(View.INVISIBLE);
 			}
 		});

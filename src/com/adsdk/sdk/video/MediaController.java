@@ -7,9 +7,10 @@ import java.util.Locale;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
-import android.graphics.Typeface;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Handler;
 import android.os.Message;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
@@ -22,8 +23,6 @@ import com.adsdk.sdk.Log;
 @SuppressLint("ViewConstructor")
 public class MediaController extends FrameLayout {
 
-	private static final int DEFAULT_TIMEOUT = 5000;
-	private static final int FADE_OUT = 1;
 	private static final int SHOW_PROGRESS = 2;
 
 	private android.widget.MediaController.MediaPlayerControl mPlayer;
@@ -34,16 +33,15 @@ public class MediaController extends FrameLayout {
 	StringBuilder mFormatBuilder;
 	Formatter mFormatter;
 	private boolean mShowing;
-	private boolean mFixed;
 	private OnUnpauseListener mOnUnpauseListener;
 	private OnPauseListener mOnPauseListener;
 	private OnReplayListener mOnReplayListener;
 
+	@SuppressWarnings("deprecation")
 	public MediaController(Context context, VideoData videoData) {
 		super(context);
 		this.setVisibility(View.GONE);
 		mShowing = true;
-		mFixed = false;
 		mContext = context;
 		mVideoData = videoData;
 		if (mVideoData == null) {
@@ -53,18 +51,22 @@ public class MediaController extends FrameLayout {
 		mFormatter = new Formatter(mFormatBuilder, Locale.getDefault());
 
 		mLeftTime = new AutoResizeTextView(mContext);
-		LayoutParams params = new LayoutParams(android.view.ViewGroup.LayoutParams.MATCH_PARENT, android.view.ViewGroup.LayoutParams.MATCH_PARENT);
-		params.gravity = Gravity.BOTTOM | Gravity.RIGHT;
-		mLeftTime.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
-		// mLeftTime.setPadding(padding, padding, padding, padding);
-		// mLeftTime.setGravity(Gravity.CENTER_VERTICAL);
-		
-		this.setBackgroundColor(Color.MAGENTA);
-		
-		mLeftTime.setTextSize(12);
+		mLeftTime.setGravity(Gravity.CENTER);
+		mLeftTime.setTextSize(14);
 		mLeftTime.setTextColor(Color.WHITE);
 
-		this.addView(mLeftTime, params);
+		int paddingHorizontal = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4, getResources().getDisplayMetrics());
+		int paddingVertical = 0;
+
+		mLeftTime.setPadding(paddingHorizontal, paddingVertical, paddingHorizontal, paddingVertical);
+
+		GradientDrawable videoEndInfoButtonShape = new GradientDrawable();
+		int cornerRadius = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, getResources().getDisplayMetrics());
+		videoEndInfoButtonShape.setCornerRadius(cornerRadius);
+		videoEndInfoButtonShape.setColor(Color.BLACK);
+		this.setBackgroundDrawable(videoEndInfoButtonShape);
+
+		this.addView(mLeftTime, new LayoutParams(android.view.ViewGroup.LayoutParams.MATCH_PARENT, android.view.ViewGroup.LayoutParams.MATCH_PARENT));
 
 		Log.d("MediaController created");
 	}
@@ -74,26 +76,12 @@ public class MediaController extends FrameLayout {
 	}
 
 	public void show() {
-		show(DEFAULT_TIMEOUT);
-	}
-
-	public void show(int timeout) {
-
-		Log.d("SHOW:" + timeout);
-		if (timeout == 0) {
-			mFixed = true;
-		}
 		if (!mShowing) {
 			this.setVisibility(View.VISIBLE);
 			mShowing = true;
 			Log.d("Change Visibility");
 		}
 		refreshProgress();
-		mHandler.removeMessages(FADE_OUT);
-		if ((timeout != 0) && (!mFixed)) {
-			Message msg = mHandler.obtainMessage(FADE_OUT);
-			mHandler.sendMessageDelayed(msg, timeout);
-		}
 	}
 
 	public boolean isShowing() {
@@ -102,7 +90,6 @@ public class MediaController extends FrameLayout {
 
 	public void hide() {
 		Log.d("HIDE");
-		mFixed = false;
 
 		if (mShowing) {
 			Log.d("Hide change visibility");
@@ -146,9 +133,6 @@ public class MediaController extends FrameLayout {
 
 	private void handleMessage(Message msg) {
 		switch (msg.what) {
-		case FADE_OUT:
-			hide();
-			break;
 		case SHOW_PROGRESS:
 			refreshProgress();
 			break;
@@ -235,7 +219,7 @@ public class MediaController extends FrameLayout {
 	}
 
 	public void onPause() {
-		show(0);
+		show();
 	}
 
 	public void setOnPauseListener(OnPauseListener l) {

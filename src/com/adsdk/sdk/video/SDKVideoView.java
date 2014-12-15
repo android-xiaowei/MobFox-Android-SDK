@@ -288,7 +288,7 @@ public class SDKVideoView extends SurfaceView implements MediaPlayerControl {
 				start();
 			} else if (!isPlaying() && (seekToPosition != 0 || getCurrentPosition() > 0)) {
 				if (mMediaController != null) {
-					mMediaController.show(0);
+					mMediaController.show();
 				}
 			}
 		}
@@ -300,7 +300,7 @@ public class SDKVideoView extends SurfaceView implements MediaPlayerControl {
 			mCurrentState = STATE_PLAYBACK_COMPLETED;
 			mTargetState = STATE_PLAYBACK_COMPLETED;
 			if (mMediaController != null) {
-				mMediaController.show(0);
+				mMediaController.show();
 			}
 			if (mOnCompletionListener != null) {
 				mOnCompletionListener.onCompletion(mMediaPlayer);
