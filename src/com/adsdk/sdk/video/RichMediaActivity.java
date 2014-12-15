@@ -767,6 +767,9 @@ public class RichMediaActivity extends Activity {
 			}
 		});
 
+		int minimalButtonWidth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 205, getResources().getDisplayMetrics());
+		clickButton.setMinimumWidth(minimalButtonWidth);
+		
 		buttonsLayout.addView(clickButton, new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
 		
 		View separator = new View(this);
@@ -781,7 +784,7 @@ public class RichMediaActivity extends Activity {
 		replayButton.setTypeface(null, Typeface.BOLD);
 		replayButton.setTextColor(Color.BLACK);
 		replayButton.setBackgroundColor(0xEFE7E8E9);
-		replayButton.setTextSize(12);
+		replayButton.setTextSize(18);
 		replayButton.setOnClickListener(new OnClickListener() {
 			
 			@Override
