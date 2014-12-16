@@ -57,6 +57,8 @@ public class NativeAdView extends FrameLayout {
 		ad.prepareImpression(adView);
 		overlayView.setOnClickListener(createOnNativeAdClickListener(ad));
 		this.addView(adView);
+		
+		overlayView.setLayoutParams(new LayoutParams(adView.getWidth(), adView.getHeight()));
 		this.addView(overlayView);
 	}
 
@@ -221,6 +223,7 @@ public class NativeAdView extends FrameLayout {
 
 	@Override
 	protected void dispatchDraw(Canvas canvas) {
+		overlayView.setLayoutParams(new LayoutParams(adView.getWidth(), adView.getHeight()));
 		if (!impressionReported) {
 			impressionReported = true;
 			if(nativeAd != null) {				
