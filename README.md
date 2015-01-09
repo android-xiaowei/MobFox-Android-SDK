@@ -7,7 +7,9 @@ To get started, sign up for a MobFox account under http://www.mobfox.com/signup
 
 Integration Documentation
 =====================
-Integration docs are available directly in your MobFox account. Just log in, head to Integration, and you will see the latest integration tutorials.
+Integration documentation can be found on the [GitHub Wiki](https://github.com/mobfox/MobFox-Android-SDK/wiki).
+
+Integration docs are also available directly in your MobFox account. Just log in, head to Integration, and you will see the latest integration tutorials.
 
 Custom Events
 =====================
