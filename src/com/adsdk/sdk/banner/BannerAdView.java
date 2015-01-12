@@ -92,7 +92,6 @@ public class BannerAdView extends RelativeLayout {
 
 		this.webSettings = webView.getSettings();
 		this.webSettings.setJavaScriptEnabled(true);
-		this.webSettings.setSupportMultipleWindows(true);
 		webView.setBackgroundColor(Color.TRANSPARENT);
 		setLayer(webView);
 
