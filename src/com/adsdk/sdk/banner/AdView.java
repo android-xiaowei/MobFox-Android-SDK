@@ -234,6 +234,7 @@ public class AdView extends FrameLayout {
 		Log.d(Const.TAG, "SDK Version:" + Const.VERSION);
 		registerScreenStateBroadcastReceiver();
 		Util.prepareAndroidAdId(context);
+		customAdListener = createCustomAdListener();
 	}
 
 	public boolean isInternalBrowser() {
@@ -648,7 +649,6 @@ public class AdView extends FrameLayout {
 		if (mBannerView != null) {
 			mBannerView.setAdListener(createBannerAdViewListener());
 		}
-		customAdListener = createCustomAdListener();
 	}
 
 	public void setInternalBrowser(final boolean isInternalBrowser) {
