@@ -697,19 +697,25 @@ public class AdView extends FrameLayout {
 	}
 	
 	public int getRefreshTime() {
+		if (this.response == null) {
+			return -1;
+		}
 		return this.response.getRefresh() * 1000;
 	}
 	
 	public void setRefreshTime(int time) {
-		this.response.setRefresh(time);
-		stopReloadTimer();
-		if (time > 0)
-			startReloadTimer();
+		if (this.response != null) {
+			this.response.setRefresh(time);
+			stopReloadTimer();
+			if (time > 0)
+				startReloadTimer();
+		}
 	}
 	
 	public void startReloadTimer() {
 		Log.d(Const.TAG, "start reload timer");
-		if (this.reloadTimer == null || response.getRefresh() <= 0)
+		if (this.reloadTimer == null || response == null
+				|| response.getRefresh() <= 0)
 			return;
 		
 		final int refreshTime = this.response.getRefresh() * 1000;
