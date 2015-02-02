@@ -201,6 +201,7 @@ public class AdView extends FrameLayout {
 		if (this.request == null) {
 			this.request = new AdRequest();
 			this.request.setAndroidAdId(Util.getAndroidAdId());
+			this.request.setAdDoNotTrack(Util.hasAdDoNotTrack());
 			this.request.setPublisherId(this.publisherId);
 			this.request.setUserAgent(Util.getDefaultUserAgentString(mContext));
 			this.request.setUserAgent2(Util.buildUserAgent());

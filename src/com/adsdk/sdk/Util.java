@@ -34,6 +34,7 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 
 public class Util {
 	private static String androidAdId;
+	private static boolean adDoNotTrack = false;
 
 
 	private static final float MINIMAL_ACCURACY = 1000;
@@ -230,6 +231,8 @@ public class Util {
 						adInfo = AdvertisingIdClient.getAdvertisingIdInfo(context);
 						androidAdId = adInfo.getId();
 						boolean enabled = adInfo.isLimitAdTrackingEnabled();
+
+						adDoNotTrack = adInfo.isLimitAdTrackingEnabled();
 					} catch (IOException e) {
 						e.printStackTrace();
 					} catch (GooglePlayServicesNotAvailableException e) {
@@ -255,7 +258,11 @@ public class Util {
 		}
 		return androidAdId;
 	}
-	
+
+	public static boolean hasAdDoNotTrack() {
+		return adDoNotTrack;
+	}
+
 	public static Bitmap loadBitmap (String url) {
 		Bitmap bitmap = null;
 		try {

@@ -32,6 +32,7 @@ public class AdRequest {
 
 	private String ipAddress;
 	private String androidAdId = "";
+	private boolean adDoNotTrack = false;
 	private String connectionType;
 	private long timestamp;
 
@@ -171,6 +172,7 @@ public class AdRequest {
 		b.appendQueryParameter("u2", this.getUserAgent2());
 		b.appendQueryParameter("s", this.getPublisherId());
 		b.appendQueryParameter("o_andadvid", androidAdId);
+		b.appendQueryParameter("o_andadvdnt", (adDoNotTrack ? "1" : "0"));
 		b.appendQueryParameter("r_random", Integer.toString(random));
 		b.appendQueryParameter("t", Long.toString(this.getTimestamp()));
 		b.appendQueryParameter("connection_type", this.getConnectionType());
@@ -261,6 +263,14 @@ public class AdRequest {
 
 	public void setAndroidAdId(String androidAdId) {
 		this.androidAdId = androidAdId;
+	}
+
+	public Boolean hasAdDoNotTrack() {
+		return adDoNotTrack;
+	}
+
+	public void setAdDoNotTrack(boolean adDoNotTrack) {
+		this.adDoNotTrack = adDoNotTrack;
 	}
 
 	public boolean isVideoRequest() {

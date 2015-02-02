@@ -81,6 +81,7 @@ public class NativeAdManager {
 		if (this.request == null) {
 			this.request = new NativeAdRequest();
 			this.request.setAndroidAdId(Util.getAndroidAdId());
+			this.request.setAdDoNotTrack(Util.hasAdDoNotTrack());
 			this.request.setPublisherId(this.publisherId);
 			this.request.setUserAgent(Util.getDefaultUserAgentString(context));
 			this.request.setUserAgent2(Util.buildUserAgent());

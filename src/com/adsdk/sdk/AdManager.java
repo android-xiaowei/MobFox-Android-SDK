@@ -28,6 +28,7 @@ public class AdManager {
 
 	private String mPublisherId;
 	private String androidAdId;
+	private boolean adDoNotTrack;
 	private boolean mIncludeLocation;
 	private static Context mContext;
 	private Thread mRequestThread;
@@ -389,6 +390,7 @@ public class AdManager {
 		Log.d("Ad SDK Version:" + Const.VERSION);
 
 		this.androidAdId = Util.getAndroidAdId();
+		this.adDoNotTrack = Util.hasAdDoNotTrack();
 
 		if ((mPublisherId == null) || (mPublisherId.length() == 0)) {
 			Log.e("Publisher Id cannot be null or empty");
@@ -516,6 +518,7 @@ public class AdManager {
 		if (this.request == null) {
 			this.request = new AdRequest();
 			request.setAndroidAdId(androidAdId);
+			request.setAdDoNotTrack(adDoNotTrack);
 			this.request.setPublisherId(this.mPublisherId);
 			this.request.setUserAgent(Util.getDefaultUserAgentString(mContext));
 			this.request.setUserAgent2(Util.buildUserAgent());
@@ -560,6 +563,7 @@ public class AdManager {
 		if (this.request == null) {
 			this.request = new AdRequest();
 			request.setAndroidAdId(androidAdId);
+			request.setAdDoNotTrack(adDoNotTrack);
 			this.request.setPublisherId(this.mPublisherId);
 			this.request.setUserAgent(Util.getDefaultUserAgentString(mContext));
 			this.request.setUserAgent2(Util.buildUserAgent());
