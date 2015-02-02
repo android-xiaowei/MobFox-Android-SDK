@@ -21,6 +21,7 @@ public class NativeAdRequest {
 	private String userAgent;
 	private String userAgent2;
 	private String androidAdId = "";
+	private boolean adDoNotTrack = false;
 	private String protocolVersion;
 
 	private double longitude = 0.0;
@@ -56,6 +57,7 @@ public class NativeAdRequest {
 		b.appendQueryParameter("u2", this.getUserAgent2());
 		b.appendQueryParameter("r_random", Integer.toString(random));
 		b.appendQueryParameter("o_andadvid", androidAdId);
+		b.appendQueryParameter("o_andadvdnt", (adDoNotTrack ? "1" : "0"));
 		b.appendQueryParameter("v", this.getProtocolVersion());
 
 		if (userAge != 0) {
@@ -113,6 +115,14 @@ public class NativeAdRequest {
 
 	public void setAndroidAdId(String androidAdId) {
 		this.androidAdId = androidAdId;
+	}
+
+	public Boolean hasAdDoNotTrack() {
+		return adDoNotTrack;
+	}
+
+	public void setAdDoNotTrack(boolean adDoNotTrack) {
+		this.adDoNotTrack = adDoNotTrack;
 	}
 
 	public String getProtocolVersion() {
