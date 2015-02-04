@@ -230,8 +230,6 @@ public class Util {
 					try {
 						adInfo = AdvertisingIdClient.getAdvertisingIdInfo(context);
 						androidAdId = adInfo.getId();
-						boolean enabled = adInfo.isLimitAdTrackingEnabled();
-
 						adDoNotTrack = adInfo.isLimitAdTrackingEnabled();
 					} catch (IOException e) {
 						e.printStackTrace();
