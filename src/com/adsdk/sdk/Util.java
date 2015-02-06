@@ -215,11 +215,6 @@ public class Util {
 	}
 
 	public static void prepareAndroidAdId(final Context context) {
-		try {
-			Class.forName("com.google.android.gms.common.GooglePlayServicesUtil");
-		} catch (ClassNotFoundException e) {
-			return;
-		}
 
 		if (androidAdId == null && GooglePlayServicesUtil.isGooglePlayServicesAvailable(context) == ConnectionResult.SUCCESS) {
 			AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
