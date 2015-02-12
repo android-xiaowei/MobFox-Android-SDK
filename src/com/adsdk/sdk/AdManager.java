@@ -130,7 +130,7 @@ public class AdManager {
 					Log.d("starting request thread");
 					try {
 						RequestGeneralAd requestAd = new RequestGeneralAd();
-						if (isInterstitialAdsEnabled && !prioritizeVideoAds && !alreadyRequestedInterstitial) {
+						if (isInterstitialAdsEnabled && !alreadyRequestedInterstitial && (!prioritizeVideoAds || alreadyRequestedVideo)) {
 							request = getInterstitialRequest();
 							alreadyRequestedInterstitial = true;
 						} else if (isVideoAdsEnabled && !alreadyRequestedVideo) {
