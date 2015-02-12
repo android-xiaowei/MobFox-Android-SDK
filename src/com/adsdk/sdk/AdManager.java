@@ -427,7 +427,7 @@ public class AdManager {
 				loadCustomEventFullscreen();
 				if (customEventFullscreen != null) {
 					return;
-				} else if (mResponse.getType() != Const.NO_AD && mResponse.getType() != Const.AD_FAILED) {
+				} else if (mResponse != null && mResponse.getType() != Const.NO_AD && mResponse.getType() != Const.AD_FAILED) {
 					notifyAdLoaded(mResponse);
 				} else {
 					if ((isVideoAdsEnabled && !alreadyRequestedVideo) || (isInterstitialAdsEnabled && !alreadyRequestedInterstitial)) {
