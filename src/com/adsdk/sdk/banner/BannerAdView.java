@@ -289,11 +289,19 @@ public class BannerAdView extends RelativeLayout {
 				String text = MessageFormat.format(Const.IMAGE_BODY, this.response.getImageUrl(), this.response.getBannerWidth(), this.response.getBannerHeight());
 				Log.d(Const.TAG, "set image: " + text);
 				text = Uri.encode(Const.HIDE_BORDER + text);
+				if (!text.contains("<html>")) {
+					text = "<html><head></head><body style='margin:0;padding:0;'>"
+							+ text + "</body></html>";
+				}
 				webView.loadData(text, "text/html", Const.ENCODING);
 				adListener.onLoad();
 			} else if (this.response.getType() == Const.TEXT) {
-				final String text = Uri.encode(Const.HIDE_BORDER + this.response.getText());
+				String text = Uri.encode(Const.HIDE_BORDER + this.response.getText());
 				Log.d(Const.TAG, "set text: " + text);
+				if (!text.contains("<html>")) {
+					text = "<html><head></head><body style='margin:0;padding:0;'>"
+							+ text + "</body></html>";
+				}
 				webView.loadData(text, "text/html", Const.ENCODING);
 				adListener.onLoad();
 			}
