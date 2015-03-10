@@ -1,21 +1,19 @@
-
 package com.adsdk.sdk.customevents;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 
 import android.app.Activity;
 import android.content.Context;
 import android.view.ViewGroup.LayoutParams;
 
-import com.amazon.device.ads.Ad;
-import com.amazon.device.ads.AdError;
-import com.amazon.device.ads.AdLayout;
-import com.amazon.device.ads.AdListener;
-import com.amazon.device.ads.AdProperties;
-import com.amazon.device.ads.AdRegistration;
-import com.amazon.device.ads.AdSize;
-
 public class AmazonBanner extends CustomEventBanner {
 
-	private AdLayout banner;
+	private Object banner;
+	private Class<?> listenerClass;
+	private Class<?> adLayoutClass;
 
 	@Override
 	public void loadBanner(Context context, CustomEventBannerListener customEventBannerListener, String optionalParameters, String trackingPixel, int width, int height) {
@@ -23,14 +21,17 @@ public class AmazonBanner extends CustomEventBanner {
 		listener = customEventBannerListener;
 		this.trackingPixel = trackingPixel;
 
+		Class<?> adRegistrationClass;
+		Class<?> adSizeClass;
+
 		try {
 			Class.forName("com.amazon.device.ads.Ad");
 			Class.forName("com.amazon.device.ads.AdError");
-			Class.forName("com.amazon.device.ads.AdLayout");
-			Class.forName("com.amazon.device.ads.AdListener");
+			adLayoutClass = Class.forName("com.amazon.device.ads.AdLayout");
+			listenerClass = Class.forName("com.amazon.device.ads.AdListener");
 			Class.forName("com.amazon.device.ads.AdProperties");
-			Class.forName("com.amazon.device.ads.AdRegistration");
-			Class.forName("com.amazon.device.ads.AdSize");
+			adRegistrationClass = Class.forName("com.amazon.device.ads.AdRegistration");
+			adSizeClass = Class.forName("com.amazon.device.ads.AdSize");
 		} catch (ClassNotFoundException e) {
 			if (listener != null) {
 				listener.onBannerFailed();
@@ -44,57 +45,78 @@ public class AmazonBanner extends CustomEventBanner {
 			return;
 		}
 
-		AdRegistration.setAppKey(adId);
-		Activity activity = (Activity) context;
-		AdSize size = new AdSize(width, height);
-		banner = new AdLayout(activity, size);
-		banner.setListener(createListener());
-		banner.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
-		banner.loadAd();
+		try {
+			Method setAppKeyMethod = adRegistrationClass.getMethod("setAppKey", String.class);
+			setAppKeyMethod.invoke(null, adId);
+			Activity activity = (Activity) context;
+
+			Object adSize;
+			Constructor<?> adSizeConstructor = adSizeClass.getConstructor(new Class[] { int.class, int.class });
+			adSize = adSizeConstructor.newInstance(width, height);
+			 
+			Constructor<?> adLayoutConstructor = adLayoutClass.getConstructor(new Class[] { Activity.class, adSizeClass });
+			banner = adLayoutConstructor.newInstance(activity, adSize);
+
+			Method setListenerMethod = adLayoutClass.getMethod("setListener", listenerClass);
+			setListenerMethod.invoke(banner, createListener());
+
+			LayoutParams params = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+			Method setLayoutParamsMethod = adLayoutClass.getMethod("setLayoutParams", LayoutParams.class);
+			setLayoutParamsMethod.invoke(banner, params);
+
+			Method loadAdMethod = adLayoutClass.getMethod("loadAd");
+			loadAdMethod.invoke(banner);
+		} catch (Exception e) {
+			e.printStackTrace();
+			if (listener != null) {
+				listener.onBannerFailed();
+			}
+		}
+
 	}
 
-	private AdListener createListener() {
-		return new AdListener() {
+	private Object createListener() {
+		
+		Object instance = Proxy.newProxyInstance(listenerClass.getClassLoader(), new Class<?>[] { listenerClass }, new InvocationHandler() {
 
 			@Override
-			public void onAdLoaded(Ad arg0, AdProperties arg1) {
-				reportImpression();
-				if (listener != null) {
-					listener.onBannerLoaded(banner);
+			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+
+				if (method.getName().equals("onAdLoaded")) {
+					reportImpression();
+					if (listener != null) {
+						listener.onBannerLoaded((android.view.View)banner);
+					}
+				} else if (method.getName().equals("onAdFailedToLoad")) {
+					if (listener != null) {
+						listener.onBannerFailed();
+					}
+
+				} else if (method.getName().equals("onAdExpanded")) {
+					if (listener != null) {
+						listener.onBannerExpanded();
+					}
+				} else if (method.getName().equals("onAdCollapsed")) {
+					if (listener != null) {
+						listener.onBannerClosed();
+					}
 				}
+				return null;
 			}
+		});
 
-			@Override
-			public void onAdFailedToLoad(Ad arg0, AdError arg1) {
-				if (listener != null) {
-					listener.onBannerFailed();
-				}
-			}
-
-			@Override
-			public void onAdExpanded(Ad arg0) {
-				if (listener != null) {
-					listener.onBannerExpanded();
-				}
-			}
-
-			@Override
-			public void onAdDismissed(Ad arg0) {
-			}
-
-			@Override
-			public void onAdCollapsed(Ad arg0) {
-				if (listener != null) {
-					listener.onBannerClosed();
-				}
-			}
-		};
+		return instance;
+		
 	}
 
 	@Override
 	public void destroy() {
 		if (banner != null) {
-			banner.destroy();
+			try {
+				Method destroyMethod = adLayoutClass.getMethod("destroy");
+				destroyMethod.invoke(banner);
+			} catch (Exception e) {
+			}
 		}
 		super.destroy();
 	}
