@@ -1,13 +1,16 @@
 package com.adsdk.sdk.customevents;
 
-import android.app.Activity;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 
-import com.unity3d.ads.android.IUnityAdsListener;
-import com.unity3d.ads.android.UnityAds;
+import android.app.Activity;
 
 public class ApplifierFullscreen extends CustomEventFullscreen {
 	private static boolean initialized;
 	private boolean shouldReportAvailability;
+	private Class<?> unityClass;
+	private Class<?> listenerClass;
 
 	@Override
 	public void loadFullscreen(Activity activity, CustomEventFullscreenListener customEventFullscreenListener, String optionalParameters, String trackingPixel) {
@@ -17,8 +20,8 @@ public class ApplifierFullscreen extends CustomEventFullscreen {
 		this.trackingPixel = trackingPixel;
 
 		try {
-			Class.forName("com.unity3d.ads.android.IUnityAdsListener");
-			Class.forName("com.unity3d.ads.android.UnityAds");
+			listenerClass = Class.forName("com.unity3d.ads.android.IUnityAdsListener");
+			unityClass = Class.forName("com.unity3d.ads.android.UnityAds");
 		} catch (ClassNotFoundException e) {
 			if (listener != null) {
 				listener.onFullscreenFailed();
@@ -26,71 +29,93 @@ public class ApplifierFullscreen extends CustomEventFullscreen {
 			return;
 		}
 
-		if (!initialized) {
-			UnityAds.init(activity, adId, createListener());
-			initialized = true;
-		} else if (UnityAds.canShowAds()){
-			shouldReportAvailability = false;
-			if (listener != null) {
-				listener.onFullscreenLoaded(this);
+		try {
+			if (!initialized) {
+				Method initMethod;
+				initMethod = unityClass.getMethod("init", new Class[] { Activity.class, String.class, listenerClass });
+
+				initMethod.invoke(null, activity, adId, createListener());
+
+				initialized = true;
+			} else {
+				Method canShowAdsMethod = unityClass.getMethod("canShowAds");
+				boolean canShow = (Boolean) canShowAdsMethod.invoke(null);
+
+				if (canShow) {
+					shouldReportAvailability = false;
+					if (listener != null) {
+						listener.onFullscreenLoaded(this);
+					}
+					Method setListenerMethod = unityClass.getMethod("setListener", listenerClass);
+					setListenerMethod.invoke(null, createListener());
+				} else {
+					shouldReportAvailability = false;
+					if (listener != null) {
+						listener.onFullscreenFailed();
+					}
+				}
 			}
-			UnityAds.setListener(createListener());
-		} else {
-			shouldReportAvailability = false;
+		} catch (Exception e) {
 			if (listener != null) {
 				listener.onFullscreenFailed();
 			}
 		}
-
 	}
 
-	private IUnityAdsListener createListener() {
-		return new IUnityAdsListener() {
+	private Object createListener() {
+
+		Object instance = Proxy.newProxyInstance(listenerClass.getClassLoader(), new Class<?>[] { listenerClass }, new InvocationHandler() {
 
 			@Override
-			public void onVideoStarted() {
-			}
+			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 
-			@Override
-			public void onVideoCompleted(String arg0, boolean arg1) {
-			}
+				if (method.getName().equals("onShow")) {
+					reportImpression();
+					if (listener != null) {
+						listener.onFullscreenOpened();
+					}
+				} else if (method.getName().equals("onHide")) {
+					if (listener != null) {
+						listener.onFullscreenClosed();
+					}
 
-			@Override
-			public void onShow() {
-				reportImpression();
-				if (listener != null) {
-					listener.onFullscreenOpened();
+				} else if (method.getName().equals("onFetchFailed")) {
+					if (listener != null && shouldReportAvailability) {
+						listener.onFullscreenFailed();
+					}
+				} else if (method.getName().equals("onFetchCompleted")) {
+					if (listener != null && shouldReportAvailability) {
+						listener.onFullscreenLoaded(ApplifierFullscreen.this);
+					}
 				}
+				return null;
 			}
+		});
 
-			@Override
-			public void onHide() {
-				if (listener != null) {
-					listener.onFullscreenClosed();
-				}
-			}
+		return instance;
 
-			@Override
-			public void onFetchFailed() {
-				if (listener != null && shouldReportAvailability) {
-					listener.onFullscreenFailed();
-				}
-			}
-
-			@Override
-			public void onFetchCompleted() {
-				if (listener != null && shouldReportAvailability) {
-					listener.onFullscreenLoaded(ApplifierFullscreen.this);
-				}
-			}
-		};
 	}
 
 	@Override
 	public void showFullscreen() {
+		try {
 
-		if (UnityAds.canShow() && UnityAds.canShowAds()) {
-			UnityAds.show();
+			Method canShowAdsMethod = unityClass.getMethod("canShowAds");
+			boolean canShowAds = (Boolean) canShowAdsMethod.invoke(null);
+
+			Method canShowMethod = unityClass.getMethod("canShow");
+			boolean canShow = (Boolean) canShowMethod.invoke(null);
+
+			if (canShow && canShowAds) {
+				Method showMethod = unityClass.getMethod("show");
+				showMethod.invoke(null);
+			} else if (listener != null) {
+				listener.onFullscreenFailed();
+			}
+		} catch (Exception e) {
+			if (listener != null) {
+				listener.onFullscreenFailed();
+			}
 		}
 
 	}
