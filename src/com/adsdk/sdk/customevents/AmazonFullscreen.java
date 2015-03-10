@@ -1,18 +1,17 @@
-
 package com.adsdk.sdk.customevents;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 
 import android.app.Activity;
 
-import com.amazon.device.ads.Ad;
-import com.amazon.device.ads.AdError;
-import com.amazon.device.ads.AdListener;
-import com.amazon.device.ads.AdProperties;
-import com.amazon.device.ads.AdRegistration;
-import com.amazon.device.ads.InterstitialAd;
-
 public class AmazonFullscreen extends CustomEventFullscreen {
 
-	private InterstitialAd interstitial;
+	private Object interstitial;
+	private Class<?> interstitialClass;
+	private Class<?> listenerClass;
 
 	@Override
 	public void loadFullscreen(Activity activity, CustomEventFullscreenListener customEventFullscreenListener, String optionalParameters, String trackingPixel) {
@@ -20,13 +19,13 @@ public class AmazonFullscreen extends CustomEventFullscreen {
 		listener = customEventFullscreenListener;
 		this.trackingPixel = trackingPixel;
 
+		Class<?> adRegistrationClass;
+
 		try {
 			Class.forName("com.amazon.device.ads.Ad");
-			Class.forName("com.amazon.device.ads.AdError");
-			Class.forName("com.amazon.device.ads.AdListener");
-			Class.forName("com.amazon.device.ads.AdProperties");
-			Class.forName("com.amazon.device.ads.AdRegistration");
-			Class.forName("com.amazon.device.ads.InterstitialAd");
+			listenerClass = Class.forName("com.amazon.device.ads.AdListener");
+			adRegistrationClass = Class.forName("com.amazon.device.ads.AdRegistration");
+			interstitialClass = Class.forName("com.amazon.device.ads.InterstitialAd");
 		} catch (ClassNotFoundException e) {
 			if (listener != null) {
 				listener.onFullscreenFailed();
@@ -34,54 +33,69 @@ public class AmazonFullscreen extends CustomEventFullscreen {
 			return;
 		}
 
-		AdRegistration.setAppKey(adId);
-		interstitial = new InterstitialAd(activity);
-		interstitial.setListener(createListener());
-		interstitial.loadAd();
+		try {
+
+			Method setAppKeyMethod = adRegistrationClass.getMethod("setAppKey", String.class);
+			setAppKeyMethod.invoke(null, adId);
+
+			Constructor<?> interstitialConstructor = interstitialClass.getConstructor(Activity.class);
+			interstitial = interstitialConstructor.newInstance(activity);
+
+			Method setListenerMethod = interstitialClass.getMethod("setListener", listenerClass);
+			setListenerMethod.invoke(interstitial, createListener());
+
+			Method loadAdMethod = interstitialClass.getMethod("loadAd");
+			loadAdMethod.invoke(interstitial);
+		} catch (Exception e) {
+			e.printStackTrace();
+			if (listener != null) {
+				listener.onFullscreenFailed();
+			}
+		}
 
 	}
 
-	private AdListener createListener() {
-		return new AdListener() {
+	private Object createListener() {
+		Object instance = Proxy.newProxyInstance(listenerClass.getClassLoader(), new Class<?>[] { listenerClass }, new InvocationHandler() {
 
 			@Override
-			public void onAdLoaded(Ad arg0, AdProperties arg1) {
-				if (listener != null) {
-					listener.onFullscreenLoaded(AmazonFullscreen.this);
+			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+
+				if (method.getName().equals("onAdLoaded")) {
+					if (listener != null) {
+						listener.onFullscreenLoaded(AmazonFullscreen.this);
+					}
+				} else if (method.getName().equals("onAdFailedToLoad")) {
+					if (listener != null) {
+						listener.onFullscreenFailed();
+					}
+				} else if (method.getName().equals("onAdExpanded")) {
+					if (listener != null) {
+						listener.onFullscreenLeftApplication();
+					}
+				} else if (method.getName().equals("onAdDismissed")) {
+					if (listener != null) {
+						listener.onFullscreenClosed();
+					}
 				}
+				return null;
 			}
+		});
 
-			@Override
-			public void onAdFailedToLoad(Ad arg0, AdError arg1) {
-				if (listener != null) {
-					listener.onFullscreenFailed();
-				}
-			}
-
-			@Override
-			public void onAdExpanded(Ad arg0) {
-				if (listener != null) { // TODO: Check listener methods
-					listener.onFullscreenLeftApplication();
-				}
-			}
-
-			@Override
-			public void onAdDismissed(Ad arg0) {
-				if (listener != null) {
-					listener.onFullscreenClosed();
-				}
-			}
-
-			@Override
-			public void onAdCollapsed(Ad arg0) {
-			}
-		};
+		return instance;
 	}
 
 	@Override
 	public void showFullscreen() {
 		if (interstitial != null) {
-			if (interstitial.showAd()) {
+			boolean shown = false;
+			try {
+				Method showAdMethod = interstitialClass.getMethod("showAd");
+				shown = (Boolean) showAdMethod.invoke(interstitial);
+			} catch (Exception e) {
+			}
+
+			if (shown) {
 				reportImpression();
 				if (listener != null) {
 					listener.onFullscreenOpened();
