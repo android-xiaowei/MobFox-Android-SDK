@@ -256,8 +256,9 @@ public class NativeAdView extends FrameLayout {
 
 			@Override
 			protected Void doInBackground(Void... params) {
+				AndroidHttpClient client = null;
 				try {
-					AndroidHttpClient client = AndroidHttpClient.newInstance(System.getProperty("http.agent"));
+					client = AndroidHttpClient.newInstance(System.getProperty("http.agent"));
 					HttpGet request = new HttpGet();
 					request.setHeader("User-Agent", System.getProperty("http.agent"));
 					request.setURI(new URI(url));
@@ -265,6 +266,10 @@ public class NativeAdView extends FrameLayout {
 					client.close();
 				} catch (Exception e) {
 					e.printStackTrace();
+				} finally {
+					if(client != null) {						
+						client.close();
+					}
 				}
 				return null;
 			}
