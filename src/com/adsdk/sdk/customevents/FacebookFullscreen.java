@@ -1,16 +1,19 @@
 
 package com.adsdk.sdk.customevents;
 
-import com.facebook.ads.Ad;
-import com.facebook.ads.AdError;
-import com.facebook.ads.InterstitialAd;
-import com.facebook.ads.InterstitialAdListener;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 
 import android.app.Activity;
+import android.content.Context;
 
 public class FacebookFullscreen extends CustomEventFullscreen {
 
-	private InterstitialAd interstitial;
+	private Object interstitial;
+	private Class<?> interstitialClass;
+	private Class<?> listenerClass;
 
 	@Override
 	public void loadFullscreen(Activity activity, CustomEventFullscreenListener customEventFullscreenListener, String optionalParameters, String trackingPixel) {
@@ -21,66 +24,87 @@ public class FacebookFullscreen extends CustomEventFullscreen {
 		try {
 			Class.forName("com.facebook.ads.Ad");
 			Class.forName("com.facebook.ads.AdError");
-			Class.forName("com.facebook.ads.InterstitialAd");
-			Class.forName("com.facebook.ads.InterstitialAdListener");
+			interstitialClass = Class.forName("com.facebook.ads.InterstitialAd");
+			listenerClass = Class.forName("com.facebook.ads.InterstitialAdListener");
 		} catch (ClassNotFoundException e) {
 			if (listener != null) {
 				listener.onFullscreenFailed();
 			}
 			return;
 		}
+		
+		try {
+			Constructor<?> interstitialConstructor = interstitialClass.getConstructor(new Class[] {Context.class, String.class});
+			interstitial = interstitialConstructor.newInstance(activity, adId);
+			
+			Method setAdListenerMethod = interstitialClass.getMethod("setAdListener", listenerClass);
+			setAdListenerMethod.invoke(interstitial, createListener());
+			
+			Method loadAdMethod = interstitialClass.getMethod("loadAd");
+			loadAdMethod.invoke(interstitial);
+		} catch (Exception e) {
+			if (listener != null) {
+				listener.onFullscreenFailed();
+			}
+		}
+		
 
-		interstitial = new InterstitialAd(activity, adId);
-		interstitial.setAdListener(createListener());
-		interstitial.loadAd();
 
 	}
 
-	private InterstitialAdListener createListener() {
-		return new InterstitialAdListener() {
+	private Object createListener() {
+		Object instance = Proxy.newProxyInstance(listenerClass.getClassLoader(), new Class<?>[] { listenerClass }, new InvocationHandler() {
 
 			@Override
-			public void onError(Ad arg0, AdError arg1) {
-				if (listener != null) {
-					listener.onFullscreenFailed();
-				}
-			}
+			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 
-			@Override
-			public void onAdLoaded(Ad arg0) {
-				if (listener != null) {
-					listener.onFullscreenLoaded(FacebookFullscreen.this);
+				if (method.getName().equals("onError")) {
+					if (listener != null) {
+						listener.onFullscreenFailed();
+					}
+				} else if (method.getName().equals("onAdLoaded")) {
+					if (listener != null) {
+						listener.onFullscreenLoaded(FacebookFullscreen.this);
+					}
+				} else if (method.getName().equals("onAdClicked")) {
+					if (listener != null) {
+						listener.onFullscreenLeftApplication();
+					}
+				} else if (method.getName().equals("onInterstitialDisplayed")) {
+					reportImpression();
+					if (listener != null) {
+						listener.onFullscreenOpened();
+					}
+				} else if (method.getName().equals("onInterstitialDismissed")) {
+					if (listener != null) {
+						listener.onFullscreenClosed();
+					}
 				}
+				return null;
 			}
+		});
 
-			@Override
-			public void onAdClicked(Ad arg0) {
-				if (listener != null) { // TODO: Check listener methods
-					listener.onFullscreenLeftApplication();
-				}
-			}
-
-			@Override
-			public void onInterstitialDisplayed(Ad arg0) {
-				reportImpression();
-				if (listener != null) {
-					listener.onFullscreenOpened();
-				}
-			}
-
-			@Override
-			public void onInterstitialDismissed(Ad arg0) {
-				if (listener != null) {
-					listener.onFullscreenClosed();
-				}
-			}
-		};
+		return instance;
+		
 	}
 
 	@Override
 	public void showFullscreen() {
-		if (interstitial != null && interstitial.isAdLoaded()) {
-			interstitial.show();
+		if (interstitial != null && interstitialClass != null) {
+			try {
+				
+			Method isAdLoadedMethod = interstitialClass.getMethod("isAdLoaded");
+			boolean isLoaded = (Boolean)isAdLoadedMethod.invoke(interstitial);
+			if(isLoaded) {
+				Method showMethod = interstitialClass.getMethod("show");
+				showMethod.invoke(interstitial);
+			}
+			} catch (Exception e) {
+				if (listener != null) {
+					listener.onFullscreenFailed();
+				}
+			}
+			
 		}
 
 	}

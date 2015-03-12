@@ -1,29 +1,33 @@
 package com.adsdk.sdk.customevents;
 
-import android.content.Context;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 
-import com.facebook.ads.Ad;
-import com.facebook.ads.AdError;
-import com.facebook.ads.AdListener;
-import com.facebook.ads.AdSize;
-import com.facebook.ads.AdView;
+import android.content.Context;
+import android.view.View;
 
 public class FacebookBanner extends CustomEventBanner {
 	
-	private AdView banner;
+	private Object banner;
+	private Class<?> bannerClass;
+	private Class<?> listenerClass;
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public void loadBanner(Context context, CustomEventBannerListener customEventBannerListener, String optionalParameters, String trackingPixel, int width, int height) {
 		String adId = optionalParameters;
 		listener = customEventBannerListener;
 		this.trackingPixel = trackingPixel;
 
+		Class<?> adSizeClass;
 		try {
 			Class.forName("com.facebook.ads.Ad");
 			Class.forName("com.facebook.ads.AdError");
-			Class.forName("com.facebook.ads.AdListener");
-			Class.forName("com.facebook.ads.AdSize");
-			Class.forName("com.facebook.ads.AdView");
+			listenerClass = Class.forName("com.facebook.ads.AdListener");
+			adSizeClass = Class.forName("com.facebook.ads.AdSize");
+			bannerClass = Class.forName("com.facebook.ads.AdView");
 		} catch (ClassNotFoundException e) {
 			if (listener != null) {
 				listener.onBannerFailed();
@@ -31,44 +35,61 @@ public class FacebookBanner extends CustomEventBanner {
 			return;
 		}
 		
-		banner = new AdView(context, adId, AdSize.BANNER_320_50); //there is only one size for banner
-		banner.setAdListener(createListener());
-		banner.loadAd();
+		try {
+			Constructor<?> bannerConstructor = bannerClass.getConstructor(new Class[] {Context.class, String.class, adSizeClass});
+			Object adSize = Enum.valueOf((Class<Enum>)adSizeClass, "BANNER_320_50");
+			banner = bannerConstructor.newInstance(context, adId, adSize);
+			
+			Method setListenerMethod = bannerClass.getMethod("setAdListener", listenerClass);
+			setListenerMethod.invoke(banner, createListener());
+			
+			Method loadAdMethod = bannerClass.getMethod("loadAd");
+			loadAdMethod.invoke(banner);
+		} catch (Exception e) {
+			if (listener != null) {
+				listener.onBannerFailed();
+			}
+		}
+		
 		
 	}
 
-	private AdListener createListener() {
-		return new AdListener() {
-			
+	private Object createListener() {
+		
+		Object instance = Proxy.newProxyInstance(listenerClass.getClassLoader(), new Class<?>[] { listenerClass }, new InvocationHandler() {
+
 			@Override
-			public void onError(Ad arg0, AdError arg1) {
-				if (listener != null) {
-					listener.onBannerFailed();
+			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+
+				if (method.getName().equals("onError")) {
+					if (listener != null) {
+						listener.onBannerFailed();
+					}
+				} else if (method.getName().equals("onAdLoaded")) {
+					reportImpression();
+					if (listener != null) {
+						listener.onBannerLoaded((View)banner);
+					}
+				} else if (method.getName().equals("onAdClicked")) {
+					if (listener != null) {
+						listener.onBannerExpanded();
+					}
 				}
+				return null;
 			}
-			
-			@Override
-			public void onAdLoaded(Ad arg0) {
-				reportImpression();
-				if (listener != null) {
-					listener.onBannerLoaded(banner);
-				}
-			}
-			
-			@Override
-			public void onAdClicked(Ad arg0) {
-				if (listener != null) {
-					listener.onBannerExpanded();
-				}
-			}
-			
-		};
+		});
+
+		return instance;
 	}
 	
 	@Override
 	public void destroy() {
-		if(banner != null) {
-			banner.destroy();
+		if(banner != null && bannerClass != null) {
+			try {
+				Method destroyMethod = bannerClass.getMethod("destroy");
+				destroyMethod.invoke(banner);
+			} catch (Exception e) {
+			}
 		}
 		super.destroy();
 	}
