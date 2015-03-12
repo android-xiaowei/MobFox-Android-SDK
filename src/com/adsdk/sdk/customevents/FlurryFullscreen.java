@@ -1,19 +1,20 @@
 package com.adsdk.sdk.customevents;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+
 import android.app.Activity;
 import android.content.Context;
-import android.widget.FrameLayout;
 
-import com.flurry.android.FlurryAdListener;
-import com.flurry.android.FlurryAdSize;
-import com.flurry.android.FlurryAdType;
-import com.flurry.android.FlurryAds;
-import com.flurry.android.FlurryAgent;
-
-public class FlurryFullscreen extends CustomEventFullscreen implements FlurryAdListener {
+public class FlurryFullscreen extends CustomEventFullscreen {
 	private Context context;
-	private FrameLayout layout;
 	private String adSpace;
+	private Object interstitial;
+	private Class<?> interstitialClass;
+	private Class<?> listenerClass;
+	private Class<?> flurryAgentClass;
 
 	@Override
 	public void loadFullscreen(Activity activity, CustomEventFullscreenListener customEventFullscreenListener, String optionalParameters, String trackingPixel) {
@@ -32,92 +33,107 @@ public class FlurryFullscreen extends CustomEventFullscreen implements FlurryAdL
 		this.trackingPixel = trackingPixel;
 
 		try {
-			Class.forName("com.flurry.android.FlurryAdListener");
-			Class.forName("com.flurry.android.FlurryAdSize");
-			Class.forName("com.flurry.android.FlurryAdType");
-			Class.forName("com.flurry.android.FlurryAds");
-			Class.forName("com.flurry.android.FlurryAgent");
+			flurryAgentClass = Class.forName("com.flurry.android.FlurryAgent");
+			interstitialClass = Class.forName("com.flurry.android.ads.FlurryAdInterstitial");
+			listenerClass = Class.forName("com.flurry.android.ads.FlurryAdInterstitialListener");
 		} catch (ClassNotFoundException e) {
 			if (listener != null) {
 				listener.onFullscreenFailed();
 			}
 			return;
 		}
-		layout = new FrameLayout(context);
-		FlurryAgent.onStartSession(activity, apiKey);
-		FlurryAds.setAdListener(this);
-		FlurryAds.fetchAd(context, adSpace, layout, FlurryAdSize.FULLSCREEN);
+
+		try {
+
+			Method initMethod = flurryAgentClass.getMethod("init", new Class[] { Context.class, String.class });
+			initMethod.invoke(null, context, apiKey);
+
+			Method onStartSessionMethod = flurryAgentClass.getMethod("onStartSession", new Class[] { Context.class, String.class });
+			onStartSessionMethod.invoke(null, context, apiKey);
+
+			Constructor<?> interstitialConstructor = interstitialClass.getConstructor(new Class[] { Context.class, String.class });
+			interstitial = interstitialConstructor.newInstance(context, adSpace);
+			// interstitial = new FlurryAdInterstitial(context, adSpace);
+
+			Method setListenerMethod = interstitialClass.getMethod("setListener", listenerClass);
+			setListenerMethod.invoke(interstitial, createListener());
+			// interstitial.setListener(createListener());
+
+			Method fetchAdMethod = interstitialClass.getMethod("fetchAd");
+			fetchAdMethod.invoke(interstitial);
+			// interstitial.fetchAd();
+		} catch (Exception e) {
+			if (listener != null) {
+				listener.onFullscreenFailed();
+			}
+		}
+	}
+
+	private Object createListener() {
+		Object instance = Proxy.newProxyInstance(listenerClass.getClassLoader(), new Class<?>[] { listenerClass }, new InvocationHandler() {
+
+			@Override
+			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+
+				if (method.getName().equals("onFetched")) {
+					if (listener != null) {
+						listener.onFullscreenLoaded(FlurryFullscreen.this);
+					}
+				} else if (method.getName().equals("onError")) {
+					if (listener != null) {
+						listener.onFullscreenFailed();
+					}
+				} else if (method.getName().equals("onDisplay")) {
+					reportImpression();
+					if (listener != null) {
+						listener.onFullscreenOpened();
+					}
+				} else if (method.getName().equals("onClose")) {
+					if (listener != null) {
+						listener.onFullscreenClosed();
+					}
+				} else if (method.getName().equals("onAppExit")) {
+					if (listener != null) {
+						listener.onFullscreenLeftApplication();
+					}
+				}
+				return null;
+			}
+		});
+		
+		return instance;
 	}
 
 	@Override
 	public void finish() {
-		FlurryAds.setAdListener(null);
-		FlurryAds.removeAd(context, adSpace, layout);
-		FlurryAgent.onEndSession(context);
+
+		try {
+			if (interstitial != null && interstitialClass != null) {
+				Method destroyMethod = interstitialClass.getMethod("destroy");
+				destroyMethod.invoke(interstitial);
+			}
+			interstitial = null;
+			
+			if(flurryAgentClass != null) {
+				Method onEndSessionMethod = flurryAgentClass.getMethod("onEndSession", Context.class);
+				onEndSessionMethod.invoke(null, context);
+			}
+		} catch (Exception e) {
+		}
 		super.finish();
 	}
 
 	@Override
 	public void showFullscreen() {
-		FlurryAds.displayAd(context, adSpace, layout);
-	}
-
-	@Override
-	public void onAdClicked(String arg0) {
-	}
-
-	@Override
-	public void onAdClosed(String arg0) {
-		if (listener != null && arg0.equals(adSpace)) {
-			listener.onFullscreenClosed();
-		}
-	}
-
-	@Override
-	public void onAdOpened(String arg0) {
-		if (arg0.equals(adSpace)) {
-			reportImpression();
+		try {
+			Method displayAdMethod = interstitialClass.getMethod("displayAd");
+			displayAdMethod.invoke(interstitial);
+		} catch (Exception e) {
 			if (listener != null) {
-				listener.onFullscreenOpened();
+				listener.onFullscreenFailed();
 			}
 		}
-	}
-
-	@Override
-	public void onApplicationExit(String arg0) {
-		if (listener != null && arg0.equals(adSpace)) {
-			listener.onFullscreenLeftApplication();
-		}
-	}
-
-	@Override
-	public void onRenderFailed(String arg0) {
-	}
-
-	@Override
-	public void onRendered(String arg0) {
-	}
-
-	@Override
-	public void onVideoCompleted(String arg0) {
-	}
-
-	@Override
-	public boolean shouldDisplayAd(String arg0, FlurryAdType arg1) {
-		return true;
-	}
-
-	@Override
-	public void spaceDidFailToReceiveAd(String arg0) {
-		if (listener != null) {
-			listener.onFullscreenFailed();
-		}
-	}
-
-	@Override
-	public void spaceDidReceiveAd(String arg0) {
-		if (listener != null && arg0.equals(adSpace)) {
-			listener.onFullscreenLoaded(FlurryFullscreen.this);
-		}
+		
+		
 	}
 }
