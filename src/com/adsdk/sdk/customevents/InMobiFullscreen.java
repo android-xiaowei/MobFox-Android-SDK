@@ -1,18 +1,20 @@
 package com.adsdk.sdk.customevents;
 
-import java.util.Map;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 
 import android.app.Activity;
-
-import com.inmobi.commons.InMobi;
-import com.inmobi.monetization.IMErrorCode;
-import com.inmobi.monetization.IMInterstitial;
-import com.inmobi.monetization.IMInterstitialListener;
+import android.content.Context;
 
 public class InMobiFullscreen extends CustomEventFullscreen {
-	
-	private IMInterstitial interstitial;
+
+	private Object interstitial;
 	private static boolean isInitialized;
+	private Class<?> interstitialClass;
+	private Class<?> listenerClass;
+	private Class<?> inMobiClass;
 
 	@Override
 	public void loadFullscreen(Activity activity, CustomEventFullscreenListener customEventFullscreenListener, String optionalParameters, String trackingPixel) {
@@ -20,74 +22,94 @@ public class InMobiFullscreen extends CustomEventFullscreen {
 		this.trackingPixel = trackingPixel;
 
 		try {
-			Class.forName("com.inmobi.commons.InMobi");
-			Class.forName("com.inmobi.monetization.IMErrorCode");
-			Class.forName("com.inmobi.monetization.IMInterstitial");
-			Class.forName("com.inmobi.monetization.IMInterstitialListener");
+			inMobiClass = Class.forName("com.inmobi.commons.InMobi");
+			interstitialClass = Class.forName("com.inmobi.monetization.IMInterstitial");
+			listenerClass = Class.forName("com.inmobi.monetization.IMInterstitialListener");
 		} catch (ClassNotFoundException e) {
 			if (listener != null) {
 				listener.onFullscreenFailed();
 			}
 			return;
 		}
-		if(!isInitialized) {
-			InMobi.initialize(activity, optionalParameters);
-			isInitialized = true;
+
+		try {
+
+			if (!isInitialized) {
+				Method initializeMethod = inMobiClass.getMethod("initialize", new Class[] {Context.class, String.class});
+				initializeMethod.invoke(null, activity, optionalParameters);
+				isInitialized = true;
+			}
+			
+			Constructor<?> interstitialConstructor = interstitialClass.getConstructor(new Class[] {Activity.class, String.class});
+			interstitial = interstitialConstructor.newInstance(activity, optionalParameters);
+			
+			Method setListenerMethod = interstitialClass.getMethod("setIMInterstitialListener", listenerClass);
+			setListenerMethod.invoke(interstitial, createListener());
+			
+			Method loadInterstitialMethod = interstitialClass.getMethod("loadInterstitial");
+			loadInterstitialMethod.invoke(interstitial);
+		} catch (Exception e) {
+			if (listener != null) {
+				listener.onFullscreenFailed();
+			}
 		}
-		interstitial = new IMInterstitial(activity, optionalParameters);
-		interstitial.setIMInterstitialListener(createListener());
-		interstitial.loadInterstitial();
 	}
 
-	private IMInterstitialListener createListener() {
-		return new IMInterstitialListener() {
-			
+	private Object createListener() {
+		Object instance = Proxy.newProxyInstance(listenerClass.getClassLoader(), new Class<?>[] { listenerClass }, new InvocationHandler() {
+
 			@Override
-			public void onShowInterstitialScreen(IMInterstitial arg0) {
-				reportImpression();
-				if (listener != null) {
-					listener.onFullscreenOpened();
+			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+
+				if (method.getName().equals("onShowInterstitialScreen")) {
+					reportImpression();
+					if (listener != null) {
+						listener.onFullscreenOpened();
+					}
+				} else if (method.getName().equals("onInterstitialLoaded")) {
+					if (listener != null) {
+						listener.onFullscreenLoaded(InMobiFullscreen.this);
+					}
+				} else if (method.getName().equals("onInterstitialInteraction")) {
+					if (listener != null) {
+						listener.onFullscreenLeftApplication();
+					}
+				} else if (method.getName().equals("onInterstitialFailed")) {
+					if (listener != null) {
+						listener.onFullscreenFailed();
+					}
+				} else if (method.getName().equals("onDismissInterstitialScreen")) {
+					if (listener != null) {
+						listener.onFullscreenClosed();
+					}
 				}
+				return null;
 			}
-			
-			@Override
-			public void onLeaveApplication(IMInterstitial arg0) {
-			}
-			
-			@Override
-			public void onInterstitialLoaded(IMInterstitial arg0) {
-				if (listener != null) {
-					listener.onFullscreenLoaded(InMobiFullscreen.this);
+		});
+		
+		return instance;
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@Override
+	public void showFullscreen() {
+		if(interstitial != null && interstitialClass != null) {
+			try {
+				Class<?> stateClass = Class.forName("com.inmobi.monetization.IMInterstitial$State");
+				Object readyState = Enum.valueOf((Class<Enum>)stateClass, "READY");
+				Method getStateMethod = interstitialClass.getMethod("getState");
+				boolean ready = (getStateMethod.invoke(interstitial) == readyState);
+				
+				if (ready) {
+					Method showMethod = interstitialClass.getMethod("show");
+					showMethod.invoke(interstitial);
 				}
-			}
-			
-			@Override
-			public void onInterstitialInteraction(IMInterstitial arg0, Map<String, String> arg1) {
-				if(listener != null) {
-					listener.onFullscreenLeftApplication();
-				}
-			}
-			
-			@Override
-			public void onInterstitialFailed(IMInterstitial arg0, IMErrorCode arg1) {
+				
+			} catch (Exception e) {
 				if (listener != null) {
 					listener.onFullscreenFailed();
 				}
 			}
-			
-			@Override
-			public void onDismissInterstitialScreen(IMInterstitial arg0) {
-				if (listener != null) {
-					listener.onFullscreenClosed();
-				}
-			}
-		};
-	}
-
-	@Override
-	public void showFullscreen() {
-		if (interstitial.getState() ==IMInterstitial.State.READY) {			
-			interstitial.show();
 		}
 	}
 

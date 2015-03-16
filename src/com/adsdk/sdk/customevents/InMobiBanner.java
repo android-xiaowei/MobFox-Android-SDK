@@ -1,23 +1,25 @@
 package com.adsdk.sdk.customevents;
 
-import java.util.Map;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 
 import android.app.Activity;
 import android.content.Context;
+import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.FrameLayout;
 
-import com.inmobi.commons.InMobi;
-import com.inmobi.monetization.IMBanner;
-import com.inmobi.monetization.IMBannerListener;
-import com.inmobi.monetization.IMErrorCode;
-
 public class InMobiBanner extends CustomEventBanner {
 
-	private IMBanner banner;
+	private Object banner;
 	private FrameLayout bannerLayout;
 	private static boolean isInitialized;
 	private boolean reportedClick;
+	private Class<?> inMobiClass;
+	private Class<?> bannerClass;
+	private Class<?> listenerClass;
 
 	@Override
 	public void loadBanner(Context context, CustomEventBannerListener customEventBannerListener, String optionalParameters, String trackingPixel, int width, int height) {
@@ -25,10 +27,9 @@ public class InMobiBanner extends CustomEventBanner {
 		this.trackingPixel = trackingPixel;
 
 		try {
-			Class.forName("com.inmobi.commons.InMobi");
-			Class.forName("com.inmobi.monetization.IMBanner");
-			Class.forName("com.inmobi.monetization.IMBannerListener");
-			Class.forName("com.inmobi.monetization.IMErrorCode");
+			inMobiClass = Class.forName("com.inmobi.commons.InMobi");
+			bannerClass = Class.forName("com.inmobi.monetization.IMBanner");
+			listenerClass = Class.forName("com.inmobi.monetization.IMBannerListener");
 		} catch (ClassNotFoundException e) {
 			if (listener != null) {
 				listener.onBannerFailed();
@@ -41,88 +42,95 @@ public class InMobiBanner extends CustomEventBanner {
 			}
 			return;
 		}
-		
+
 		bannerLayout = new FrameLayout(context);
 
-		if (!isInitialized) {
-			InMobi.initialize(context, optionalParameters);
-			isInitialized = true;
+		try {
+
+			if (!isInitialized) {
+				Method initializeMethod = inMobiClass.getMethod("initialize", new Class[] {Context.class, String.class});
+				initializeMethod.invoke(null, context, optionalParameters);
+				isInitialized = true;
+			}
+			int adSize;
+			
+			if (width >= 728 && height >= 90) {
+				adSize = bannerClass.getDeclaredField("INMOBI_AD_UNIT_728X90").getInt(null);
+			} else if (width >= 300 && height >= 250) {
+				adSize = bannerClass.getDeclaredField("INMOBI_AD_UNIT_300X250").getInt(null);
+			} else if (width >= 468 && height >= 60) {
+				adSize = bannerClass.getDeclaredField("INMOBI_AD_UNIT_468X60").getInt(null);
+			} else {
+				adSize = bannerClass.getDeclaredField("INMOBI_AD_UNIT_320X50").getInt(null);
+			}
+			Constructor<?> bannerConstructor = bannerClass.getConstructor(new Class[] {Activity.class, String.class, int.class});
+			banner = bannerConstructor.newInstance((Activity)context, optionalParameters, adSize);			
+			
+			Method setIMBannerListenerMethod = bannerClass.getMethod("setIMBannerListener", listenerClass);
+			setIMBannerListenerMethod.invoke(banner, createListener());
+			
+			int refreshIntervalOff = bannerClass.getDeclaredField("REFRESH_INTERVAL_OFF").getInt(null);
+			Method setRefreshIntervalMethod = bannerClass.getMethod("setRefreshInterval", int.class);
+			setRefreshIntervalMethod.invoke(banner, refreshIntervalOff);
+
+			final float scale = context.getResources().getDisplayMetrics().density;
+			bannerLayout.addView((View)banner, new LayoutParams((int) (width * scale + 0.5f), (int) (height * scale + 0.5f)));
+
+			Method loadBannerMethod = bannerClass.getMethod("loadBanner");
+			loadBannerMethod.invoke(banner);
+		} catch (Exception e) {
+			if (listener != null) {
+				listener.onBannerFailed();
+			}
 		}
-		if (width >= 728 && height >= 90) {
-			banner = new IMBanner((Activity) context, optionalParameters, IMBanner.INMOBI_AD_UNIT_728X90);
-		} else if (width >= 300 && height >= 250) {
-			banner = new IMBanner((Activity) context, optionalParameters, IMBanner.INMOBI_AD_UNIT_300X250);
-		} else if (width >= 468 && height >= 60) {
-			banner = new IMBanner((Activity) context, optionalParameters, IMBanner.INMOBI_AD_UNIT_468X60);
-		} else {
-			banner = new IMBanner((Activity) context, optionalParameters, IMBanner.INMOBI_AD_UNIT_320X50);
-		}
-		banner.setIMBannerListener(createListener());
-		banner.setRefreshInterval(IMBanner.REFRESH_INTERVAL_OFF);
-		
-		final float scale = context.getResources().getDisplayMetrics().density;
-		bannerLayout.addView(banner, new LayoutParams((int) (width * scale + 0.5f), (int) (height * scale + 0.5f)));
-		
-		banner.loadBanner();
-		
 
 	}
 
-	private IMBannerListener createListener() {
-		return new IMBannerListener() {
+	private Object createListener() {
+		Object instance = Proxy.newProxyInstance(listenerClass.getClassLoader(), new Class<?>[] { listenerClass }, new InvocationHandler() {
 
 			@Override
-			public void onShowBannerScreen(IMBanner arg0) {
-				if (listener != null && !reportedClick) {
-					reportedClick = true;
-					listener.onBannerExpanded();
+			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+
+				if (method.getName().equals("onShowBannerScreen")) {
+					if (listener != null && !reportedClick) {
+						reportedClick = true;
+						listener.onBannerExpanded();
+					}
+				} else if (method.getName().equals("onLeaveApplication")) {
+					if (listener != null && !reportedClick) {
+						reportedClick = true;
+						listener.onBannerExpanded();
+					}
+				} else if (method.getName().equals("onDismissBannerScreen")) {
+					reportedClick = false;
+					if (listener != null) {
+						listener.onBannerClosed();
+					}
+				} else if (method.getName().equals("onBannerRequestSucceeded")) {
+					reportImpression();
+					if (listener != null) {
+						listener.onBannerLoaded(bannerLayout);
+					}
+				} else if (method.getName().equals("onBannerRequestFailed")) {
+					if (listener != null) {
+						listener.onBannerFailed();
+					}
 				}
+				return null;
 			}
-
-			@Override
-			public void onLeaveApplication(IMBanner arg0) {
-				if (listener != null && !reportedClick) {
-					reportedClick = true;
-					listener.onBannerExpanded();
-				}
-			}
-
-			@Override
-			public void onDismissBannerScreen(IMBanner arg0) {
-				reportedClick = false;
-				if (listener != null) {
-					listener.onBannerClosed();
-				}
-			}
-
-			@Override
-			public void onBannerRequestSucceeded(IMBanner arg0) {
-				reportImpression();
-				if (listener != null) {
-					listener.onBannerLoaded(bannerLayout);
-				}
-			}
-
-			@Override
-			public void onBannerRequestFailed(IMBanner arg0, IMErrorCode arg1) {
-				if (listener != null) {
-					listener.onBannerFailed();
-				}
-			}
-
-			@Override
-			public void onBannerInteraction(IMBanner arg0, Map<String, String> arg1) {
-			}
-		};
+		});
+		
+		return instance;
 	}
 
 	@Override
 	public void destroy() {
-		if(bannerLayout != null) {
+		if (bannerLayout != null) {
 			bannerLayout.removeAllViews();
 			bannerLayout = null;
 		}
-		
+
 		banner = null;
 		super.destroy();
 	}
