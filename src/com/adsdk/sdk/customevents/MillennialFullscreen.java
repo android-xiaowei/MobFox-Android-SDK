@@ -1,17 +1,18 @@
-
 package com.adsdk.sdk.customevents;
 
-import android.app.Activity;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 
-import com.millennialmedia.android.MMAd;
-import com.millennialmedia.android.MMException;
-import com.millennialmedia.android.MMInterstitial;
-import com.millennialmedia.android.MMRequest;
-import com.millennialmedia.android.RequestListener;
+import android.app.Activity;
+import android.content.Context;
 
 public class MillennialFullscreen extends CustomEventFullscreen {
 
-	private MMInterstitial interstitial;
+	private Object interstitial;
+	private Class<?> listenerClass;
+	private Class<?> interstitialClass;
 	private boolean wasTapped;
 
 	@Override
@@ -19,13 +20,12 @@ public class MillennialFullscreen extends CustomEventFullscreen {
 		String adId = optionalParameters;
 		listener = customEventFullscreenListener;
 		this.trackingPixel = trackingPixel;
+		Class<?> requestClass;
 
 		try {
-			Class.forName("com.millennialmedia.android.MMAd");
-			Class.forName("com.millennialmedia.android.MMException");
-			Class.forName("com.millennialmedia.android.MMInterstitial");
-			Class.forName("com.millennialmedia.android.MMRequest");
-			Class.forName("com.millennialmedia.android.RequestListener");
+			interstitialClass = Class.forName("com.millennialmedia.android.MMInterstitial");
+			requestClass = Class.forName("com.millennialmedia.android.MMRequest");
+			listenerClass = Class.forName("com.millennialmedia.android.RequestListener");
 		} catch (ClassNotFoundException e) {
 			if (listener != null) {
 				listener.onFullscreenFailed();
@@ -33,73 +33,87 @@ public class MillennialFullscreen extends CustomEventFullscreen {
 			return;
 		}
 
-		interstitial = new MMInterstitial(activity);
-		interstitial.setListener(createListener());
-		interstitial.setApid(adId);
-		MMRequest request = new MMRequest();
+		try {
+			Constructor<?> interstitialConstructor = interstitialClass.getConstructor(Context.class);
+			interstitial = interstitialConstructor.newInstance(activity);
 
-		interstitial.setMMRequest(request);
+			Method setListenerMethod = interstitialClass.getMethod("setListener", listenerClass);
+			setListenerMethod.invoke(interstitial, createListener());
 
-		if (interstitial.isAdAvailable() == false) {
-			interstitial.fetch();
-		} else {
+			Method setApidMethod = interstitialClass.getMethod("setApid", String.class);
+			setApidMethod.invoke(interstitial, adId);
+
+			Constructor<?> requestConstructor = requestClass.getConstructor();
+			Object request = requestConstructor.newInstance();
+
+			Method setMMRequestMethod = interstitialClass.getMethod("setMMRequest", requestClass);
+			setMMRequestMethod.invoke(interstitial, request);
+
+			Method isAdAvailableMethod = interstitialClass.getMethod("isAdAvailable");
+
+			if ((Boolean) isAdAvailableMethod.invoke(interstitial)) {
+				if (listener != null) {
+					listener.onFullscreenLoaded(this);
+				}
+			} else {
+				Method fetchMethod = interstitialClass.getMethod("fetch");
+				fetchMethod.invoke(interstitial);
+			}
+		} catch (Exception e) {
 			if (listener != null) {
-				listener.onFullscreenLoaded(this);
+				listener.onFullscreenFailed();
 			}
 		}
 	}
 
-	private RequestListener createListener() {
-		return new RequestListener() {
+	private Object createListener() {
+
+		Object instance = Proxy.newProxyInstance(listenerClass.getClassLoader(), new Class<?>[] { listenerClass }, new InvocationHandler() {
 
 			@Override
-			public void requestFailed(MMAd arg0, MMException arg1) {
-				if (listener != null) {
-					listener.onFullscreenFailed();
+			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+
+				if (method.getName().equals("requestFailed")) {
+					if (listener != null) {
+						listener.onFullscreenFailed();
+					}
+				} else if (method.getName().equals("requestCompleted")) {
+					if (listener != null) {
+						listener.onFullscreenLoaded(MillennialFullscreen.this);
+					}
+				} else if (method.getName().equals("onSingleTap")) {
+					if (listener != null && wasTapped) { // millennial reports tap also on close button "X" click
+						listener.onFullscreenLeftApplication();
+					}
+					wasTapped = true;
+				} else if (method.getName().equals("MMAdOverlayLaunched")) {
+					reportImpression();
+					if (listener != null) {
+						listener.onFullscreenOpened();
+					}
+				} else if (method.getName().equals("MMAdOverlayClosed")) {
+					if (listener != null) {
+						listener.onFullscreenClosed();
+					}
 				}
+				return null;
 			}
+		});
 
-			@Override
-			public void requestCompleted(MMAd arg0) {
-				if (listener != null) {
-					listener.onFullscreenLoaded(MillennialFullscreen.this);
-				}
-			}
-
-			@Override
-			public void onSingleTap(MMAd arg0) {
-				
-				if(listener != null && wasTapped) { //millennial reports tap also on close button "X" click
-					listener.onFullscreenLeftApplication();
-				}
-				wasTapped = true;
-			}
-
-			@Override
-			public void MMAdRequestIsCaching(MMAd arg0) {
-			}
-
-			@Override
-			public void MMAdOverlayLaunched(MMAd arg0) {
-				reportImpression();
-				if (listener != null) {
-					listener.onFullscreenOpened();
-				}
-			}
-
-			@Override
-			public void MMAdOverlayClosed(MMAd arg0) {
-				if (listener != null) {
-					listener.onFullscreenClosed();
-				}
-			}
-		};
+		return instance;
 	}
 
 	@Override
 	public void showFullscreen() {
-		if (interstitial != null && interstitial.isAdAvailable()) {
-			interstitial.display();
+		if (interstitial != null && interstitialClass != null) {
+			try {
+				Method isAdAvailableMethod = interstitialClass.getMethod("isAdAvailable");
+				if ((Boolean) isAdAvailableMethod.invoke(interstitial)) {
+					Method displayMethod = interstitialClass.getMethod("display");
+					displayMethod.invoke(interstitial);
+				}
+			} catch (Exception e) {
+			}
 		}
 	}
 
