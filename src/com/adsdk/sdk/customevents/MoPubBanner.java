@@ -1,16 +1,19 @@
-
 package com.adsdk.sdk.customevents;
 
-import android.content.Context;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 
-import com.mopub.mobileads.MoPubErrorCode;
-import com.mopub.mobileads.MoPubView;
-import com.mopub.mobileads.MoPubView.BannerAdListener;
+import android.content.Context;
+import android.view.View;
 
 public class MoPubBanner extends CustomEventBanner {
 
-	private MoPubView banner;
+	private Object banner;
 	private boolean reportedClick;
+	private Class<?> bannerClass;
+	private Class<?> listenerClass;
 
 	@Override
 	public void loadBanner(Context context, CustomEventBannerListener customEventBannerListener, String optionalParameters, String trackingPixel, int width, int height) {
@@ -19,70 +22,87 @@ public class MoPubBanner extends CustomEventBanner {
 		this.trackingPixel = trackingPixel;
 
 		try {
-			Class.forName("com.mopub.mobileads.MoPubView");
-			Class.forName("com.mopub.mobileads.MoPubErrorCode");
+			bannerClass = Class.forName("com.mopub.mobileads.MoPubView");
+			listenerClass = Class.forName("com.mopub.mobileads.MoPubView$BannerAdListener");
 		} catch (ClassNotFoundException e) {
 			if (listener != null) {
 				listener.onBannerFailed();
 			}
 			return;
 		}
+		
+		reportedClick = false;
 
-		banner = new MoPubView(context);
-		banner.setAdUnitId(adId);
-		banner.setAutorefreshEnabled(false);
-		banner.setBannerAdListener(createListener());
-		banner.loadAd();
+		try {
+			Constructor<?> bannerConstructor = bannerClass.getConstructor(Context.class);
+			banner = bannerConstructor.newInstance(context);
+
+			Method setAdUnitIdMethod = bannerClass.getMethod("setAdUnitId", String.class);
+			setAdUnitIdMethod.invoke(banner, adId);
+
+			Method setAutorefreshEnabledMethod = bannerClass.getMethod("setAutorefreshEnabled", boolean.class);
+			setAutorefreshEnabledMethod.invoke(banner, false);
+
+			Method setListenerMethod = bannerClass.getMethod("setBannerAdListener", listenerClass);
+			setListenerMethod.invoke(banner, createListener());
+
+			Method loadAdMethod = bannerClass.getMethod("loadAd");
+			loadAdMethod.invoke(banner);
+		} catch (Exception e) {
+			if (listener != null) {
+				listener.onBannerFailed();
+			}
+		}
+
 	}
 
-	private BannerAdListener createListener() {
-		return new BannerAdListener() {
+	private Object createListener() {
+		Object instance = Proxy.newProxyInstance(listenerClass.getClassLoader(), new Class<?>[] { listenerClass }, new InvocationHandler() {
 
 			@Override
-			public void onBannerLoaded(MoPubView arg0) {
-				reportImpression();
-				if (listener != null) {
-					listener.onBannerLoaded(banner);
-				}
-			}
+			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 
-			@Override
-			public void onBannerFailed(MoPubView arg0, MoPubErrorCode arg1) {
-				if (listener != null) {
-					listener.onBannerFailed();
+				if (method.getName().equals("onBannerLoaded")) {
+					reportImpression();
+					if (listener != null) {
+						listener.onBannerLoaded((View)banner);
+					}
+				} else if (method.getName().equals("onBannerFailed")) {
+					if (listener != null) {
+						listener.onBannerFailed();
+					}
+				} else if (method.getName().equals("onBannerExpanded")) {
+					if (listener != null && !reportedClick) {
+						reportedClick = true;
+						listener.onBannerExpanded();
+					}
+				} else if (method.getName().equals("onBannerCollapsed")) {
+					if (listener != null) {
+						reportedClick = false;
+						listener.onBannerClosed();
+					}
 				}
-			}
-
-			@Override
-			public void onBannerExpanded(MoPubView arg0) {
-				if (listener != null && !reportedClick) {
-					reportedClick = true;
-					listener.onBannerExpanded();
+				else if (method.getName().equals("onBannerClicked")) {
+					if (listener != null && !reportedClick) {
+						reportedClick = true;
+						listener.onBannerExpanded();
+					}
 				}
+				return null;
 			}
-
-			@Override
-			public void onBannerCollapsed(MoPubView arg0) {
-				if (listener != null) {
-					reportedClick = false;
-					listener.onBannerClosed();
-				}
-			}
-
-			@Override
-			public void onBannerClicked(MoPubView arg0) {
-				if (listener != null && !reportedClick) {
-					reportedClick = true;
-					listener.onBannerExpanded();
-				}
-			}
-		};
+		});
+		
+		return instance;
 	}
 
 	@Override
 	public void destroy() {
-		if (banner != null) {
-			banner.destroy();
+		if (banner != null && bannerClass != null) {
+			try {
+				Method destroyMethod = bannerClass.getMethod("destroy");
+				destroyMethod.invoke(banner);
+			} catch (Exception e) {
+			}
 		}
 		super.destroy();
 	}
