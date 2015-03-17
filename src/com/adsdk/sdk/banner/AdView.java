@@ -673,8 +673,12 @@ public class AdView extends FrameLayout {
 	
 	public void startReloadTimer() {
 		Log.d(Const.TAG, "start reload timer");
-		if (this.reloadTimer == null || response.getRefresh() <= 0)
+		if (response.getRefresh() <= 0) {			
 			return;
+		}
+		if (this.reloadTimer == null) {
+			this.reloadTimer = new Timer();
+		}
 		
 		final int refreshTime = this.response.getRefresh() * 1000;
 		Log.d(Const.TAG, "set timer: " + refreshTime);
