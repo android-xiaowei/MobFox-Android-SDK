@@ -61,16 +61,16 @@ public class NativeAdRequest {
 		b.appendQueryParameter("v", this.getProtocolVersion());
 
 		if (userAge != 0) {
-			b.appendQueryParameter("demo.age", Integer.toString(userAge));
+			b.appendQueryParameter("demo_age", Integer.toString(userAge));
 		}
 
 		if (gender != null) {
-			b.appendQueryParameter("demo.gender", gender.getServerParam());
+			b.appendQueryParameter("demo_gender", gender.getServerParam());
 		}
 
 		if (keywords != null && !keywords.isEmpty()) {
 			String parameter = TextUtils.join(", ", keywords);
-			b.appendQueryParameter("demo.keywords", parameter);
+			b.appendQueryParameter("demo_keywords", parameter);
 		}
 
 		b.appendQueryParameter("u_wv", this.getUserAgent());

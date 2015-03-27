@@ -178,7 +178,7 @@ public class AdRequest {
 		b.appendQueryParameter("connection_type", this.getConnectionType());
 		b.appendQueryParameter("listads", this.getListAds());
 		b.appendQueryParameter("c_customevents", "1");
-		b.appendQueryParameter("c.mraid", "1");
+		b.appendQueryParameter("c_mraid", "1");
 		if(isVideoRequest) {
 			b.appendQueryParameter("r_type", "video");
 			b.appendQueryParameter("r_resp", "vast20");
@@ -193,16 +193,16 @@ public class AdRequest {
 		}
 		
 		if(userAge != 0) {
-			b.appendQueryParameter("demo.age", Integer.toString(userAge));
+			b.appendQueryParameter("demo_age", Integer.toString(userAge));
 		}
 		
 		if (gender != null) {
-			b.appendQueryParameter("demo.gender", gender.getServerParam());
+			b.appendQueryParameter("demo_gender", gender.getServerParam());
 		}
 		
 		if(keywords != null && !keywords.isEmpty()) {
 			String parameter = TextUtils.join(", ", keywords);
-			b.appendQueryParameter("demo.keywords", parameter);
+			b.appendQueryParameter("demo_keywords", parameter);
 		}
 		
 		b.appendQueryParameter("u_wv", this.getUserAgent());
@@ -214,12 +214,12 @@ public class AdRequest {
 		
 		if(adspaceHeight != 0 && adspaceWidth != 0) {
 			if(adspaceStrict) {
-				b.appendQueryParameter("adspace.strict", "1");
+				b.appendQueryParameter("adspace_strict", "1");
 			} else {
-				b.appendQueryParameter("adspace.strict", "0");
+				b.appendQueryParameter("adspace_strict", "0");
 			}
-			b.appendQueryParameter("adspace.width", Integer.toString(adspaceWidth));
-			b.appendQueryParameter("adspace.height", Integer.toString(adspaceHeight));
+			b.appendQueryParameter("adspace_width", Integer.toString(adspaceWidth));
+			b.appendQueryParameter("adspace_height", Integer.toString(adspaceHeight));
 		}
 
 		return b.build();
