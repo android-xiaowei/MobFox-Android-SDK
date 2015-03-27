@@ -63,6 +63,7 @@ public class FlurryBanner extends CustomEventBanner {
 			Method fetchAdMethod = bannerClass.getMethod("fetchAd");
 			fetchAdMethod.invoke(banner);
 		} catch (Exception e) {
+			e.printStackTrace();
 			if (listener != null) {
 				listener.onBannerFailed();
 			}
@@ -128,6 +129,7 @@ public class FlurryBanner extends CustomEventBanner {
 				destroyMethod.invoke(banner);
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		super.destroy();
 	}

@@ -49,6 +49,7 @@ public class MoPubBanner extends CustomEventBanner {
 			Method loadAdMethod = bannerClass.getMethod("loadAd");
 			loadAdMethod.invoke(banner);
 		} catch (Exception e) {
+			e.printStackTrace();
 			if (listener != null) {
 				listener.onBannerFailed();
 			}
@@ -102,6 +103,7 @@ public class MoPubBanner extends CustomEventBanner {
 				Method destroyMethod = bannerClass.getMethod("destroy");
 				destroyMethod.invoke(banner);
 			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
 		super.destroy();

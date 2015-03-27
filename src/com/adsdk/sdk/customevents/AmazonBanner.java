@@ -25,11 +25,8 @@ public class AmazonBanner extends CustomEventBanner {
 		Class<?> adSizeClass;
 
 		try {
-			Class.forName("com.amazon.device.ads.Ad");
-			Class.forName("com.amazon.device.ads.AdError");
 			adLayoutClass = Class.forName("com.amazon.device.ads.AdLayout");
 			listenerClass = Class.forName("com.amazon.device.ads.AdListener");
-			Class.forName("com.amazon.device.ads.AdProperties");
 			adRegistrationClass = Class.forName("com.amazon.device.ads.AdRegistration");
 			adSizeClass = Class.forName("com.amazon.device.ads.AdSize");
 		} catch (ClassNotFoundException e) {
@@ -111,11 +108,12 @@ public class AmazonBanner extends CustomEventBanner {
 
 	@Override
 	public void destroy() {
-		if (banner != null) {
+		if (banner != null && adLayoutClass != null) {
 			try {
 				Method destroyMethod = adLayoutClass.getMethod("destroy");
 				destroyMethod.invoke(banner);
 			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
 		super.destroy();

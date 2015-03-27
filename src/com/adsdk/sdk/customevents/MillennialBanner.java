@@ -58,13 +58,14 @@ public class MillennialBanner extends CustomEventBanner {
 
 			Method setMMRequestMethod = bannerClass.getMethod("setMMRequest", requestClass);
 			setMMRequestMethod.invoke(millenialAdView, request);
-			
+
 			Method setListenerMethod = bannerClass.getMethod("setListener", listenerClass);
 			setListenerMethod.invoke(millenialAdView, createAdListener());
 
 			Method getAdMethod = bannerClass.getMethod("getAd");
 			getAdMethod.invoke(millenialAdView);
 		} catch (Exception e) {
+			e.printStackTrace();
 			if (listener != null) {
 				listener.onBannerFailed();
 			}
@@ -85,7 +86,7 @@ public class MillennialBanner extends CustomEventBanner {
 				} else if (method.getName().equals("requestCompleted")) {
 					reportImpression();
 					if (listener != null) {
-						listener.onBannerLoaded((View)millenialAdView);
+						listener.onBannerLoaded((View) millenialAdView);
 					}
 				} else if (method.getName().equals("MMAdOverlayLaunched")) {
 					if (listener != null) {
@@ -99,7 +100,7 @@ public class MillennialBanner extends CustomEventBanner {
 				return null;
 			}
 		});
-		
+
 		return instance;
 	}
 

@@ -42,6 +42,7 @@ public class FacebookNative extends CustomEventNative {
 			Method loadAdMethod = nativeAdClass.getMethod("loadAd");
 			loadAdMethod.invoke(facebookNative);
 		} catch (Exception e) {
+			e.printStackTrace();
 			if (listener != null) {
 				listener.onCustomEventNativeFailed();
 			}
@@ -132,6 +133,7 @@ public class FacebookNative extends CustomEventNative {
 								}
 
 							} catch (Exception e) {
+								e.printStackTrace();
 								if (listener != null) {
 									listener.onCustomEventNativeFailed();
 								}
@@ -176,6 +178,7 @@ public class FacebookNative extends CustomEventNative {
 			Method prepareImpressionMethod = nativeAdClass.getMethod("registerViewForInteraction", View.class);
 			prepareImpressionMethod.invoke(facebookNative, view);
 		} catch (Exception e) {
+			e.printStackTrace();
 			if (listener != null) {
 				listener.onCustomEventNativeFailed();
 			}

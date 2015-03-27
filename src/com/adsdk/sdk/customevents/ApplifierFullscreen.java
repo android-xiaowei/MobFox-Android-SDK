@@ -56,6 +56,7 @@ public class ApplifierFullscreen extends CustomEventFullscreen {
 				}
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
 			if (listener != null) {
 				listener.onFullscreenFailed();
 			}
@@ -98,26 +99,29 @@ public class ApplifierFullscreen extends CustomEventFullscreen {
 
 	@Override
 	public void showFullscreen() {
-		try {
+		if (unityClass != null) {
 
-			Method canShowAdsMethod = unityClass.getMethod("canShowAds");
-			boolean canShowAds = (Boolean) canShowAdsMethod.invoke(null);
+			try {
+				Method canShowAdsMethod = unityClass.getMethod("canShowAds");
+				boolean canShowAds = (Boolean) canShowAdsMethod.invoke(null);
 
-			Method canShowMethod = unityClass.getMethod("canShow");
-			boolean canShow = (Boolean) canShowMethod.invoke(null);
+				Method canShowMethod = unityClass.getMethod("canShow");
+				boolean canShow = (Boolean) canShowMethod.invoke(null);
 
-			if (canShow && canShowAds) {
-				Method showMethod = unityClass.getMethod("show");
-				showMethod.invoke(null);
-			} else if (listener != null) {
-				listener.onFullscreenFailed();
+				if (canShow && canShowAds) {
+					Method showMethod = unityClass.getMethod("show");
+					showMethod.invoke(null);
+				} else if (listener != null) {
+					listener.onFullscreenFailed();
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				if (listener != null) {
+					listener.onFullscreenFailed();
+				}
 			}
-		} catch (Exception e) {
-			if (listener != null) {
-				listener.onFullscreenFailed();
-			}
+
 		}
-
 	}
 
 }

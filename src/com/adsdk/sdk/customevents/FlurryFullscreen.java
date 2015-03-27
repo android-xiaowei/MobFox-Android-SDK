@@ -44,7 +44,6 @@ public class FlurryFullscreen extends CustomEventFullscreen {
 		}
 
 		try {
-
 			Method initMethod = flurryAgentClass.getMethod("init", new Class[] { Context.class, String.class });
 			initMethod.invoke(null, context, apiKey);
 
@@ -53,16 +52,14 @@ public class FlurryFullscreen extends CustomEventFullscreen {
 
 			Constructor<?> interstitialConstructor = interstitialClass.getConstructor(new Class[] { Context.class, String.class });
 			interstitial = interstitialConstructor.newInstance(context, adSpace);
-			// interstitial = new FlurryAdInterstitial(context, adSpace);
 
 			Method setListenerMethod = interstitialClass.getMethod("setListener", listenerClass);
 			setListenerMethod.invoke(interstitial, createListener());
-			// interstitial.setListener(createListener());
 
 			Method fetchAdMethod = interstitialClass.getMethod("fetchAd");
 			fetchAdMethod.invoke(interstitial);
-			// interstitial.fetchAd();
 		} catch (Exception e) {
+			e.printStackTrace();
 			if (listener != null) {
 				listener.onFullscreenFailed();
 			}
@@ -119,6 +116,7 @@ public class FlurryFullscreen extends CustomEventFullscreen {
 				onEndSessionMethod.invoke(null, context);
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		super.finish();
 	}
@@ -129,6 +127,7 @@ public class FlurryFullscreen extends CustomEventFullscreen {
 			Method displayAdMethod = interstitialClass.getMethod("displayAd");
 			displayAdMethod.invoke(interstitial);
 		} catch (Exception e) {
+			e.printStackTrace();
 			if (listener != null) {
 				listener.onFullscreenFailed();
 			}

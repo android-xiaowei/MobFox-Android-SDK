@@ -43,6 +43,7 @@ public class MoPubNative extends CustomEventNative {
 			Method makeRequestMethod = moPubNativeClass.getMethod("makeRequest");
 			makeRequestMethod.invoke(moPubNative);
 		} catch (Exception e) {
+			e.printStackTrace();
 			if (listener != null) {
 				listener.onCustomEventNativeFailed();
 			}

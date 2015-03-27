@@ -60,6 +60,7 @@ public class MillennialFullscreen extends CustomEventFullscreen {
 				fetchMethod.invoke(interstitial);
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
 			if (listener != null) {
 				listener.onFullscreenFailed();
 			}
@@ -113,6 +114,7 @@ public class MillennialFullscreen extends CustomEventFullscreen {
 					displayMethod.invoke(interstitial);
 				}
 			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
 	}

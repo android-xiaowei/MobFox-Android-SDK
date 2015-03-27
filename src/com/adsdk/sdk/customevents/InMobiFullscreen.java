@@ -35,20 +35,21 @@ public class InMobiFullscreen extends CustomEventFullscreen {
 		try {
 
 			if (!isInitialized) {
-				Method initializeMethod = inMobiClass.getMethod("initialize", new Class[] {Context.class, String.class});
+				Method initializeMethod = inMobiClass.getMethod("initialize", new Class[] { Context.class, String.class });
 				initializeMethod.invoke(null, activity, optionalParameters);
 				isInitialized = true;
 			}
-			
-			Constructor<?> interstitialConstructor = interstitialClass.getConstructor(new Class[] {Activity.class, String.class});
+
+			Constructor<?> interstitialConstructor = interstitialClass.getConstructor(new Class[] { Activity.class, String.class });
 			interstitial = interstitialConstructor.newInstance(activity, optionalParameters);
-			
+
 			Method setListenerMethod = interstitialClass.getMethod("setIMInterstitialListener", listenerClass);
 			setListenerMethod.invoke(interstitial, createListener());
-			
+
 			Method loadInterstitialMethod = interstitialClass.getMethod("loadInterstitial");
 			loadInterstitialMethod.invoke(interstitial);
 		} catch (Exception e) {
+			e.printStackTrace();
 			if (listener != null) {
 				listener.onFullscreenFailed();
 			}
@@ -86,26 +87,27 @@ public class InMobiFullscreen extends CustomEventFullscreen {
 				return null;
 			}
 		});
-		
+
 		return instance;
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public void showFullscreen() {
-		if(interstitial != null && interstitialClass != null) {
+		if (interstitial != null && interstitialClass != null) {
 			try {
 				Class<?> stateClass = Class.forName("com.inmobi.monetization.IMInterstitial$State");
-				Object readyState = Enum.valueOf((Class<Enum>)stateClass, "READY");
+				Object readyState = Enum.valueOf((Class<Enum>) stateClass, "READY");
 				Method getStateMethod = interstitialClass.getMethod("getState");
 				boolean ready = (getStateMethod.invoke(interstitial) == readyState);
-				
+
 				if (ready) {
 					Method showMethod = interstitialClass.getMethod("show");
 					showMethod.invoke(interstitial);
 				}
-				
+
 			} catch (Exception e) {
+				e.printStackTrace();
 				if (listener != null) {
 					listener.onFullscreenFailed();
 				}

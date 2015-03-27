@@ -1,4 +1,3 @@
-
 package com.adsdk.sdk.customevents;
 
 import java.lang.reflect.Constructor;
@@ -32,23 +31,22 @@ public class FacebookFullscreen extends CustomEventFullscreen {
 			}
 			return;
 		}
-		
+
 		try {
-			Constructor<?> interstitialConstructor = interstitialClass.getConstructor(new Class[] {Context.class, String.class});
+			Constructor<?> interstitialConstructor = interstitialClass.getConstructor(new Class[] { Context.class, String.class });
 			interstitial = interstitialConstructor.newInstance(activity, adId);
-			
+
 			Method setAdListenerMethod = interstitialClass.getMethod("setAdListener", listenerClass);
 			setAdListenerMethod.invoke(interstitial, createListener());
-			
+
 			Method loadAdMethod = interstitialClass.getMethod("loadAd");
 			loadAdMethod.invoke(interstitial);
 		} catch (Exception e) {
+			e.printStackTrace();
 			if (listener != null) {
 				listener.onFullscreenFailed();
 			}
 		}
-		
-
 
 	}
 
@@ -85,26 +83,27 @@ public class FacebookFullscreen extends CustomEventFullscreen {
 		});
 
 		return instance;
-		
+
 	}
 
 	@Override
 	public void showFullscreen() {
 		if (interstitial != null && interstitialClass != null) {
 			try {
-				
-			Method isAdLoadedMethod = interstitialClass.getMethod("isAdLoaded");
-			boolean isLoaded = (Boolean)isAdLoadedMethod.invoke(interstitial);
-			if(isLoaded) {
-				Method showMethod = interstitialClass.getMethod("show");
-				showMethod.invoke(interstitial);
-			}
+
+				Method isAdLoadedMethod = interstitialClass.getMethod("isAdLoaded");
+				boolean isLoaded = (Boolean) isAdLoadedMethod.invoke(interstitial);
+				if (isLoaded) {
+					Method showMethod = interstitialClass.getMethod("show");
+					showMethod.invoke(interstitial);
+				}
 			} catch (Exception e) {
+				e.printStackTrace();
 				if (listener != null) {
 					listener.onFullscreenFailed();
 				}
 			}
-			
+
 		}
 
 	}

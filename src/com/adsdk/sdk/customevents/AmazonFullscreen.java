@@ -22,7 +22,6 @@ public class AmazonFullscreen extends CustomEventFullscreen {
 		Class<?> adRegistrationClass;
 
 		try {
-			Class.forName("com.amazon.device.ads.Ad");
 			listenerClass = Class.forName("com.amazon.device.ads.AdListener");
 			adRegistrationClass = Class.forName("com.amazon.device.ads.AdRegistration");
 			interstitialClass = Class.forName("com.amazon.device.ads.InterstitialAd");
@@ -87,12 +86,13 @@ public class AmazonFullscreen extends CustomEventFullscreen {
 
 	@Override
 	public void showFullscreen() {
-		if (interstitial != null) {
+		if (interstitial != null && interstitialClass != null) {
 			boolean shown = false;
 			try {
 				Method showAdMethod = interstitialClass.getMethod("showAd");
 				shown = (Boolean) showAdMethod.invoke(interstitial);
 			} catch (Exception e) {
+				e.printStackTrace();
 			}
 
 			if (shown) {

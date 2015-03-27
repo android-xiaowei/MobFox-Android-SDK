@@ -39,6 +39,7 @@ public class MoPubFullscreen extends CustomEventFullscreen {
 			Method loadMethod = interstitialClass.getMethod("load");
 			loadMethod.invoke(interstitial);
 		} catch (Exception e) {
+			e.printStackTrace();
 			if (listener != null) {
 				listener.onFullscreenFailed();
 			}
@@ -94,6 +95,7 @@ public class MoPubFullscreen extends CustomEventFullscreen {
 					showMethod.invoke(interstitial);
 				}
 			} catch (Exception e) {
+				e.printStackTrace();
 				if (listener != null) {
 					listener.onFullscreenFailed();
 				}
@@ -108,6 +110,7 @@ public class MoPubFullscreen extends CustomEventFullscreen {
 				Method destroyMethod = interstitialClass.getMethod("destroy");
 				destroyMethod.invoke(interstitial);
 			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
 		super.finish();

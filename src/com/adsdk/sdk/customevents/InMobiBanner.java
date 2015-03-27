@@ -79,6 +79,7 @@ public class InMobiBanner extends CustomEventBanner {
 			Method loadBannerMethod = bannerClass.getMethod("loadBanner");
 			loadBannerMethod.invoke(banner);
 		} catch (Exception e) {
+			e.printStackTrace();
 			if (listener != null) {
 				listener.onBannerFailed();
 			}

@@ -30,7 +30,6 @@ public class VungleFullscreen extends CustomEventFullscreen {
 			listenerClass = Class.forName("com.vungle.publisher.EventListener");
 			vungleClass = Class.forName("com.vungle.publisher.VunglePub");
 		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
 			if (listener != null) {
 				listener.onFullscreenFailed();
 			}
@@ -89,6 +88,7 @@ public class VungleFullscreen extends CustomEventFullscreen {
 			}
 
 		} catch (Exception e) {
+			e.printStackTrace();
 			if (listener != null) {
 				listener.onFullscreenFailed();
 			}
@@ -150,6 +150,7 @@ public class VungleFullscreen extends CustomEventFullscreen {
 					removeEventListenersMethod.invoke(vunglePub, eventListenerArray);
 				}
 			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
 		eventListenerArray = null;
@@ -166,6 +167,7 @@ public class VungleFullscreen extends CustomEventFullscreen {
 					playAdMethod.invoke(vunglePub);
 				}
 			} catch (Exception e) {
+				e.printStackTrace();
 				if (listener != null) {
 					listener.onFullscreenFailed();
 				}

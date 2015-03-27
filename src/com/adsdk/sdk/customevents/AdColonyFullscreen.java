@@ -93,6 +93,7 @@ public class AdColonyFullscreen extends CustomEventFullscreen {
 			}
 
 		} catch (Exception e) {
+			e.printStackTrace();
 			if (listener != null) {
 				listener.onFullscreenFailed();
 			}
@@ -139,13 +140,17 @@ public class AdColonyFullscreen extends CustomEventFullscreen {
 	@Override
 	public void showFullscreen() {
 		try {
-			boolean isReady = (Boolean) isReadyMethod.invoke(videoAd);
+			if (videoAd != null) {
+				boolean isReady = (Boolean) isReadyMethod.invoke(videoAd);
 
-			if (videoAd != null && isReady) {
-				Method showMethod = videoAdClass.getMethod("show");
-				showMethod.invoke(videoAd);
+				if (isReady) {
+					Method showMethod = videoAdClass.getMethod("show");
+					showMethod.invoke(videoAd);
+				}
 			}
+
 		} catch (Exception e) {
+			e.printStackTrace();
 			if (listener != null) {
 				listener.onFullscreenFailed();
 			}

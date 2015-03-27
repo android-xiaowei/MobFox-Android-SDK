@@ -54,6 +54,7 @@ public class InMobiNative extends CustomEventNative {
 			Method loadAdMethod = nativeAdClass.getMethod("loadAd");
 			loadAdMethod.invoke(inMobiNative);
 		} catch (Exception e) {
+			e.printStackTrace();
 			if (listener != null) {
 				listener.onCustomEventNativeFailed();
 			}
@@ -125,6 +126,7 @@ public class InMobiNative extends CustomEventNative {
 									}
 								}
 							} catch (Exception e) {
+								e.printStackTrace();
 								if (listener != null) {
 									listener.onCustomEventNativeFailed();
 								}
@@ -156,6 +158,7 @@ public class InMobiNative extends CustomEventNative {
 				attachToViewMethod.invoke(loadedNative, (ViewGroup) view.getParent());
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 
@@ -165,6 +168,7 @@ public class InMobiNative extends CustomEventNative {
 			Method handleClickMethod = nativeAdClass.getMethod("handleClick", HashMap.class);
 			handleClickMethod.invoke(loadedNative);
 		} catch (Exception e) {
+			e.printStackTrace();
 		}
 
 	}
