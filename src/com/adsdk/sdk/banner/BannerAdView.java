@@ -230,7 +230,7 @@ public class BannerAdView extends RelativeLayout {
 		this.webView = this.createWebView(mContext);
 		Log.d(Const.TAG, "Create view flipper");
 		final float scale = mContext.getResources().getDisplayMetrics().density;
-		if (width != 0 && height != 0) {
+		if (width > 0 && height > 0) {
 			this.setLayoutParams(new RelativeLayout.LayoutParams((int) (width * scale + 0.5f), (int) (height * scale + 0.5f)));
 		} else {
 			this.setLayoutParams(new RelativeLayout.LayoutParams((int) (300 * scale + 0.5f), (int) (50 * scale + 0.5f)));

@@ -212,7 +212,7 @@ public class AdRequest {
 			b.appendQueryParameter("latitude", Double.toString(latitude));
 		}
 		
-		if(adspaceHeight != 0 && adspaceWidth != 0) {
+		if(adspaceHeight > 0 && adspaceWidth > 0) {
 			if(adspaceStrict) {
 				b.appendQueryParameter("adspace_strict", "1");
 			} else {

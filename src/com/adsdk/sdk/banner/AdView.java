@@ -93,11 +93,19 @@ public class AdView extends FrameLayout {
 	private CustomEventBannerListener customAdListener;
 
 	public void setAdspaceWidth(int width) {
-		adspaceWidth = width;
+		if (width > 0) {
+			adspaceWidth = width;
+		} else {
+			Log.w("Adspace width must be greater than 0! Ignoring value:" + width);
+		}
 	}
 
 	public void setAdspaceHeight(int height) {
-		adspaceHeight = height;
+		if (height > 0) {
+			adspaceHeight = height;
+		} else {
+			Log.w("Adspace height must be greater than 0! Ignoring value:" + height);
+		}
 	}
 
 	public void setAdspaceStrict(boolean strict) {
@@ -283,6 +291,10 @@ public class AdView extends FrameLayout {
 						requestAd = new RequestGeneralAd(xml);
 
 					try {
+						if (adspaceHeight < 1 || adspaceWidth < 1) {
+							Log.w("For improved ad serving, it is highly recommended to set the adspace size.");
+						}
+						
 						AdView.this.response = requestAd.sendRequest(AdView.this.getRequest());
 						if (AdView.this.response != null) {
 							Log.d(Const.TAG, "response received");
@@ -483,7 +495,7 @@ public class AdView extends FrameLayout {
 
 	private void addMRAIDBannerView() {
 		final float scale = mContext.getResources().getDisplayMetrics().density;
-		if (adspaceHeight != 0 && adspaceWidth != 0) {
+		if (adspaceHeight > 0 && adspaceWidth > 0) {
 			AdView.this.addView(MRAIDFrame, new FrameLayout.LayoutParams((int) (adspaceWidth * scale + 0.5f), (int) (adspaceHeight * scale + 0.5f)));
 		} else {
 			AdView.this.addView(MRAIDFrame, new FrameLayout.LayoutParams(android.view.ViewGroup.LayoutParams.WRAP_CONTENT, (int) (50 * scale + 0.5f)));
@@ -500,7 +512,7 @@ public class AdView extends FrameLayout {
 				handler.post(new Runnable() {
 					@Override
 					public void run() {
-						if (adspaceHeight != 0 && adspaceWidth != 0) {
+						if (adspaceHeight > 0 && adspaceWidth > 0) {
 							customEventBanner.loadBanner(mContext, customAdListener, event.getOptionalParameter(), event.getPixelUrl(), adspaceWidth, adspaceHeight);
 						} else {
 							customEventBanner.loadBanner(mContext, customAdListener, event.getOptionalParameter(), event.getPixelUrl(), 300, 50);
