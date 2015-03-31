@@ -1,7 +1,5 @@
 package com.adsdk.sdk.banner;
 
-import static com.adsdk.sdk.Const.TAG;
-
 import java.io.InputStream;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.List;
@@ -182,7 +180,7 @@ public class AdView extends FrameLayout {
 		IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
 		filter.addAction(Intent.ACTION_USER_PRESENT);
 		mContext.registerReceiver(mScreenStateReceiver, filter);
-		Log.v(Const.TAG, "onAttachedToWindow");
+		Log.v("onAttachedToWindow");
 	}
 
 	@Override
@@ -190,7 +188,7 @@ public class AdView extends FrameLayout {
 
 		super.onDetachedFromWindow();
 		unregisterScreenStateBroadcastReceiver();
-		Log.v(Const.TAG, "onDetachedFromWindow");
+		Log.v("onDetachedFromWindow");
 	}
 
 	@Override
@@ -213,8 +211,8 @@ public class AdView extends FrameLayout {
 			this.request.setPublisherId(this.publisherId);
 			this.request.setUserAgent(Util.getDefaultUserAgentString(mContext));
 			this.request.setUserAgent2(Util.buildUserAgent());
-			Log.d(Const.TAG, "WebKit UserAgent:" + this.request.getUserAgent());
-			Log.d(Const.TAG, "SDK built UserAgent:" + this.request.getUserAgent2());
+			Log.d("WebKit UserAgent:" + this.request.getUserAgent());
+			Log.d("SDK built UserAgent:" + this.request.getUserAgent2());
 		}
 		request.setGender(userGender);
 		request.setUserAge(userAge);
@@ -223,7 +221,7 @@ public class AdView extends FrameLayout {
 		if (this.includeLocation)
 			location = Util.getLocation(mContext);
 		if (location != null) {
-			Log.d(Const.TAG, "location is longitude: " + location.getLongitude() + ", latitude: " + location.getLatitude());
+			Log.d("location is longitude: " + location.getLongitude() + ", latitude: " + location.getLatitude());
 			this.request.setLatitude(location.getLatitude());
 			this.request.setLongitude(location.getLongitude());
 		} else {
@@ -239,8 +237,7 @@ public class AdView extends FrameLayout {
 	}
 
 	private void initialize(final Context context) {
-		Log.LOGGING_ENABLED = Log.isLoggingEnabled(mContext);
-		Log.d(Const.TAG, "SDK Version:" + Const.VERSION);
+		Log.d("SDK Version:" + Const.VERSION);
 		registerScreenStateBroadcastReceiver();
 		Util.prepareAndroidAdId(context);
 		customAdListener = createCustomAdListener();
@@ -256,17 +253,17 @@ public class AdView extends FrameLayout {
 			public void onReceive(Context context, Intent intent) {
 				if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
 					if (mIsInForeground) {
-						Log.d(Const.TAG, "Screen sleep with ad in foreground, disable refresh");
+						Log.d("Screen sleep with ad in foreground, disable refresh");
 						pause();
 					} else {
-						Log.d(Const.TAG, "Screen sleep but ad in background; " + "refresh should already be disabled");
+						Log.d("Screen sleep but ad in background; " + "refresh should already be disabled");
 					}
 				} else if (intent.getAction().equals(Intent.ACTION_USER_PRESENT)) {
 					if (mIsInForeground) {
 						resume();
-						Log.d(Const.TAG, "Screen wake / ad in foreground, reset refresh");
+						Log.d("Screen wake / ad in foreground, reset refresh");
 					} else {
-						Log.d(Const.TAG, "Screen wake but ad in background; don't enable refresh");
+						Log.d("Screen wake but ad in background; don't enable refresh");
 					}
 				}
 			}
@@ -277,13 +274,13 @@ public class AdView extends FrameLayout {
 	}
 
 	private void loadContent() {
-		Log.d(Const.TAG, "load content");
+		Log.d("load content");
 
 		if (this.loadContentThread == null) {
 			this.loadContentThread = new Thread(new Runnable() {
 				@Override
 				public void run() {
-					Log.d(Const.TAG, "starting request thread");
+					Log.d("starting request thread");
 					final RequestGeneralAd requestAd;
 					if (xml == null)
 						requestAd = new RequestGeneralAd();
@@ -294,18 +291,18 @@ public class AdView extends FrameLayout {
 						if (adspaceHeight < 1 || adspaceWidth < 1) {
 							Log.w("For improved ad serving, it is highly recommended to set the adspace size.");
 						}
-						
+
 						AdView.this.response = requestAd.sendRequest(AdView.this.getRequest());
 						if (AdView.this.response != null) {
-							Log.d(Const.TAG, "response received");
-							Log.d(Const.TAG, "getVisibility: " + AdView.this.getVisibility());
+							Log.d("response received");
+							Log.d("getVisibility: " + AdView.this.getVisibility());
 							AdView.this.handler.post(AdView.this.showContent);
 						}
 					} catch (final Throwable e) {
 						AdView.this.notifyLoadAdFailed(e);
 					}
 					AdView.this.loadContentThread = null;
-					Log.d(Const.TAG, "finishing request thread");
+					Log.d("finishing request thread");
 				}
 
 			});
@@ -313,7 +310,7 @@ public class AdView extends FrameLayout {
 
 				@Override
 				public void uncaughtException(final Thread thread, final Throwable ex) {
-					Log.e(Const.TAG, "Exception in request thread", ex);
+					Log.e("Exception in request thread", ex);
 					AdView.this.loadContentThread = null;
 				}
 			});
@@ -323,7 +320,7 @@ public class AdView extends FrameLayout {
 	}
 
 	public void loadNextAd() {
-		Log.d(Const.TAG, "load next ad");
+		Log.d("load next ad");
 		this.loadContent();
 	}
 
@@ -332,7 +329,7 @@ public class AdView extends FrameLayout {
 
 			@Override
 			public void run() {
-				Log.d(Const.TAG, "No Ad");
+				Log.d("No Ad");
 
 				if (adListener != null)
 					adListener.noAdFound();
@@ -345,9 +342,9 @@ public class AdView extends FrameLayout {
 
 			@Override
 			public void run() {
-				Log.e(Const.TAG, "Exception when building ad:", e);
+				Log.e("Exception when building ad:", e);
 				if (AdView.this.adListener != null) {
-					Log.d(Const.TAG, "notify bannerListener: " + AdView.this.adListener.getClass().getName());
+					Log.d("notify bannerListener: " + AdView.this.adListener.getClass().getName());
 					adListener.noAdFound();
 				}
 			}
@@ -413,7 +410,7 @@ public class AdView extends FrameLayout {
 			mIsInForeground = false;
 			pause();
 		}
-		Log.d(TAG, "onWindowVisibilityChanged: " + visibility);
+		Log.d("onWindowVisibilityChanged: " + visibility);
 	}
 
 	private void showContent() {
@@ -651,7 +648,7 @@ public class AdView extends FrameLayout {
 			notifyAdClosed();
 		}
 
-		Log.d(Const.TAG, "response: " + this.response);
+		Log.d("response: " + this.response);
 
 		if (this.response != null && (this.response.getRefresh() > 0 || customReloadTime > 0))
 			this.startReloadTimerInternal();
@@ -662,10 +659,10 @@ public class AdView extends FrameLayout {
 	public void pause() {
 		if (this.reloadTimer != null)
 			try {
-				Log.d(Const.TAG, "cancel reload timer");
+				Log.d("cancel reload timer");
 				stopReloadTimerInternal();
 			} catch (final Exception e) {
-				Log.e(Const.TAG, "unable to cancel reloadTimer", e);
+				Log.e("unable to cancel reloadTimer", e);
 			}
 	}
 
@@ -684,7 +681,7 @@ public class AdView extends FrameLayout {
 	}
 
 	private void startReloadTimerInternal() {
-		Log.d(Const.TAG, "start reload timer");
+		Log.d("start reload timer");
 		if ((response.getRefresh() <= 0 && customReloadTime <= 0) || !isAutoreloadingActive) {
 			return;
 		}
@@ -699,7 +696,7 @@ public class AdView extends FrameLayout {
 			refreshTime = this.response.getRefresh() * 1000;
 		}
 
-		Log.d(Const.TAG, "set timer: " + refreshTime);
+		Log.d("set timer: " + refreshTime);
 
 		final ReloadTask reloadTask = new ReloadTask(AdView.this);
 		this.reloadTimer.schedule(reloadTask, refreshTime);
@@ -711,7 +708,7 @@ public class AdView extends FrameLayout {
 	}
 
 	private void stopReloadTimerInternal() {
-		Log.d(Const.TAG, "stop reload timer");
+		Log.d("stop reload timer");
 		if (this.reloadTimer == null) {
 			return;
 		}

@@ -76,7 +76,7 @@ public class BannerAdView extends RelativeLayout {
 
 	private WebView createWebView(final Context context) {
 		final WebView webView = new WebView(this.getContext()) {
-			
+
 			@Override
 			public boolean onTouchEvent(MotionEvent event) {
 				wasUserAction = true;
@@ -101,10 +101,8 @@ public class BannerAdView extends RelativeLayout {
 				if (wasUserAction) {
 					if (response.getSkipOverlay() == 1) {
 						doOpenUrl(url);
-						Log.i("TouchListener", "false");
 						return true;
 					}
-					Log.i("TouchListener", "default");
 					openLink();
 					return true;
 				}
@@ -228,7 +226,7 @@ public class BannerAdView extends RelativeLayout {
 
 	private void buildBannerView() {
 		this.webView = this.createWebView(mContext);
-		Log.d(Const.TAG, "Create view flipper");
+		Log.d("Create view flipper");
 		final float scale = mContext.getResources().getDisplayMetrics().density;
 		if (width > 0 && height > 0) {
 			this.setLayoutParams(new RelativeLayout.LayoutParams((int) (width * scale + 0.5f), (int) (height * scale + 0.5f)));
@@ -236,15 +234,13 @@ public class BannerAdView extends RelativeLayout {
 			this.setLayoutParams(new RelativeLayout.LayoutParams((int) (300 * scale + 0.5f), (int) (50 * scale + 0.5f)));
 		}
 
-		final RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(android.view.ViewGroup.LayoutParams.MATCH_PARENT,
-				android.view.ViewGroup.LayoutParams.MATCH_PARENT);
+		final RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(android.view.ViewGroup.LayoutParams.MATCH_PARENT, android.view.ViewGroup.LayoutParams.MATCH_PARENT);
 		this.addView(this.webView, params);
 
-		Log.d(Const.TAG, "animation: " + this.animation);
+		Log.d("animation: " + this.animation);
 		if (this.animation) {
 
-			this.fadeInAnimation = new TranslateAnimation(Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, +1.0f,
-					Animation.RELATIVE_TO_PARENT, 0.0f);
+			this.fadeInAnimation = new TranslateAnimation(Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, +1.0f, Animation.RELATIVE_TO_PARENT, 0.0f);
 			this.fadeInAnimation.setDuration(1000);
 
 			// this.fadeOutAnimation = new TranslateAnimation(
@@ -287,20 +283,18 @@ public class BannerAdView extends RelativeLayout {
 			if (this.response.getType() == Const.IMAGE) {
 
 				String text = MessageFormat.format(Const.IMAGE_BODY, this.response.getImageUrl(), this.response.getBannerWidth(), this.response.getBannerHeight());
-				Log.d(Const.TAG, "set image: " + text);
+				Log.d("set image: " + text);
 				text = Uri.encode(Const.HIDE_BORDER + text);
 				if (!text.contains("<html>")) {
-					text = "<html><head></head><body style='margin:0;padding:0;'>"
-							+ text + "</body></html>";
+					text = "<html><head></head><body style='margin:0;padding:0;'>" + text + "</body></html>";
 				}
 				webView.loadData(text, "text/html", Const.ENCODING);
 				adListener.onLoad();
 			} else if (this.response.getType() == Const.TEXT) {
 				String text = Uri.encode(Const.HIDE_BORDER + this.response.getText());
-				Log.d(Const.TAG, "set text: " + text);
+				Log.d("set text: " + text);
 				if (!text.contains("<html>")) {
-					text = "<html><head></head><body style='margin:0;padding:0;'>"
-							+ text + "</body></html>";
+					text = "<html><head></head><body style='margin:0;padding:0;'>" + text + "</body></html>";
 				}
 				webView.loadData(text, "text/html", Const.ENCODING);
 				adListener.onLoad();
@@ -309,12 +303,13 @@ public class BannerAdView extends RelativeLayout {
 				webView.startAnimation(fadeInAnimation);
 			}
 		} catch (final Throwable t) {
-			Log.e(Const.TAG, "Exception in show content", t);
+			Log.e("Exception in show content", t);
 		}
 	}
-	
+
 	public interface BannerAdViewListener {
 		public void onLoad();
+
 		public void onClick();
 	}
 

@@ -205,7 +205,7 @@ public class ResourceManager {
 		if (d != null) {
 			sResources.put(resId, d);
 		} else {
-			Log.i("registerImageResource", "drawable was null " + name);
+			Log.i("registerImageResource: drawable was null " + name);
 		}
 	}
 

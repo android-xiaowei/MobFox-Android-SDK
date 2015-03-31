@@ -386,7 +386,6 @@ public class AdManager {
 	}
 
 	private void initialize() throws IllegalArgumentException {
-		Log.LOGGING_ENABLED = Log.isLoggingEnabled(getmContext());
 		Log.d("Ad SDK Version:" + Const.VERSION);
 
 		this.androidAdId = Util.getAndroidAdId();

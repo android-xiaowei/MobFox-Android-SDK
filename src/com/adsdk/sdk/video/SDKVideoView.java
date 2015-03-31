@@ -1,7 +1,5 @@
 package com.adsdk.sdk.video;
 
-import static com.adsdk.sdk.Const.TAG;
-
 import java.io.IOException;
 import java.util.Vector;
 
@@ -202,13 +200,13 @@ public class SDKVideoView extends SurfaceView implements MediaPlayerControl {
 			mCurrentState = STATE_PREPARING;
 			attachMediaController();
 		} catch (IOException ex) {
-			Log.w(TAG, "Unable to open content: " + mUri, ex);
+			Log.w("Unable to open content: " + mUri, ex);
 			mCurrentState = STATE_ERROR;
 			mTargetState = STATE_ERROR;
 			mErrorListener.onError(mMediaPlayer, MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
 			return;
 		} catch (IllegalArgumentException ex) {
-			Log.w(TAG, "Unable to open content: " + mUri, ex);
+			Log.w("Unable to open content: " + mUri, ex);
 			mCurrentState = STATE_ERROR;
 			mTargetState = STATE_ERROR;
 			mErrorListener.onError(mMediaPlayer, MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);

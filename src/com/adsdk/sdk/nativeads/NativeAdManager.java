@@ -52,7 +52,7 @@ public class NativeAdManager {
 
 	public void requestAd() {
 		request = getRequest();
-		
+
 		Thread requestThread = new Thread(new Runnable() {
 
 			@Override
@@ -62,7 +62,7 @@ public class NativeAdManager {
 				try {
 					requestAd.sendRequest(request, handler, listener, context);
 				} catch (RequestException e) {
-					Log.e(Const.TAG, "Exception in native ad request thread", e);
+					Log.e("Exception in native ad request thread", e);
 				}
 
 			}
@@ -71,7 +71,7 @@ public class NativeAdManager {
 		requestThread.setUncaughtExceptionHandler(new UncaughtExceptionHandler() {
 			@Override
 			public void uncaughtException(final Thread thread, final Throwable ex) {
-				Log.e(Const.TAG, "Exception in native ad request thread", ex);
+				Log.e("Exception in native ad request thread", ex);
 			}
 		});
 		executor.submit(requestThread);
@@ -85,7 +85,7 @@ public class NativeAdManager {
 			this.request.setPublisherId(this.publisherId);
 			this.request.setUserAgent(Util.getDefaultUserAgentString(context));
 			this.request.setUserAgent2(Util.buildUserAgent());
-			Log.d(Const.TAG, "WebKit UserAgent:" + this.request.getUserAgent());
+			Log.d("WebKit UserAgent:" + this.request.getUserAgent());
 		}
 		request.setRequestUrl(requestUrl);
 		request.setAdTypes(adTypes);
@@ -97,7 +97,7 @@ public class NativeAdManager {
 		if (this.includeLocation)
 			location = Util.getLocation(context);
 		if (location != null) {
-			Log.d(Const.TAG, "location is longitude: " + location.getLongitude() + ", latitude: " + location.getLatitude());
+			Log.d("location is longitude: " + location.getLongitude() + ", latitude: " + location.getLatitude());
 			this.request.setLatitude(location.getLatitude());
 			this.request.setLongitude(location.getLongitude());
 		} else {

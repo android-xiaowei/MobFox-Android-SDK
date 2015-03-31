@@ -29,7 +29,6 @@ public class InAppWebView extends Activity {
 		final Intent intent = this.getIntent();
 
 		initializeWebView(intent);
-
 	}
 
 	@SuppressLint("SetJavaScriptEnabled")
@@ -66,7 +65,7 @@ public class InAppWebView extends Activity {
 				try {
 					startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
 				} catch (ActivityNotFoundException exception) {
-					Log.w("MoPub", "Unable to start activity for " + url + ". " + "Ensure that your phone can handle this intent.");
+					Log.w("MoPub: Unable to start activity for " + url + ". " + "Ensure that your phone can handle this intent.");
 				}
 
 				finish();

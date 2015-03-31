@@ -1,121 +1,76 @@
 package com.adsdk.sdk;
 
-import android.content.Context;
-
-
 public final class Log {
 
-	public static boolean LOGGING_ENABLED = false;
+	/*
+	 * Enable logging DEBUG logs on a device: 
+	 * adb shell setprop log.tag.ADSDK DEBUG
+	 */
 
-	public static boolean isLoggingEnabled(Context context){
-		int debug = context.getResources().getIdentifier("adsdk_debug_enabled", "string", context.getPackageName());
-		if (debug!=0){
-			String sDebug = context.getResources().getString(debug);
-			if(sDebug.equalsIgnoreCase("true")){
-				return true;
-			}
-		}
-		return false;
+	public static final String TAG = "ADSDK";
+	public static final boolean LOG_AD_RESPONSES = false;
 
-	}
-
-	private static boolean isLoggingEnabled(){
-		return LOGGING_ENABLED;
+	public static boolean isLoggable(int logLevel) {
+		return android.util.Log.isLoggable(TAG, logLevel);
 	}
 
 	public static void d(final String msg) {
-		Log.d(Const.TAG, msg);
-	}
-
-	public static void d(final String tag, final String msg) {
-		if(isLoggingEnabled())
-			android.util.Log.d(tag, msg, null);
-	}
-
-	public static void d(final String tag, final String msg, final Throwable tr) {
-		// if (android.util.Log.isLoggable(tag, android.util.Log.DEBUG))
-		if(isLoggingEnabled())
-			android.util.Log.d(tag, msg, tr);
+		if (isLoggable(android.util.Log.DEBUG)) {
+			android.util.Log.d(TAG, msg);
+		}
 	}
 
 	public static void d(final String msg, final Throwable tr) {
-		if(isLoggingEnabled())
-			android.util.Log.d(Const.TAG, msg, tr);
+		if (isLoggable(android.util.Log.DEBUG)) {
+			android.util.Log.d(TAG, msg, tr);
+		}
 	}
 
 	public static void e(final String msg) {
-		Log.e(Const.TAG, msg);
-	}
-
-	public static void e(final String tag, final String msg) {
-		if(isLoggingEnabled())
-			android.util.Log.w(tag, msg, null);
-	}
-
-	public static void e(final String tag, final String msg, final Throwable tr) {
-		if(isLoggingEnabled())
-			android.util.Log.w(tag, msg, tr);
+		if (isLoggable(android.util.Log.ERROR)) {
+			android.util.Log.e(TAG, msg);
+		}
 	}
 
 	public static void e(final String msg, final Throwable tr) {
-		if(isLoggingEnabled())
-			android.util.Log.w(Const.TAG, msg, tr);
+		if (isLoggable(android.util.Log.ERROR)) {
+			android.util.Log.w(TAG, msg, tr);
+		}
 	}
 
 	public static void i(final String msg) {
-		Log.i(Const.TAG, msg);
-	}
-
-	public static void i(final String tag, final String msg) {
-		if(isLoggingEnabled())
-			android.util.Log.i(tag, msg, null);
-	}
-
-	public static void i(final String tag, final String msg, final Throwable tr) {
-		if(isLoggingEnabled())
-			android.util.Log.i(tag, msg, tr);
+		if (isLoggable(android.util.Log.INFO)) {
+			android.util.Log.i(TAG, msg);
+		}
 	}
 
 	public static void i(final String msg, final Throwable tr) {
-		if(isLoggingEnabled())
-			android.util.Log.i(Const.TAG, msg, tr);
+		if (isLoggable(android.util.Log.INFO)) {
+			android.util.Log.i(TAG, msg, tr);
+		}
 	}
 
 	public static void v(final String msg) {
-		Log.v(Const.TAG, msg);
-	}
-
-	public static void v(final String tag, final String msg) {
-		if(isLoggingEnabled())
-			android.util.Log.v(tag, msg, null);
-	}
-
-	public static void v(final String tag, final String msg, final Throwable tr) {
-		if(isLoggingEnabled())
-			android.util.Log.v(tag, msg, tr);
+		if (isLoggable(android.util.Log.VERBOSE)) {
+			android.util.Log.v(TAG, msg);
+		}
 	}
 
 	public static void v(final String msg, final Throwable tr) {
-		if(isLoggingEnabled())
-			android.util.Log.v(Const.TAG, msg, tr);
+		if (isLoggable(android.util.Log.VERBOSE)) {
+			android.util.Log.v(TAG, msg, tr);
+		}
 	}
 
 	public static void w(final String msg) {
-		Log.w(Const.TAG, msg);
-	}
-
-	public static void w(final String tag, final String msg) {
-		if(isLoggingEnabled())
-			android.util.Log.w(tag, msg, null);
-	}
-
-	public static void w(final String tag, final String msg, final Throwable tr) {
-		if(isLoggingEnabled())
-			android.util.Log.w(tag, msg, tr);
+		if (isLoggable(android.util.Log.WARN)) {
+			android.util.Log.w(TAG, msg);
+		}
 	}
 
 	public static void w(final String msg, final Throwable tr) {
-		if(isLoggingEnabled())
-			android.util.Log.w(Const.TAG, msg, tr);
+		if (isLoggable(android.util.Log.WARN)) {
+			android.util.Log.w(TAG, msg, tr);
+		}
 	}
 }

@@ -151,7 +151,7 @@ public class RequestGeneralAd extends RequestAd<AdResponse> {
 			} else {
 				db = dbf.newDocumentBuilder();
 				InputSource src = new InputSource(inputStream);
-				if (Log.LOGGING_ENABLED) {
+				if (Log.LOG_AD_RESPONSES) {
 					String sResponse = convertStreamToString(inputStream);
 					Log.d("Ad RequestPerform HTTP Response: " + sResponse);
 					byte[] bytes = sResponse.getBytes(RESPONSE_ENCODING);
@@ -186,7 +186,6 @@ public class RequestGeneralAd extends RequestAd<AdResponse> {
 					response.setType(Const.TEXT);
 					response.setText(this.getValue(doc, "htmlString"));
 					String skipOverlay = this.getAttribute(doc, "htmlString", "skipoverlaybutton");
-					Log.i("PARSER", "SkipOverlay: " + skipOverlay);
 					if (skipOverlay != null) {
 						response.setSkipOverlay(Integer.parseInt(skipOverlay));
 					}
@@ -200,7 +199,6 @@ public class RequestGeneralAd extends RequestAd<AdResponse> {
 					response.setType(Const.MRAID);
 					response.setText(this.getValue(doc, "htmlString"));
 					String skipOverlay = this.getAttribute(doc, "htmlString", "skipoverlaybutton");
-					Log.i("PARSER", "SkipOverlay: " + skipOverlay);
 					if (skipOverlay != null) {
 						response.setSkipOverlay(Integer.parseInt(skipOverlay));
 					}
