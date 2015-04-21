@@ -209,6 +209,10 @@ public class ResourceManager {
 		}
 	}
 
+    public static String getStringResource(Context ctx,String name){
+        return "";
+    };
+
 	private static Drawable buildDrawable(Context ctx, String name) {
 
 		InputStream in = null;

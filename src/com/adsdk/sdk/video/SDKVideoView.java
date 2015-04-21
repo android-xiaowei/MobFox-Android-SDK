@@ -553,7 +553,6 @@ public class SDKVideoView extends SurfaceView implements MediaPlayerControl {
 		return true;
 	}
 
-	@Override
 	public int getAudioSessionId() {
 		if (mMediaPlayer != null) {
 			return mMediaPlayer.getAudioSessionId();
