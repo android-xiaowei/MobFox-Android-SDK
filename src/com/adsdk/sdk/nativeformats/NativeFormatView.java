@@ -76,7 +76,7 @@ public class NativeFormatView extends WebView {
 
 			//webSettings.setAllowUniversalAccessFromFileURLs(true);
             try {
-                Method m = WebSettings.class.getMethod("setAllowUniversalAccessFromFileURLs");
+                Method m = WebSettings.class.getMethod("setAllowUniversalAccessFromFileURLs",boolean.class);
                 m.invoke(webSettings,true);
             } catch (Exception e) {
                 Log.v("html5","can't set setAllowUniversalAccessFromFileURLs",e);
@@ -246,7 +246,11 @@ public class NativeFormatView extends WebView {
 
                         });
 
-                        thisView.loadUrl("file:///android_res/raw/render_template.html");
+
+                        String renderTemplete = ResourceManager.getStringResource(thisView.getContext(),"render_template.html");
+                        Log.v("html5","render template contents:"+renderTemplete);
+                        thisView.loadDataWithBaseURL(null,renderTemplete,"text/html","utf-8",null);
+
                     }
 
 

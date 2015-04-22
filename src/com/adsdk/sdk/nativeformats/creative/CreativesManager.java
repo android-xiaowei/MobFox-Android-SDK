@@ -40,11 +40,10 @@ public class CreativesManager {
 	protected CreativesManager(final Context ctx) {
 
 		// add fallback creatives
-        String libs = ;
-        String libs = ResourceManager.getStringResource(ctx, "fallback_320x50.mustache");
+        String libs = ResourceManager.getStringResource(ctx, "libs.js");
 
-        addResourceCreative(ctx, ResourceManager.getStringResource(ctx, "fallback_320x480.mustache"), 320, 480, 0, creatives);
-		addResourceCreative(ctx, R.raw.fallback_320x50, 320, 50, 0, creatives);
+        addResourceCreative("fallback_320x480.mustache",ResourceManager.getStringResource(ctx, "fallback_320x480.mustache"), 320, 480, 0, creatives);
+		addResourceCreative("fallback_320x50.mustache",ResourceManager.getStringResource(ctx, "fallback_320x50.mustache"), 320, 50, 0, creatives);
 
 		// get remote creatives
 		Thread requestThread = new Thread(new Runnable() {
@@ -150,9 +149,8 @@ public class CreativesManager {
 
 	}
 
-	protected void addResourceCreative(int id, int width, int height, double prob, Stack<Creative> stack) {
-		String template = Utils.loadResource(ctx, id); //TODO: If loading fails- don't push to stack?
-		stack.push(new Creative("fallback_" + id, template, width, height, prob));
+	protected void addResourceCreative(String name , String template,int width, int height, double prob, Stack<Creative> stack) {
+		stack.push(new Creative(name, template, width, height, prob));
 	}
 
 }
