@@ -138,7 +138,6 @@ public class CreativesManager {
 				continue;
 			agg += c.getProb();
 			Log.v("creative prob: " + c.getProb() + ", agg: " + agg);
-			;
 			if (agg >= prob) {
 				return c;
 			}

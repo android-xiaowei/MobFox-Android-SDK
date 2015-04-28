@@ -153,16 +153,25 @@ public class NativeFormatView extends WebView {
 
 		ViewGroup.LayoutParams lp = this.getLayoutParams();
 
+        int orient = this.getContext().getResources().getConfiguration().orientation;
+        int defaultWidth = 320, defaultHeight = 480;
+
+        if(orient == this.getContext().getResources().getConfiguration().ORIENTATION_LANDSCAPE){
+            int temp = defaultWidth;
+            defaultWidth = defaultHeight;
+            defaultHeight = temp;
+        }
+
 		if (lp != null) {
 			float density = getResources().getDisplayMetrics().density; //TODO: why not 320x50?
-			width = Math.min(320, (int) (lp.width / density));
-			height = Math.min(480, (int) (lp.height / density));
+			width = Math.min(defaultWidth, (int) (lp.width / density));
+			height = Math.min(defaultHeight, (int) (lp.height / density));
 		}
 
 		if (width <= 0)
-			width = 320;
+			width = defaultWidth;
 		if (height <= 0)
-			height = 480;
+			height = defaultHeight;
 		
 		Log.v("html5","dims: " + width + ", " + height);
 		Log.v("html5","getting creative ...");
