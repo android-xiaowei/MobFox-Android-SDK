@@ -21,9 +21,11 @@ public class WaterfallBanner extends FrameLayout {
     }
 
     Listener listener = null;
+    String publicationId;
 
-    public WaterfallBanner(Context context) {
+    public WaterfallBanner(Context context,String publicationId) {
         super(context);
+        this.publicationId = publicationId;
     }
 
     public void loadAd(){
@@ -47,7 +49,16 @@ public class WaterfallBanner extends FrameLayout {
     protected void loadBannerAd(){
 
         final WaterfallBanner _this = this;
-        AdView view = new AdView(this.getContext(),null);
+
+        AdView view = new AdView(this.getContext(), "http://my.mobfox.com/request.php",this.publicationId, true, true);
+        float density = getResources().getDisplayMetrics().density;
+        int width = (int)(this.getWidth() / density);
+        int height =  (int)(this.getWidth() / density);
+
+        view.setAdspaceWidth(width);
+        view.setAdspaceHeight(height);
+        view.setAdspaceStrict(false);
+
         view.setAdListener(new AdListener() {
 
             @Override
@@ -76,7 +87,8 @@ public class WaterfallBanner extends FrameLayout {
                 _this.loadAd();
             }
         });
-        view.loadNextAd();
+        //view.loadNextAd();
+        this.addView(view);
 
     }
 
@@ -84,6 +96,7 @@ public class WaterfallBanner extends FrameLayout {
 
         final WaterfallBanner _this = this;
         NativeFormatView nfw = new NativeFormatView(this.getContext());
+        nfw.setPublicationId(this.publicationId);
         nfw.setListener(new NativeFormatView.NativeFormatAdListener(){
 
             @Override
