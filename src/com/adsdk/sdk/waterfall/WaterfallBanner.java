@@ -1,7 +1,7 @@
 package com.adsdk.sdk.waterfall;
 
 import android.content.Context;
-import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 
 import com.adsdk.sdk.Ad;
 import com.adsdk.sdk.AdListener;
@@ -11,7 +11,7 @@ import com.adsdk.sdk.nativeformats.NativeFormatView;
 /**
  * Created by nabriski on 4/28/15.
  */
-public class WaterfallBanner extends FrameLayout {
+public class WaterfallBanner extends LinearLayout {
 
     int lastIndex = -1;
 
@@ -28,6 +28,10 @@ public class WaterfallBanner extends FrameLayout {
         this.publicationId = publicationId;
     }
 
+    public void setWaterfallBannerLister(Listener listener){
+        this.listener = listener;
+    }
+
     public void loadAd(){
 
         WaterfallManager manager = WaterfallManager.getInstance();
@@ -37,11 +41,15 @@ public class WaterfallBanner extends FrameLayout {
         }
         String type = w.getType(this.lastIndex);
 
-        if(type=="banner"){
+        if(type.equals("banner")){
             loadBannerAd();
         }
-        else if(type=="nativeFormat"){
+        else if(type.equals("nativeFormat")){
             loadNativeFormatAd();
+        }
+        else{
+            if(this.listener==null) return;
+            listener.onAdNotFound();
         }
 
     }
@@ -96,6 +104,7 @@ public class WaterfallBanner extends FrameLayout {
 
         final WaterfallBanner _this = this;
         NativeFormatView nfw = new NativeFormatView(this.getContext());
+        nfw.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT, 1f));
         nfw.setPublicationId(this.publicationId);
         nfw.setListener(new NativeFormatView.NativeFormatAdListener(){
 
@@ -115,7 +124,10 @@ public class WaterfallBanner extends FrameLayout {
 
             }
         });
+
+        this.addView(nfw);
         nfw.loadAd();
+
     }
 
 }
