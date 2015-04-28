@@ -28,13 +28,22 @@ public class Waterfall {
         types.add(new Type(name,prob));
     }
 
-    public String getType(){
-         for(int i=0; i<types.size(); i++){
+    public String getType(int idx){
+        return types.get(idx).name;
+    }
+
+
+    public int getNext(int lastIndex){
+         for(int i=lastIndex+1; i<types.size(); i++){
              double rand = Math.random();
              Type t = types.get(i);
-             if(t.prob<=rand) return t.name;
+             if(t.prob<=rand) return i;
          }
-        return null;
+        return -1;
+    }
+
+    public int getNext(){
+        return getNext(-1);
     }
 
 }
