@@ -1,7 +1,7 @@
 package com.adsdk.sdk.waterfall;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedList;
+import java.util.Queue;
 
 /**
  * Created by nabriski on 4/28/15.
@@ -20,30 +20,40 @@ public class Waterfall {
         public String name;
         public double prob;
 
+        @Override
+        public String toString(){
+          return "("+name+","+prob+")";
+        };
+
     }
 
-    List<Type> types = new ArrayList<Type>();
+    Queue<Type> types = new LinkedList<Type>();
 
     public void add(String name,double prob){
         types.add(new Type(name,prob));
     }
 
-    public String getType(int idx){
-        return types.get(idx).name;
+    public Waterfall(){};
+    public Waterfall(Waterfall src){
+        types = new LinkedList<Type>(src.types);
     }
 
+    public String getNext(){
+        while(types.size() > 0) {
+            //System.out.println(types.toString());
+            Type t = types.peek();
+            types.remove();
 
-    public int getNext(int lastIndex){
-         for(int i=lastIndex+1; i<types.size(); i++){
-             double rand = Math.random();
-             Type t = types.get(i);
-             if(t.prob<=rand) return i;
-         }
-        return -1;
-    }
+            double rand = Math.random();
+            if (t.prob > rand) return t.name;
+            else append(t.name);
+        }
+        return null;
+    };
 
-    public int getNext(){
-        return getNext(-1);
-    }
+    protected void append(String name){
+        types.add(new Type(name,1.0));
+    };
+
 
 }

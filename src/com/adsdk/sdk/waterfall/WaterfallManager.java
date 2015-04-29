@@ -21,7 +21,6 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Stack;
 
 /**
  * Created by nabriski on 4/28/15.
@@ -121,10 +120,7 @@ public class WaterfallManager {
     }
 
     public Waterfall getWaterfall(String displayType) {
-        return waterfalls.get(displayType);
+        return new Waterfall(waterfalls.get(displayType));
     }
 
-    protected void addResourceCreative(String name , String template,int width, int height, double prob, Stack<Creative> stack) {
-        stack.push(new Creative(name, template, width, height, prob));
-    }
 }

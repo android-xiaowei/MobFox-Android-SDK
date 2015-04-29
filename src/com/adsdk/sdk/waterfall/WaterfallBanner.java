@@ -36,10 +36,7 @@ public class WaterfallBanner extends LinearLayout {
 
         WaterfallManager manager = WaterfallManager.getInstance();
         Waterfall w = manager.getWaterfall("banner");
-        if(this.lastIndex < 0){
-            this.lastIndex = w.getNext();
-        }
-        String type = w.getType(this.lastIndex);
+        String type = w.getNext();
 
         if(type.equals("banner")){
             loadBannerAd();
