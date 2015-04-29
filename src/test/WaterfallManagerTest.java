@@ -23,4 +23,18 @@ public class WaterfallManagerTest extends TestCase {
         assertEquals(w.getNext(),"banner");
         assertNotNull(w);
     }
+
+    public void testGetCopy(){
+        WaterfallManager.setRetriever(new DummyJSONRetriever());
+        WaterfallManager manager = WaterfallManager.getInstance();
+        Waterfall w = manager.getWaterfall("interstitial");
+        assertEquals(w.getNext(),"nativeFormat");
+        assertEquals(w.getNext(),"video");
+        assertEquals(w.getNext(),"banner");
+        assertNull(w.getNext());
+
+        w = manager.getWaterfall("interstitial");
+        assertEquals(w.getNext(),"nativeFormat");
+
+    }
 }
