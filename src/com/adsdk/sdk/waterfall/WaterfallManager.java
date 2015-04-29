@@ -1,23 +1,13 @@
 package com.adsdk.sdk.waterfall;
 
-import android.content.Context;
-import android.net.http.AndroidHttpClient;
-
 import com.adsdk.sdk.Log;
-import com.adsdk.sdk.nativeformats.creative.Creative;
-import com.adsdk.sdk.video.ResourceManager;
+import com.adsdk.sdk.networking.JSONRetriever;
+import com.adsdk.sdk.networking.JSONRetrieverImpl;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.StatusLine;
-import org.apache.http.client.methods.HttpGet;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URI;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -27,55 +17,40 @@ import java.util.Map;
  */
 public class WaterfallManager {
 
-    private static final String BASE_URL = "http://static.starbolt.io/waterfalls.json";
+    private static final String URL = "http://static.starbolt.io/waterfalls2.json";
 
     private static WaterfallManager instance = null;
     private Map<String,Waterfall> waterfalls = new HashMap<String,Waterfall>();
+    private static JSONRetriever retriever = new JSONRetrieverImpl();
+
 
     protected WaterfallManager() {
 
         Waterfall fallbackBannerWaterfall = new Waterfall();
-        fallbackBannerWaterfall.add("banner",1);
         fallbackBannerWaterfall.add("nativeFormat",1);
+        fallbackBannerWaterfall.add("banner",1);
+
         waterfalls.put("banner",fallbackBannerWaterfall);
 
         Waterfall fallbackInterstitialWaterfall = new Waterfall();
+        fallbackBannerWaterfall.add("nativeFormat",1);
         fallbackBannerWaterfall.add("video",1);
         fallbackBannerWaterfall.add("banner",1);
-        fallbackBannerWaterfall.add("nativeFormat",1);
+
         waterfalls.put("interstitial",fallbackInterstitialWaterfall);
 
         // get remote waterfalls
-        Thread requestThread = new Thread(new Runnable() {
-
+        retriever.retrieve(URL,new JSONRetriever.Listener(){
             @Override
-            public void run() {
-                AndroidHttpClient client = null;
+            public void onFinish(Exception e, JSONObject obj) {
+                if(e!=null) {
+                    Log.e("failed to retrieve waterfalls", e);
+                    return;
+                }
+
+                JSONObject waterfallsObj = null;
                 try {
-                    client = AndroidHttpClient.newInstance(System.getProperty("http.agent"));
-                    HttpGet request = new HttpGet();
-                    request.setHeader("User-Agent", System.getProperty("http.agent"));
-                    request.setURI(new URI(BASE_URL));
-                    HttpResponse response = client.execute(request);
-                    StatusLine statusLine = response.getStatusLine();
-
-                    int statusCode = statusLine.getStatusCode();
-                    if(statusCode!=200){
-                        Log.d("Failed to load creatives");
-                    }
-
-                    StringBuilder builder = new StringBuilder();
-                    HttpEntity entity = response.getEntity();
-                    InputStream content = entity.getContent();
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(content));
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        builder.append(line + "\n");
-                    }
-                    String responseString = builder.toString();
-                    JSONObject responseJSON = new JSONObject(responseString);
-
-                    JSONObject waterfallsObj = responseJSON.getJSONObject("waterfalls");
+                    waterfallsObj = obj.getJSONObject("waterfalls");
                     Iterator<String> iter = waterfallsObj.keys();
                     while(iter.hasNext()){
                         String k = iter.next();
@@ -89,27 +64,12 @@ public class WaterfallManager {
 
                         waterfalls.put(k,w);
                     }
-
-
-                } catch (Exception e) {
-                    Log.d("Failed to load waterfalls with exception: ", e);
-                } finally {
-                    if (client != null) {
-                        client.close();
-                    }
+                } catch (JSONException e1) {
+                    Log.e("error parsing waterfalls", e);
                 }
 
             }
         });
-        requestThread.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-
-            @Override
-            public void uncaughtException(Thread thread, Throwable ex) {
-                Log.d("Failed to load creatives with exception: ", ex);
-            }
-        });
-        requestThread.start();
-
     }
 
     public static WaterfallManager getInstance() {
@@ -123,4 +83,7 @@ public class WaterfallManager {
         return new Waterfall(waterfalls.get(displayType));
     }
 
+    public static void setRetriever(JSONRetriever retriever) {
+        WaterfallManager.retriever = retriever;
+    }
 }
