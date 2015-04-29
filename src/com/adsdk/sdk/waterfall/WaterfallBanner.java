@@ -13,8 +13,6 @@ import com.adsdk.sdk.nativeformats.NativeFormatView;
  */
 public class WaterfallBanner extends LinearLayout {
 
-    int lastIndex = -1;
-
     public interface Listener{
         public void onAdLoaded();
         public void onAdNotFound();
@@ -28,7 +26,7 @@ public class WaterfallBanner extends LinearLayout {
         this.publicationId = publicationId;
     }
 
-    public void setWaterfallBannerLister(Listener listener){
+    public void setWaterfallBannerListener(Listener listener){
         this.listener = listener;
     }
 

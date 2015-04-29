@@ -1,10 +1,10 @@
 package com.adsdk.sdk.nativeformats.creative;
 
 import java.io.BufferedReader;
-import java.io.IOException;
+
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
+
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.net.URI;
 import java.util.ArrayList;
@@ -22,7 +22,6 @@ import org.json.JSONObject;
 import android.content.Context;
 import android.net.http.AndroidHttpClient;
 
-import com.adsdk.sdk.nativeformats.Utils;
 import com.adsdk.sdk.video.ResourceManager;
 
 
