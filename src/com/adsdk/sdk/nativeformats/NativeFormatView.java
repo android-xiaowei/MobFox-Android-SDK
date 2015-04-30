@@ -31,6 +31,8 @@ public class NativeFormatView extends WebView {
 
 	private static final String BASE_URL = "http://my.mobfox.com/request.php";
 	private String publicationId;
+    int adWidth = 0;
+    int adHeight=0;
 
 	public interface NativeFormatAdListener {
 		public void onNativeFormatLoaded(String html);
@@ -117,9 +119,13 @@ public class NativeFormatView extends WebView {
 		init();
 	}
 
-	// public void setCreativeId(int id){
-	// this.creativeId = id;
-	// };
+    public void setAdWidth(int width){
+        this.adWidth = width;
+    }
+
+    public void setAdHeight(int height){
+        this.adHeight = height;
+    }
 
 	public void setPublicationId(String id) {
 		this.publicationId = id;
@@ -128,6 +134,7 @@ public class NativeFormatView extends WebView {
 	public void setListener(NativeFormatAdListener listener) {
 		this.listener = listener;
 	}
+
 
 	public void loadAd() {
 
@@ -148,8 +155,8 @@ public class NativeFormatView extends WebView {
 		request.setUserAgent2(Util.buildUserAgent());
 
 		Log.v("html5",request.toString());
-		int width = 0;
-		int height = 0;
+		int width = this.adWidth;
+		int height = this.adHeight;
 
 		ViewGroup.LayoutParams lp = this.getLayoutParams();
 
@@ -164,8 +171,10 @@ public class NativeFormatView extends WebView {
 
 		if (lp != null) {
 			float density = getResources().getDisplayMetrics().density; //TODO: why not 320x50?
-			width = Math.min(defaultWidth, (int) (lp.width / density));
-			height = Math.min(defaultHeight, (int) (lp.height / density));
+			int lpWidth = Math.min(defaultWidth, (int) (lp.width / density));
+			int lpHeight = Math.min(defaultHeight, (int) (lp.height / density));
+            if(lpWidth > 0) width = lpWidth;
+            if(lpHeight > 0) height = lpHeight;
 		}
 
 		if (width <= 0)

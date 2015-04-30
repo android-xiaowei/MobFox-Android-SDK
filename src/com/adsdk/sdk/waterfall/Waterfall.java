@@ -55,5 +55,9 @@ public class Waterfall {
         types.add(new Type(name,1.0));
     };
 
+    @Override
+    public String toString(){
+        return types.toString();
+    };
 
 }

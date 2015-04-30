@@ -12,7 +12,8 @@ public class WaterfallBannerTest extends AndroidTestCase {
 
     public void testBasic(){
         WaterfallManager.setRetriever(new DummyJSONRetriever());
-        WaterfallBanner banner = new WaterfallBanner(this.getContext(),"111");
+        WaterfallBanner banner = new WaterfallBanner(this.getContext());
+        banner.setPublicationId("111");
         banner.setWaterfallBannerListener(new WaterfallBanner.Listener(){
 
             @Override

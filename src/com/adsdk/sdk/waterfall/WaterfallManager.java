@@ -1,6 +1,6 @@
 package com.adsdk.sdk.waterfall;
 
-import com.adsdk.sdk.Log;
+import android.util.Log;
 import com.adsdk.sdk.networking.JSONRetriever;
 import com.adsdk.sdk.networking.JSONRetrieverImpl;
 
@@ -27,8 +27,9 @@ public class WaterfallManager {
     protected WaterfallManager() {
 
         Waterfall fallbackBannerWaterfall = new Waterfall();
-        fallbackBannerWaterfall.add("nativeFormat",1);
+
         fallbackBannerWaterfall.add("banner",1);
+        fallbackBannerWaterfall.add("nativeFormat",1);
 
         waterfalls.put("banner",fallbackBannerWaterfall);
 
@@ -43,8 +44,11 @@ public class WaterfallManager {
         retriever.retrieve(URL,new JSONRetriever.Listener(){
             @Override
             public void onFinish(Exception e, JSONObject obj) {
+
+                Log.d("waterfall","json request returned.");
+
                 if(e!=null) {
-                    Log.e("failed to retrieve waterfalls", e);
+                    Log.e("waterfall","failed to retrieve waterfalls", e);
                     return;
                 }
 
@@ -61,11 +65,11 @@ public class WaterfallManager {
                             JSONObject next = warr.getJSONObject(i);
                             w.add(next.getString("name"),next.getDouble("prob"));
                         }
-
+                        Log.d("waterfall","putting: "+k+" , "+w.toString());
                         waterfalls.put(k,w);
                     }
                 } catch (JSONException e1) {
-                    Log.e("error parsing waterfalls", e);
+                    Log.e("waterfall","error parsing waterfalls", e);
                 }
 
             }
