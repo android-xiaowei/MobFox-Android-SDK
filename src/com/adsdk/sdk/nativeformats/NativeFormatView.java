@@ -3,7 +3,6 @@ package com.adsdk.sdk.nativeformats;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
-import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.ViewGroup;
@@ -29,7 +28,7 @@ import java.lang.reflect.Method;
  */
 public class NativeFormatView extends WebView {
 
-	private static final String BASE_URL = "http://my.mobfox.com/request.php";
+
 	private String publicationId;
     int adWidth = 0;
     int adHeight=0;
@@ -47,12 +46,11 @@ public class NativeFormatView extends WebView {
 
 	NativeFormatAdListener listener = null;
 	// int creativeId = -1;
-	CreativesManager creative_manager;
+
 
 	@SuppressLint({ "NewApi", "SetJavaScriptEnabled" })
 	private void init() {
 
-		creative_manager = CreativesManager.getInstance(this.getContext());
 		Util.prepareAndroidAdId(this.getContext());
 		this.setBackgroundColor(Color.TRANSPARENT);
 
@@ -135,26 +133,75 @@ public class NativeFormatView extends WebView {
 		this.listener = listener;
 	}
 
+    public void loadAd(final String template,final String data){
+        Log.v("html5","data: "+data);
+
+        setWebViewClient(new WebViewClient(){
+
+            @Override
+            public void onPageFinished (WebView view, String url) {
+
+               setWebViewClient(null);
+                Log.v("html5","url: "+url);
+
+                try {
+                    JSONObject inp = new JSONObject();
+                    inp.put("template", template);
+
+                    JSONObject json =  new JSONObject(data);
+                    String libs = ResourceManager.getStringResource(getContext(),"libs.js");
+                    json.put("libs","<script type='text/javascript'>"+libs+"</script>");
+                    inp.put("data", json);
+
+                    //Log.d("html5", "render template : " + inp.toString());
+
+                    setWebChromeClient(new WebChromeClient(){
+                        @Override
+                        public boolean onConsoleMessage (ConsoleMessage consoleMessage){
+
+                            final String response = consoleMessage.message();
+
+                            setWebChromeClient(null);
+                            Log.v("html5", "render template response : " + response);
+
+
+                            loadDataWithBaseURL("file:///android_res/raw/", response, "text/html", "utf-8", null);
+
+
+                            if (listener != null) {
+
+                                listener.onNativeFormatLoaded(response);
+
+                            }
+
+                            return true;
+                        }
+                    });
+
+
+                    loadUrl("javascript:renderTemplate(" + inp.toString() + ")");
+
+                } catch (final Exception e) {
+
+
+                    if (listener != null) {
+                        listener.onNativeFormatFailed(e);
+                    }
+
+                }
+            }
+
+
+        });
+
+
+        String renderTemplete = ResourceManager.getStringResource(getContext(),"render_template.html");
+        Log.v("html5","render template contents:"+renderTemplete);
+        loadDataWithBaseURL(null,renderTemplete,"text/html","utf-8",null);
+    }
 
 	public void loadAd() {
 
-		NativeFormatRequest request = new NativeFormatRequest();
-		request.setRequestUrl(BASE_URL);
-		request.setPublisherId(this.publicationId); // TODO: check if correctly set
-		String ipAddress = Utils.getIPAddress(); //TODO: can we remove it? Other requests don't send IP
-		if (ipAddress.indexOf("10.") == 0 || ipAddress.length() == 0) {
-		    ipAddress = "8.8.8.8";
-		}
-		request.ip = ipAddress;
-		// request.add("o_androidid", Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.ANDROID_ID)); //TODO: we cannot use this ID anymore (only Google Advertising ID)
-
-		// params.add("o_andadvid", "c86f7529-33e2-4346-be0d-777ac53be320");//AdvertisingIdClient.getAdvertisingIdInfo(this.getContext()).getId());
-		request.setAndroidAdId(Util.getAndroidAdId());
-		request.setAdDoNotTrack(Util.hasAdDoNotTrack());
-		request.setUserAgent(Util.getDefaultUserAgentString(getContext()));
-		request.setUserAgent2(Util.buildUserAgent());
-
-		Log.v("html5",request.toString());
 		int width = this.adWidth;
 		int height = this.adHeight;
 
@@ -185,11 +232,8 @@ public class NativeFormatView extends WebView {
 		Log.v("html5","dims: " + width + ", " + height);
 		Log.v("html5","getting creative ...");
 
-		Creative c = creative_manager.getCreative(width, height);
 
-		Log.v("html5","got creative ... " + c.getTemplate().length());
-
-		NativeFormatBuilder builder = new NativeFormatBuilder( request, c.getTemplate());
+		NativeFormat nf = new NativeFormat(this.getContext(),width,height,this.publicationId);
 
         Log.v("html5","instantiated builder");
 
@@ -199,81 +243,15 @@ public class NativeFormatView extends WebView {
 
 		final NativeFormatView thisView = this;
 
-        builder.build(new NativeFormatBuilder.NativeFormatBuilderListener() {
+        nf.loadAd(new NativeFormat.Listener() {
 
                     @Override
-                    public void onBuildSuccess(final String template, final String data) {
-
-                        Log.v("html5","data: "+data);
-
-                        thisView.setWebViewClient(new WebViewClient(){
-
-                            @Override
-                            public void onPageFinished (WebView view, String url) {
-
-                                thisView.setWebViewClient(null);
-                                Log.v("html5","url: "+url);
-
-                                try {
-                                    JSONObject inp = new JSONObject();
-                                    inp.put("template", template);
-
-                                    JSONObject json =  new JSONObject(data);
-                                    String libs = ResourceManager.getStringResource(thisView.getContext(),"libs.js");
-                                    json.put("libs","<script type='text/javascript'>"+libs+"</script>");
-                                    inp.put("data", json);
-
-                                    //Log.d("html5", "render template : " + inp.toString());
-
-                                    thisView.setWebChromeClient(new WebChromeClient(){
-                                        @Override
-                                        public boolean onConsoleMessage (ConsoleMessage consoleMessage){
-
-                                            final String response = consoleMessage.message();
-
-                                            thisView.setWebChromeClient(null);
-                                            Log.v("html5", "render template response : " + response);
-
-
-                                            thisView.loadDataWithBaseURL("file:///android_res/raw/", response, "text/html", "utf-8", null);
-
-
-                                            if (thisView.listener != null) {
-
-                                                thisView.listener.onNativeFormatLoaded(response);
-
-                                            }
-
-                                            return true;
-                                        }
-                                    });
-
-
-                                    thisView.loadUrl("javascript:renderTemplate(" + inp.toString() + ")");
-
-                                } catch (final Exception e) {
-
-
-                                    if (thisView.listener != null) {
-                                        thisView.listener.onNativeFormatFailed(e);
-                                    }
-
-                                }
-                            }
-
-
-                        });
-
-
-                        String renderTemplete = ResourceManager.getStringResource(thisView.getContext(),"render_template.html");
-                        Log.v("html5","render template contents:"+renderTemplete);
-                        thisView.loadDataWithBaseURL(null,renderTemplete,"text/html","utf-8",null);
-
+                    public void onSuccess(final String template, final String data) {
+                        thisView.loadAd(template,data);
                     }
 
-
                     @Override
-                    public void onBuildError(final Exception e) {
+                    public void onError(final Exception e) {
 
                                 if (thisView.listener != null) {
                                     thisView.listener.onNativeFormatFailed(e);

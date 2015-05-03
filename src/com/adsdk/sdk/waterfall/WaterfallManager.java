@@ -17,7 +17,7 @@ import java.util.Map;
  */
 public class WaterfallManager {
 
-    private static final String URL = "http://static.starbolt.io/waterfalls2.json";
+    private static final String URL = "http://static.starbolt.io/waterfalls4.json";
 
     private static WaterfallManager instance = null;
     private Map<String,Waterfall> waterfalls = new HashMap<String,Waterfall>();

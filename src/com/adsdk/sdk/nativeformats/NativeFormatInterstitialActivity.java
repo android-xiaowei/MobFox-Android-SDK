@@ -21,19 +21,18 @@ public class NativeFormatInterstitialActivity extends Activity {
 
 		Bundle extras = getIntent().getExtras();
 
-		String publicationId = "";
-		int creativeId = -1;
+		String template = "";
+		String data     = "";
 
 		if (extras != null) {
-			publicationId = extras.getString("PUBLICATION_ID");
-			creativeId = extras.getInt("CREATIVE_ID");
+			template    = extras.getString("TEMPLATE");
+			data        = extras.getString("DATA");
 		}
 
-		Log.v("creative id: " + String.valueOf(creativeId));
+		//Log.v("creative id: " + String.valueOf(creativeId));
 		NativeFormatView nfv = new NativeFormatView(this);
 
-		nfv.setPublicationId(publicationId);
-		// nfv.setCreativeId(creativeId);
+
 
 		nfv.setListener(new NativeFormatAdListener() {
 
@@ -45,7 +44,6 @@ public class NativeFormatInterstitialActivity extends Activity {
 
 			@Override
 			public void onNativeFormatFailed(Exception e) {
-				Log.d("no ad", e);
 				NativeFormatInterstitialActivity.this.finish();
 			}
 
@@ -67,7 +65,8 @@ public class NativeFormatInterstitialActivity extends Activity {
 
 		// this.addContentView(nfv,new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT));
 
-		nfv.loadAd();
+        nfv.loadAd(template,data);
 
-	}
+
+    }
 }

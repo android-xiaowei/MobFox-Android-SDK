@@ -17,32 +17,61 @@ import android.os.Handler;
 import android.util.Log;
 
 import com.adsdk.sdk.RequestException;
+import com.adsdk.sdk.Util;
+import com.adsdk.sdk.nativeformats.creative.Creative;
+import com.adsdk.sdk.nativeformats.creative.CreativesManager;
 
 
 /**
  * Created by itamar on 16/03/15.
  */
-public class NativeFormatBuilder {
+public class NativeFormat {
 
-	private NativeFormatRequest params;
-	private String creative;
+
+    private static final String BASE_URL = "http://my.mobfox.com/request.php";
+
+
     private Handler handler;
+    String publicationId;
+    CreativesManager creative_manager;
+    int width;
+    int height;
+    Context ctx;
 
-    public interface NativeFormatBuilderListener {
-        public void onBuildSuccess(String template,String data);
-        public void onBuildError(Exception e);
+    public interface Listener {
+        public void onSuccess(String template,String data);
+        public void onError(Exception e);
     }
 
-	NativeFormatBuilder(NativeFormatRequest params, String creative) {
-
-		this.params = params;
-		this.creative = creative;
+	NativeFormat(Context ctx,int width,int height,String publicationId) {
+        this.ctx            = ctx;
+		this.width          = width;
+        this.height         = height;
+        this.publicationId  = publicationId;
+        this.creative_manager = CreativesManager.getInstance(this.ctx);
 	}
 
 	// ---------------------------------------------------------
 
-	public void build(final NativeFormatBuilderListener listener) {
+	public void loadAd(final Listener listener) {
 
+        final Creative creative = creative_manager.getCreative(width, height);
+        final NativeFormatRequest request = new NativeFormatRequest();
+
+        request.setRequestUrl(BASE_URL);
+        request.setPublisherId(this.publicationId); // TODO: check if correctly set
+        String ipAddress = Utils.getIPAddress(); //TODO: can we remove it? Other requests don't send IP
+        if (ipAddress.indexOf("10.") == 0 || ipAddress.length() == 0) {
+            ipAddress = "8.8.8.8";
+        }
+        request.ip = ipAddress;
+        // request.add("o_androidid", Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.ANDROID_ID)); //TODO: we cannot use this ID anymore (only Google Advertising ID)
+
+        // params.add("o_andadvid", "c86f7529-33e2-4346-be0d-777ac53be320");//AdvertisingIdClient.getAdvertisingIdInfo(this.getContext()).getId());
+        request.setAndroidAdId(Util.getAndroidAdId());
+        request.setAdDoNotTrack(Util.hasAdDoNotTrack());
+        request.setUserAgent(Util.getDefaultUserAgentString(ctx));
+        request.setUserAgent2(Util.buildUserAgent());
         Log.v("html5", "starting build");
         handler = new Handler();
 
@@ -53,7 +82,7 @@ public class NativeFormatBuilder {
 				AndroidHttpClient client = null;
 				try {
 					client = AndroidHttpClient.newInstance(System.getProperty("http.agent"));
-					final String url = params.toString();
+					final String url = request.toString();
 					HttpGet request = new HttpGet(url);
 					request.setHeader("User-Agent", System.getProperty("http.agent"));
 
@@ -93,7 +122,7 @@ public class NativeFormatBuilder {
                             handler.post(new Runnable() {
                                 @Override
                                 public void run() {
-                                    listener.onBuildError(new RequestException("empty response from: " + url));
+                                    listener.onError(new RequestException("empty response from: " + url));
                                 }
                             });
 							return;
@@ -103,7 +132,7 @@ public class NativeFormatBuilder {
                         handler.post(new Runnable() {
                             @Override
                             public void run() {
-                                listener.onBuildSuccess(creative,data);
+                                listener.onSuccess(creative.getTemplate(),data);
                             }
                         });
 
@@ -112,7 +141,7 @@ public class NativeFormatBuilder {
                         handler.post(new Runnable() {
                             @Override
                             public void run() {
-                                listener.onBuildError(new RequestException("request failed: " + url));
+                                listener.onError(new RequestException("request failed: " + url));
                             }
                         });
 						return;
@@ -122,7 +151,7 @@ public class NativeFormatBuilder {
                     handler.post(new Runnable() {
                         @Override
                         public void run() {
-                            listener.onBuildError(e);
+                            listener.onError(e);
                         }
                     });
 
@@ -139,7 +168,7 @@ public class NativeFormatBuilder {
 
 			@Override
 			public void uncaughtException(Thread thread, Throwable ex) {
-				listener.onBuildError(new Exception(ex));
+				listener.onError(new Exception(ex));
 			}
 		});
 		requestThread.start();

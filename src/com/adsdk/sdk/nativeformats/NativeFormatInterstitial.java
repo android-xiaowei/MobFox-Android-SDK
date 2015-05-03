@@ -13,6 +13,7 @@ public class NativeFormatInterstitial {
     String publicationId;
     Context ctx;
     NativeFormatInterstitialActivity activity;
+    NativeFormatView.NativeFormatAdListener listener;
 
     public NativeFormatInterstitial(Context ctx){
         CreativesManager.getInstance(ctx);
@@ -23,12 +24,29 @@ public class NativeFormatInterstitial {
         this.publicationId = publicationId;
     }
 
-    public void loadAd(){
-        Intent intent = new Intent(ctx, NativeFormatInterstitialActivity.class);
-        intent.putExtra("PUBLICATION_ID", publicationId);
+    public void setListener(NativeFormatView.NativeFormatAdListener listener){
+        this.listener = listener;
+    }
 
-        ctx.startActivity(intent);
-        //TODO: perhaps preload ad before actually starting activity?
-        // Yes, I'll do this later
+    public void loadAd(){
+        final Intent intent = new Intent(ctx, NativeFormatInterstitialActivity.class);
+        NativeFormat nf = new NativeFormat(ctx,320,480,this.publicationId);
+
+        nf.loadAd(new NativeFormat.Listener(){
+
+            @Override
+            public void onSuccess(String template, String data) {
+                intent.putExtra("TEMPLATE", template);
+                intent.putExtra("DATA", data);
+                ctx.startActivity(intent);
+                listener.onNativeFormatLoaded(template);
+            }
+
+            @Override
+            public void onError(Exception e) {
+                listener.onNativeFormatFailed(e);
+            }
+        });
+
     };
 }
