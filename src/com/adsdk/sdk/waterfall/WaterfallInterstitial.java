@@ -114,7 +114,9 @@ public class WaterfallInterstitial {
     protected void loadVideoAd(){
 
         final AdManager mgr = new AdManager(this.ctx, "http://my.mobfox.com/request.php",this.publicationId, true);
+
         mgr.setInterstitialAdsEnabled(false);
+        mgr.setVideoAdsEnabled(true);
 
         final WaterfallInterstitial _this = this;
         mgr.setListener(new AdListener(){
