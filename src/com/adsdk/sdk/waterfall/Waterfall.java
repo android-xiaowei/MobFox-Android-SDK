@@ -1,5 +1,7 @@
 package com.adsdk.sdk.waterfall;
 
+import android.util.Log;
+
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -41,10 +43,12 @@ public class Waterfall {
     public String getNext(){
         while(types.size() > 0) {
             //System.out.println(types.toString());
+            Log.d("waterfall","waterfall is : " + types.toString());
             Type t = types.peek();
             types.remove();
 
             double rand = Math.random();
+            Log.d("waterfall","waterfall is : rand: " + rand + " , prob: "+t.prob);
             if (t.prob > rand) return t.name;
             else append(t.name);
         }
