@@ -1,0 +1,129 @@
+<VAST version="2.0">
+    <Ad id="AdswizzAd12532">
+        <InLine>
+            <AdSystem>Adswizz</AdSystem>
+            <AdTitle>Untitled</AdTitle>
+            <Description>Untitled</Description>
+            <Impression id="12532">
+                <![CDATA[
+http://demo.adswizz.com/www/delivery/swfIndex.php?reqType=AdsDisplayStarted&protocolVersion=2.0&adData=AS%2Fi%3Ademo%3Bad_id%3A12532%3Bzone_id%3A6072%3Bview_key%3A1430893344055815&OAGEO=aWwlN0MwNSU3Q3RlbCthdml2JTdDJTdDMzIuMDY2Njk2MTY2OTkyMTklN0MzNC43NjY2OTMxMTUyMzQzNzUlN0MlN0MlN0MlN0MlM0ElM0FmZmZmJTNBMzEuMTY4LjEzMS4xNjIlN0NiZXplcStpbnRlcm5hdGlvbmFs&sessionId=283888afb84ba946e939390e1e14ab&listenerId=5f299b7591910a011e368376773618f9&cbs=3632836
+]]>
+            </Impression>
+            <Creatives>
+                <Creative id="12532" sequence="1">
+                    <Linear>
+                        <Duration>00:00:30</Duration>
+                        <VideoClicks>
+                            <CustomClick id="12532">
+                                <![CDATA[
+http://demo.adswizz.com/www/delivery/swfIndex.php?reqType=AdsClicked&protocolVersion=2.0&adData=AS%2Fi%3Ademo%3Bad_id%3A12532%3Bzone_id%3A6072%3Bview_key%3A1430893344055815&clickX=[clickX]&clickY=[clickY]&time=[timestamp]&tagsArray=&cb=[random]&OAGEO=aWwlN0MwNSU3Q3RlbCthdml2JTdDJTdDMzIuMDY2Njk2MTY2OTkyMTklN0MzNC43NjY2OTMxMTUyMzQzNzUlN0MlN0MlN0MlN0MlM0ElM0FmZmZmJTNBMzEuMTY4LjEzMS4xNjIlN0NiZXplcStpbnRlcm5hdGlvbmFs&sessionId=283888afb84ba946e939390e1e14ab&listenerId=5f299b7591910a011e368376773618f9&cbs=1050858
+]]>
+                            </CustomClick>
+                        </VideoClicks>
+                        <MediaFiles>
+                            <MediaFile delivery="progressive" bitrate="96000" width="30275" height="0" type="audio/mpeg">
+                                <![CDATA[
+http://delivery-s3.adswizz.com/demo/anger_man_230s_ad_5542797de345b_1430419837.mp3
+]]>
+                            </MediaFile>
+                        </MediaFiles>
+                        <TrackingEvents>
+                            <Tracking event="start">
+                                <![CDATA[
+http://demo.adswizz.com/www/delivery/swfIndex.php?reqType=AdsSendReport&protocolVersion=2.0&adData=AS%2Fi%3Ademo%3Bad_id%3A12532%3Bzone_id%3A6072%3Bview_key%3A1430893344055815&tagsArray=&displayPercentage=0&time=0&OAGEO=aWwlN0MwNSU3Q3RlbCthdml2JTdDJTdDMzIuMDY2Njk2MTY2OTkyMTklN0MzNC43NjY2OTMxMTUyMzQzNzUlN0MlN0MlN0MlN0MlM0ElM0FmZmZmJTNBMzEuMTY4LjEzMS4xNjIlN0NiZXplcStpbnRlcm5hdGlvbmFs&sessionId=283888afb84ba946e939390e1e14ab&listenerId=5f299b7591910a011e368376773618f9&cbs=7772085
+]]>
+                            </Tracking>
+                            <Tracking event="firstQuartile">
+                                <![CDATA[
+http://demo.adswizz.com/www/delivery/swfIndex.php?reqType=AdsSendReport&protocolVersion=2.0&adData=AS%2Fi%3Ademo%3Bad_id%3A12532%3Bzone_id%3A6072%3Bview_key%3A1430893344055815&tagsArray=&displayPercentage=25&time=7&OAGEO=aWwlN0MwNSU3Q3RlbCthdml2JTdDJTdDMzIuMDY2Njk2MTY2OTkyMTklN0MzNC43NjY2OTMxMTUyMzQzNzUlN0MlN0MlN0MlN0MlM0ElM0FmZmZmJTNBMzEuMTY4LjEzMS4xNjIlN0NiZXplcStpbnRlcm5hdGlvbmFs&sessionId=283888afb84ba946e939390e1e14ab&listenerId=5f299b7591910a011e368376773618f9&cbs=7149984
+]]>
+                            </Tracking>
+                            <Tracking event="midpoint">
+                                <![CDATA[
+http://demo.adswizz.com/www/delivery/swfIndex.php?reqType=AdsSendReport&protocolVersion=2.0&adData=AS%2Fi%3Ademo%3Bad_id%3A12532%3Bzone_id%3A6072%3Bview_key%3A1430893344055815&tagsArray=&displayPercentage=50&time=15&OAGEO=aWwlN0MwNSU3Q3RlbCthdml2JTdDJTdDMzIuMDY2Njk2MTY2OTkyMTklN0MzNC43NjY2OTMxMTUyMzQzNzUlN0MlN0MlN0MlN0MlM0ElM0FmZmZmJTNBMzEuMTY4LjEzMS4xNjIlN0NiZXplcStpbnRlcm5hdGlvbmFs&sessionId=283888afb84ba946e939390e1e14ab&listenerId=5f299b7591910a011e368376773618f9&cbs=2654907
+]]>
+                            </Tracking>
+                            <Tracking event="thirdQuartile">
+                                <![CDATA[
+http://demo.adswizz.com/www/delivery/swfIndex.php?reqType=AdsSendReport&protocolVersion=2.0&adData=AS%2Fi%3Ademo%3Bad_id%3A12532%3Bzone_id%3A6072%3Bview_key%3A1430893344055815&tagsArray=&displayPercentage=75&time=22&OAGEO=aWwlN0MwNSU3Q3RlbCthdml2JTdDJTdDMzIuMDY2Njk2MTY2OTkyMTklN0MzNC43NjY2OTMxMTUyMzQzNzUlN0MlN0MlN0MlN0MlM0ElM0FmZmZmJTNBMzEuMTY4LjEzMS4xNjIlN0NiZXplcStpbnRlcm5hdGlvbmFs&sessionId=283888afb84ba946e939390e1e14ab&listenerId=5f299b7591910a011e368376773618f9&cbs=7290812
+]]>
+                            </Tracking>
+                            <Tracking event="complete">
+                                <![CDATA[
+http://demo.adswizz.com/www/delivery/swfIndex.php?reqType=AdsDisplayEnd&protocolVersion=2.0&adData=AS%2Fi%3Ademo%3Bad_id%3A12532%3Bzone_id%3A6072%3Bview_key%3A1430893344055815&tagsArray=&displayPercentage=100&time=30&OAGEO=aWwlN0MwNSU3Q3RlbCthdml2JTdDJTdDMzIuMDY2Njk2MTY2OTkyMTklN0MzNC43NjY2OTMxMTUyMzQzNzUlN0MlN0MlN0MlN0MlM0ElM0FmZmZmJTNBMzEuMTY4LjEzMS4xNjIlN0NiZXplcStpbnRlcm5hdGlvbmFs&sessionId=283888afb84ba946e939390e1e14ab&listenerId=5f299b7591910a011e368376773618f9&cbs=5562154
+]]>
+                            </Tracking>
+                        </TrackingEvents>
+                    </Linear>
+                </Creative>
+                <Creative sequence="1">...</Creative>
+            </Creatives>
+            <Extensions>
+                <Extension type="AdServer">
+                    <AdContext>fHA6MjQ1MQ==</AdContext>
+                </Extension>
+            </Extensions>
+        </InLine>
+    </Ad>
+    <Ad id="AdswizzAd12534">
+        <InLine>
+            <AdSystem>Adswizz</AdSystem>
+            <AdTitle>Copy of Untitled</AdTitle>
+            <Description>Copy of Untitled</Description>
+            <Impression id="12534">
+                <![CDATA[
+http://demo.adswizz.com/www/delivery/swfIndex.php?reqType=AdsDisplayStarted&protocolVersion=2.0&adData=AS%2Fi%3Ademo%3Bad_id%3A12534%3Bzone_id%3A6072%3Bview_key%3A1430893344055815&OAGEO=aWwlN0MwNSU3Q3RlbCthdml2JTdDJTdDMzIuMDY2Njk2MTY2OTkyMTklN0MzNC43NjY2OTMxMTUyMzQzNzUlN0MlN0MlN0MlN0MlM0ElM0FmZmZmJTNBMzEuMTY4LjEzMS4xNjIlN0NiZXplcStpbnRlcm5hdGlvbmFs&sessionId=283888afb84ba946e939390e1e14ab&listenerId=5f299b7591910a011e368376773618f9&cbs=7691416
+]]>
+            </Impression>
+            <Creatives>
+                <Creative id="12534" sequence="1">
+                    <Linear>
+                        <Duration>00:00:30</Duration>
+                        <VideoClicks>
+                            <CustomClick id="12534">
+                                <![CDATA[
+http://demo.adswizz.com/www/delivery/swfIndex.php?reqType=AdsClicked&protocolVersion=2.0&adData=AS%2Fi%3Ademo%3Bad_id%3A12534%3Bzone_id%3A6072%3Bview_key%3A1430893344055815&clickX=[clickX]&clickY=[clickY]&time=[timestamp]&tagsArray=&cb=[random]&OAGEO=aWwlN0MwNSU3Q3RlbCthdml2JTdDJTdDMzIuMDY2Njk2MTY2OTkyMTklN0MzNC43NjY2OTMxMTUyMzQzNzUlN0MlN0MlN0MlN0MlM0ElM0FmZmZmJTNBMzEuMTY4LjEzMS4xNjIlN0NiZXplcStpbnRlcm5hdGlvbmFs&sessionId=283888afb84ba946e939390e1e14ab&listenerId=5f299b7591910a011e368376773618f9&cbs=6797168
+]]>
+                            </CustomClick>
+                        </VideoClicks>
+                        <MediaFiles>
+                            <MediaFile delivery="progressive" bitrate="96000" width="30275" height="0" type="audio/mpeg">
+                                <![CDATA[
+http://delivery-s3.adswizz.com/demo/anger_man_230s_ad_55427c8f3be6a_1430420623.mp3
+]]>
+                            </MediaFile>
+                        </MediaFiles>
+                        <TrackingEvents>
+                            <Tracking event="start">
+                                <![CDATA[
+http://demo.adswizz.com/www/delivery/swfIndex.php?reqType=AdsSendReport&protocolVersion=2.0&adData=AS%2Fi%3Ademo%3Bad_id%3A12534%3Bzone_id%3A6072%3Bview_key%3A1430893344055815&tagsArray=&displayPercentage=0&time=0&OAGEO=aWwlN0MwNSU3Q3RlbCthdml2JTdDJTdDMzIuMDY2Njk2MTY2OTkyMTklN0MzNC43NjY2OTMxMTUyMzQzNzUlN0MlN0MlN0MlN0MlM0ElM0FmZmZmJTNBMzEuMTY4LjEzMS4xNjIlN0NiZXplcStpbnRlcm5hdGlvbmFs&sessionId=283888afb84ba946e939390e1e14ab&listenerId=5f299b7591910a011e368376773618f9&cbs=1162259
+]]>
+                            </Tracking>
+                            <Tracking event="firstQuartile">
+                                <![CDATA[
+http://demo.adswizz.com/www/delivery/swfIndex.php?reqType=AdsSendReport&protocolVersion=2.0&adData=AS%2Fi%3Ademo%3Bad_id%3A12534%3Bzone_id%3A6072%3Bview_key%3A1430893344055815&tagsArray=&displayPercentage=25&time=7&OAGEO=aWwlN0MwNSU3Q3RlbCthdml2JTdDJTdDMzIuMDY2Njk2MTY2OTkyMTklN0MzNC43NjY2OTMxMTUyMzQzNzUlN0MlN0MlN0MlN0MlM0ElM0FmZmZmJTNBMzEuMTY4LjEzMS4xNjIlN0NiZXplcStpbnRlcm5hdGlvbmFs&sessionId=283888afb84ba946e939390e1e14ab&listenerId=5f299b7591910a011e368376773618f9&cbs=6436050
+]]>
+                            </Tracking>
+                            <Tracking event="midpoint">
+                                <![CDATA[
+http://demo.adswizz.com/www/delivery/swfIndex.php?reqType=AdsSendReport&protocolVersion=2.0&adData=AS%2Fi%3Ademo%3Bad_id%3A12534%3Bzone_id%3A6072%3Bview_key%3A1430893344055815&tagsArray=&displayPercentage=50&time=15&OAGEO=aWwlN0MwNSU3Q3RlbCthdml2JTdDJTdDMzIuMDY2Njk2MTY2OTkyMTklN0MzNC43NjY2OTMxMTUyMzQzNzUlN0MlN0MlN0MlN0MlM0ElM0FmZmZmJTNBMzEuMTY4LjEzMS4xNjIlN0NiZXplcStpbnRlcm5hdGlvbmFs&sessionId=283888afb84ba946e939390e1e14ab&listenerId=5f299b7591910a011e368376773618f9&cbs=4395475
+]]>
+                            </Tracking>
+                            <Tracking event="thirdQuartile">
+                                <![CDATA[
+http://demo.adswizz.com/www/delivery/swfIndex.php?reqType=AdsSendReport&protocolVersion=2.0&adData=AS%2Fi%3Ademo%3Bad_id%3A12534%3Bzone_id%3A6072%3Bview_key%3A1430893344055815&tagsArray=&displayPercentage=75&time=22&OAGEO=aWwlN0MwNSU3Q3RlbCthdml2JTdDJTdDMzIuMDY2Njk2MTY2OTkyMTklN0MzNC43NjY2OTMxMTUyMzQzNzUlN0MlN0MlN0MlN0MlM0ElM0FmZmZmJTNBMzEuMTY4LjEzMS4xNjIlN0NiZXplcStpbnRlcm5hdGlvbmFs&sessionId=283888afb84ba946e939390e1e14ab&listenerId=5f299b7591910a011e368376773618f9&cbs=6841614
+]]>
+                            </Tracking>
+                            <Tracking event="complete">
+                                <![CDATA[
+http://demo.adswizz.com/www/delivery/swfIndex.php?reqType=AdsDisplayEnd&protocolVersion=2.0&adData=AS%2Fi%3Ademo%3Bad_id%3A12534%3Bzone_id%3A6072%3Bview_key%3A1430893344055815&tagsArray=&displayPercentage=100&time=30&OAGEO=aWwlN0MwNSU3Q3RlbCthdml2JTdDJTdDMzIuMDY2Njk2MTY2OTkyMTklN0MzNC43NjY2OTMxMTUyMzQzNzUlN0MlN0MlN0MlN0MlM0ElM0FmZmZmJTNBMzEuMTY4LjEzMS4xNjIlN0NiZXplcStpbnRlcm5hdGlvbmFs&sessionId=283888afb84ba946e939390e1e14ab&listenerId=5f299b7591910a011e368376773618f9&cbs=9094586
+]]>
+                            </Tracking>
+                        </TrackingEvents>
+                    </Linear>
+                </Creative>
+            </Creatives>
+            <Extensions></Extensions>
+        </InLine>
+    </Ad>
+</VAST>

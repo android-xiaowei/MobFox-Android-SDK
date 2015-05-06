@@ -166,7 +166,6 @@ public class AdManager {
 							notifyAdLoaded(mResponse);
 						} else if (mResponse.getType() == Const.NO_AD && mResponse.getCustomEvents() != null && mResponse.getCustomEvents().isEmpty()) {
 							Log.d("response NO AD received");
-							notifyNoAdFound();
 						} else if (mResponse.getCustomEvents() != null && !mResponse.getCustomEvents().isEmpty()) {
 							loadCustomEventFullscreen();
 							if (customEventFullscreen == null) {

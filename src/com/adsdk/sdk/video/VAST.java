@@ -93,7 +93,25 @@ public class VAST {
 			@ElementList(name = "Creatives")
 			List<Creative> creatives;
 
+            @ElementList(name = "Extensions")
+            List<Extension> extensions;
+
 		}
+
+        @Root (name = "Extension")
+        public static class Extension{
+
+            @Attribute(required = false, name = "type")
+            String type;
+
+            @Element(required=false,name="AdContext")
+            AdContext ac;
+
+            public static class AdContext{
+                @Text
+                String data;
+            }
+        }
 
 		@Root (name = "Creative")
 		public static class Creative {
@@ -181,6 +199,10 @@ public class VAST {
 				
 				@Root(name = "CustomClick")
 				public static class CustomClick{
+
+                    @Attribute(required = false, name = "id")
+                    String id;
+
 					@Text
 					String url;
 				}
@@ -289,5 +311,6 @@ public class VAST {
 			}
 		}
 		
-	}
+
+    }
 }

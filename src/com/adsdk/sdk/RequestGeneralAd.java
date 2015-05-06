@@ -137,14 +137,17 @@ public class RequestGeneralAd extends RequestAd<AdResponse> {
 
 			if (isVideo) {
 
+                Log.d("Detected video!");
 				VAST vast = VASTParser.createVastFromStream(inputStream);
 				VideoData video = VASTParser.fillVideoDataFromVast(vast);
 				if (video == null) {
+                    Log.d("Video could not be parsed!");
 					response.setType(Const.NO_AD);
 					if (response.getRefresh() <= 0) {
 						response.setRefresh(RELOAD_AFTER_NO_AD);
 					}
 				} else {
+                    Log.d("Got video setting data!");
 					response.setVideoData(video);
 					response.setType(Const.VIDEO);
 				}
@@ -235,6 +238,7 @@ public class RequestGeneralAd extends RequestAd<AdResponse> {
 
 	@Override
 	AdResponse parseTestString() throws RequestException {
-		return parse(is, null, false);
+		Log.d("parse vast here ...");
+        return parse(is, null, true);
 	}
 }
