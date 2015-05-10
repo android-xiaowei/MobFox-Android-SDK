@@ -93,7 +93,7 @@ public class VAST {
 			@ElementList(name = "Creatives")
 			List<Creative> creatives;
 
-            @ElementList(name = "Extensions")
+            @ElementList(required = false, name = "Extensions")
             List<Extension> extensions;
 
 		}

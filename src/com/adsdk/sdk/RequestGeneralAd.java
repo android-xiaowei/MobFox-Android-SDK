@@ -125,7 +125,7 @@ public class RequestGeneralAd extends RequestAd<AdResponse> {
 	}
 
 	@Override
-	AdResponse parse(final InputStream inputStream, Header[] headers, boolean isVideo) throws RequestException {
+    public AdResponse parse(final InputStream inputStream, Header[] headers, boolean isVideo) throws RequestException {
 
 		final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		DocumentBuilder db;
@@ -138,9 +138,20 @@ public class RequestGeneralAd extends RequestAd<AdResponse> {
 			if (isVideo) {
 
                 Log.d("Detected video!");
+                android.util.Log.d("vast","about to call vast");
 				VAST vast = VASTParser.createVastFromStream(inputStream);
-				VideoData video = VASTParser.fillVideoDataFromVast(vast);
+                android.util.Log.d("vast","vast returned");
+
+                VideoData video = null;
+                try {
+                    video = VASTParser.fillVideoDataFromVast(vast);
+                }
+                catch(Exception e){
+                    android.util.Log.e("vast","failed to get video from vast",e);
+                }
+                android.util.Log.d("vast","vast video returned");
 				if (video == null) {
+                    android.util.Log.d("vast","video is null");
                     Log.d("Video could not be parsed!");
 					response.setType(Const.NO_AD);
 					if (response.getRefresh() <= 0) {
@@ -237,7 +248,7 @@ public class RequestGeneralAd extends RequestAd<AdResponse> {
 	}
 
 	@Override
-	AdResponse parseTestString() throws RequestException {
+	public AdResponse parseTestString() throws RequestException {
 		Log.d("parse vast here ...");
         return parse(is, null, true);
 	}

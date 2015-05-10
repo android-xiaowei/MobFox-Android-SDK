@@ -50,13 +50,16 @@ public class VASTParser {
 		Serializer serial = new Persister();
 
 		try {
+            android.util.Log.d("vast","creating vast");
 			vast = serial.read(VAST.class, inputStream);
 		} catch (NotFoundException e) {
 			e.printStackTrace();
+            android.util.Log.e("vast","err",e);
 		} catch (Exception e) {
+            android.util.Log.e("vast","err",e);
 			e.printStackTrace();
 		}
-
+        android.util.Log.d("vast","vast created");
 		return vast;
 	}
 	

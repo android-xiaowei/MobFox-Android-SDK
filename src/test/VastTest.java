@@ -29,4 +29,21 @@ public class VastTest extends TestCase{
 
         assert(true);
     }
+
+    public void testTritonValidity(){
+
+        Serializer serializer = new Persister();
+        File vastXML = new File("./testUtils/vast-triton.xml");
+        VAST v;
+        try {
+            v = serializer.read(VAST.class,vastXML);
+        } catch (Exception e) {
+
+            e.printStackTrace();
+            assert(false);
+        }
+
+        assert(true);
+    }
+
 }

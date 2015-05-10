@@ -56,8 +56,8 @@ public abstract class RequestAd<T> {
 		}
 	}
 
-	abstract T parseTestString() throws RequestException;
+	public abstract T parseTestString() throws RequestException;
 
-	abstract T parse(InputStream inputStream, Header[] headers, boolean isVideo) throws RequestException;
+	public abstract T parse(InputStream inputStream, Header[] headers, boolean isVideo) throws RequestException;
 
 }
