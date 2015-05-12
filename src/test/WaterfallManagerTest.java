@@ -1,5 +1,6 @@
 package test;
 
+import com.adsdk.sdk.networking.JSONRetriever;
 import com.adsdk.sdk.waterfall.Waterfall;
 import com.adsdk.sdk.waterfall.WaterfallManager;
 
@@ -12,7 +13,7 @@ public class WaterfallManagerTest extends TestCase {
 
     public void testInit(){
         WaterfallManager.setRetriever(new DummyJSONRetriever());
-        WaterfallManager manager = WaterfallManager.getInstance();
+        WaterfallManager manager = WaterfallManager.getInstance("111");
         Waterfall w = manager.getWaterfall("banner");
         assertNotNull(w);
         assertEquals(w.getNext(),"nativeFormat");
@@ -25,9 +26,13 @@ public class WaterfallManagerTest extends TestCase {
     }
 
     public void testGetCopy(){
-        WaterfallManager.setRetriever(new DummyJSONRetriever());
-        WaterfallManager manager = WaterfallManager.getInstance();
+        DummyJSONRetriever ret = new DummyJSONRetriever();
+        WaterfallManager.setRetriever(ret);
+
+        WaterfallManager manager = WaterfallManager.getInstance("111");
+
         Waterfall w = manager.getWaterfall("interstitial");
+
         assertEquals(w.getNext(),"nativeFormat");
         assertEquals(w.getNext(),"video");
         assertEquals(w.getNext(),"banner");

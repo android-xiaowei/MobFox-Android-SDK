@@ -72,7 +72,13 @@ public class NativeFormat {
         request.setAdDoNotTrack(Util.hasAdDoNotTrack());
         request.setUserAgent(Util.getDefaultUserAgentString(ctx));
         request.setUserAgent2(Util.buildUserAgent());
+        request.setTemplateName(creative.getName());
+
+
+
         Log.v("html5", "starting build");
+        Log.d("html5","native req: "+request.toUri());
+
         handler = new Handler();
 
 		Thread requestThread = new Thread(new Runnable() {

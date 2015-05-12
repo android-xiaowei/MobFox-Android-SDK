@@ -30,7 +30,7 @@ public class WaterfallInterstitial {
     public WaterfallInterstitial(Context ctx,String publicationId){
         this.publicationId = publicationId;
         this.ctx = ctx;
-        WaterfallManager manager = WaterfallManager.getInstance();
+        WaterfallManager manager = WaterfallManager.getInstance(publicationId);
     }
 
     public void setPublicationId(String publicationId) {
@@ -42,7 +42,7 @@ public class WaterfallInterstitial {
     }
 
     public void loadAd(){
-        WaterfallManager manager = WaterfallManager.getInstance();
+        WaterfallManager manager = WaterfallManager.getInstance(publicationId);
         w = manager.getWaterfall("interstitial");
         loadAdInternal();
     }

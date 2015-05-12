@@ -26,15 +26,15 @@ public class WaterfallBanner extends FrameLayout {
 
     public WaterfallBanner(Context context){
         super(context);
-        WaterfallManager manager = WaterfallManager.getInstance();
     }
     public WaterfallBanner(Context context, AttributeSet attrs){
         super(context,attrs);
-        WaterfallManager manager = WaterfallManager.getInstance();
+
     }
 
     public void setPublicationId(String publicationId) {
         this.publicationId = publicationId;
+        WaterfallManager manager = WaterfallManager.getInstance(publicationId);
     }
 
     public void setWaterfallBannerListener(Listener listener){
@@ -42,7 +42,7 @@ public class WaterfallBanner extends FrameLayout {
     }
 
     public void loadAd(){
-        WaterfallManager manager = WaterfallManager.getInstance();
+        WaterfallManager manager = WaterfallManager.getInstance(this.publicationId);
         w = manager.getWaterfall("banner");
         loadAdInternal();
     }

@@ -17,14 +17,13 @@ import java.util.Map;
  */
 public class WaterfallManager {
 
-    private static final String URL = "http://static.starbolt.io/waterfalls2.json";
+    private static final String BASE_URL = "http://static.starbolt.io/waterfalls2.json";
 
     private static WaterfallManager instance = null;
     private Map<String,Waterfall> waterfalls = new HashMap<String,Waterfall>();
     private static JSONRetriever retriever = new JSONRetrieverImpl();
 
-
-    protected WaterfallManager() {
+    protected WaterfallManager(String publisherId) {
 
         Waterfall fallbackBannerWaterfall = new Waterfall();
 
@@ -41,11 +40,11 @@ public class WaterfallManager {
         waterfalls.put("interstitial",fallbackInterstitialWaterfall);
 
         // get remote waterfalls
-        retriever.retrieve(URL,new JSONRetriever.Listener(){
+
+        retriever.retrieve(BASE_URL+"?p="+publisherId,new JSONRetriever.Listener(){
             @Override
             public void onFinish(Exception e, JSONObject obj) {
 
-                Log.d("waterfall","json request returned.");
 
                 if(e!=null) {
                     Log.e("waterfall","failed to retrieve waterfalls", e);
@@ -72,13 +71,14 @@ public class WaterfallManager {
                     Log.e("waterfall","error parsing waterfalls", e);
                 }
 
+
             }
         });
     }
 
-    public static WaterfallManager getInstance() {
+    public static WaterfallManager getInstance(String publisherID) {
         if (instance == null) {
-            instance = new WaterfallManager();
+            instance = new WaterfallManager(publisherID);
         }
         return instance;
     }
@@ -90,4 +90,6 @@ public class WaterfallManager {
     public static void setRetriever(JSONRetriever retriever) {
         WaterfallManager.retriever = retriever;
     }
+
+
 }

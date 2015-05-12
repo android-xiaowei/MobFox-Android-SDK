@@ -9,8 +9,14 @@ import org.json.JSONObject;
  * Created by nabriski on 4/29/15.
  */
 public class DummyJSONRetriever implements JSONRetriever{
+
+    String lastURL;
+
     @Override
     public void retrieve(String url, Listener listener) {
+
+        this.lastURL = url;
+
         String json = "{"+
             "\"waterfalls\":{"+
                 "\"banner\" :["+
@@ -32,4 +38,9 @@ public class DummyJSONRetriever implements JSONRetriever{
             listener.onFinish(e,null);
         }
     }
+
+    public String getLastURL(){
+        return this.lastURL;
+    }
+
 }

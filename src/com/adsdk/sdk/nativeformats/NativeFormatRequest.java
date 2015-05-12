@@ -22,6 +22,7 @@ public class NativeFormatRequest {
 	private String androidAdId = "";
 	private boolean adDoNotTrack = false;
 	private String protocolVersion;
+    private String templateName;
 
 	private double longitude = 0.0;
 	private double latitude = 0.0;
@@ -63,6 +64,8 @@ public class NativeFormatRequest {
 			b.appendQueryParameter("longitude", Double.toString(longitude));
 			b.appendQueryParameter("latitude", Double.toString(latitude));
 		}
+
+        b.appendQueryParameter("template_name",this.getTemplateName());
 
 		return b.build();
 	}
@@ -173,4 +176,12 @@ public class NativeFormatRequest {
 	public void setRequestUrl (String url) {
 		this.request_url = url;
 	}
+
+    public String getTemplateName() {
+        return templateName;
+    }
+
+    public void setTemplateName(String templateName) {
+        this.templateName = templateName;
+    }
 }
