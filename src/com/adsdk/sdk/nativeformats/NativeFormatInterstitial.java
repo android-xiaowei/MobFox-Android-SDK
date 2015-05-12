@@ -15,14 +15,12 @@ public class NativeFormatInterstitial {
     NativeFormatInterstitialActivity activity;
     NativeFormatView.NativeFormatAdListener listener;
 
-    public NativeFormatInterstitial(Context ctx){
-        CreativesManager.getInstance(ctx);
+    public NativeFormatInterstitial(Context ctx,String publicationId){
+        CreativesManager.getInstance(ctx,publicationId);
+        this.publicationId = publicationId;
         this.ctx = ctx;
     };
 
-    public void setPublicationId(String publicationId){
-        this.publicationId = publicationId;
-    }
 
     public void setListener(NativeFormatView.NativeFormatAdListener listener){
         this.listener = listener;

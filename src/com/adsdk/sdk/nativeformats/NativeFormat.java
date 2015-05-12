@@ -48,7 +48,7 @@ public class NativeFormat {
 		this.width          = width;
         this.height         = height;
         this.publicationId  = publicationId;
-        this.creative_manager = CreativesManager.getInstance(this.ctx);
+        this.creative_manager = CreativesManager.getInstance(this.ctx,publicationId);
 	}
 
 	// ---------------------------------------------------------

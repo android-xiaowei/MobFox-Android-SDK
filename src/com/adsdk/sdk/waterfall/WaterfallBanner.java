@@ -151,7 +151,7 @@ public class WaterfallBanner extends FrameLayout {
 
             @Override
             public void onNativeFormatFailed(Exception e) {
-                Log.d("waterfall", "load native format failed");
+                Log.d("waterfall", "load native format failed",e);
                 _this.loadAdInternal();
             }
 

@@ -159,8 +159,7 @@ public class WaterfallInterstitial {
 
         Log.d("waterfall", "load native format ad");
         final WaterfallInterstitial _this = this;
-        final NativeFormatInterstitial ni = new NativeFormatInterstitial(this.ctx);
-        ni.setPublicationId(this.publicationId);
+        final NativeFormatInterstitial ni = new NativeFormatInterstitial(this.ctx,this.publicationId);
 
         ni.setListener(new NativeFormatView.NativeFormatAdListener(){
 
@@ -172,7 +171,7 @@ public class WaterfallInterstitial {
 
             @Override
             public void onNativeFormatFailed(Exception e) {
-                Log.d("waterfall", "load native format failed");
+                Log.d("waterfall", "load native format failed",e);
                 _this.loadAdInternal();
             }
 

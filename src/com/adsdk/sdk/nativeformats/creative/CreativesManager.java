@@ -36,7 +36,7 @@ public class CreativesManager {
 	private static CreativesManager instance = null;
 	private Stack<Creative> creatives = new Stack<Creative>();
 
-	protected CreativesManager(final Context ctx) {
+	protected CreativesManager(final Context ctx, final String publicationId) {
 
 		// add fallback creatives
         String libs = ResourceManager.getStringResource(ctx, "libs.js");
@@ -54,7 +54,9 @@ public class CreativesManager {
 					client = AndroidHttpClient.newInstance(System.getProperty("http.agent"));
 					HttpGet request = new HttpGet();
 					request.setHeader("User-Agent", System.getProperty("http.agent"));
-					request.setURI(new URI(BASE_URL));
+
+					request.setURI(new URI(BASE_URL+"?p"+publicationId));
+
 					HttpResponse response = client.execute(request);
 					StatusLine statusLine = response.getStatusLine();
 
@@ -104,9 +106,9 @@ public class CreativesManager {
 
 	}
 
-	public static CreativesManager getInstance(Context ctx) {
+	public static CreativesManager getInstance(Context ctx,String publicationId) {
 		if (instance == null) {
-			instance = new CreativesManager(ctx);
+			instance = new CreativesManager(ctx,publicationId);
 		}
 		return instance;
 	}
