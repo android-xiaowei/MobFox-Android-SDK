@@ -138,20 +138,20 @@ public class RequestGeneralAd extends RequestAd<AdResponse> {
 			if (isVideo) {
 
                 Log.d("Detected video!");
-                android.util.Log.d("vast","about to call vast");
+                Log.d("vast about to call vast");
 				VAST vast = VASTParser.createVastFromStream(inputStream);
-                android.util.Log.d("vast","vast returned");
+                Log.d("vast returned");
 
                 VideoData video = null;
                 try {
                     video = VASTParser.fillVideoDataFromVast(vast);
                 }
                 catch(Exception e){
-                    android.util.Log.e("vast","failed to get video from vast",e);
+                    Log.e("vast failed to get video from vast",e);
                 }
-                android.util.Log.d("vast","vast video returned");
+                Log.d("vast video returned");
 				if (video == null) {
-                    android.util.Log.d("vast","video is null");
+                    Log.d("vast video is null");
                     Log.d("Video could not be parsed!");
 					response.setType(Const.NO_AD);
 					if (response.getRefresh() <= 0) {

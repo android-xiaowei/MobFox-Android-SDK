@@ -9,13 +9,13 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.HttpGet;
-import org.json.JSONException;
 
 import android.content.Context;
 import android.net.http.AndroidHttpClient;
 import android.os.Handler;
-import android.util.Log;
 
+
+import com.adsdk.sdk.Log;
 import com.adsdk.sdk.RequestException;
 import com.adsdk.sdk.Util;
 import com.adsdk.sdk.nativeformats.creative.Creative;
@@ -76,8 +76,8 @@ public class NativeFormat {
 
 
 
-        Log.v("html5", "starting build");
-        Log.d("html5","native req: "+request.toUri());
+        Log.d("starting build");
+        Log.d("native req: "+request.toUri());
 
         handler = new Handler();
 
@@ -94,7 +94,7 @@ public class NativeFormat {
 
 
 					HttpResponse response = client.execute(request);
-                    Log.v("html5", "sent request");
+                    Log.v("sent request");
 
 					StatusLine statusLine = response.getStatusLine();
 
@@ -111,7 +111,7 @@ public class NativeFormat {
 
 					if (statusCode == 200) {
 
-                        Log.v("html5", "start build response");
+                        Log.v("start build response");
 						StringBuilder builder = new StringBuilder();
 						HttpEntity entity = response.getEntity();
 						InputStream content = entity.getContent();
@@ -122,7 +122,7 @@ public class NativeFormat {
 						}
 						final String data = builder.toString();
 
-                        Log.v("html5", "build got data");
+                        Log.v("build got data");
 
 						if (data.length() == 0) {
                             handler.post(new Runnable() {
@@ -133,7 +133,7 @@ public class NativeFormat {
                             });
 							return;
 						}
-						Log.v("html5","builder: "+data);
+						Log.v("builder: "+data);
 
                         handler.post(new Runnable() {
                             @Override

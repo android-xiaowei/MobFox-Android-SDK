@@ -4,7 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
 import android.util.AttributeSet;
-import android.util.Log;
+
 import android.view.ViewGroup;
 import android.webkit.ConsoleMessage;
 //import android.webkit.JavascriptInterface;
@@ -13,10 +13,9 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-//import com.adsdk.sdk.Log;
+import com.adsdk.sdk.Log;
 import com.adsdk.sdk.Util;
-import com.adsdk.sdk.nativeformats.creative.Creative;
-import com.adsdk.sdk.nativeformats.creative.CreativesManager;
+
 import com.adsdk.sdk.video.ResourceManager;
 
 import org.json.JSONObject;
@@ -79,7 +78,7 @@ public class NativeFormatView extends WebView {
                 Method m = WebSettings.class.getMethod("setAllowUniversalAccessFromFileURLs",boolean.class);
                 m.invoke(webSettings,true);
             } catch (Exception e) {
-                Log.v("html5","can't set setAllowUniversalAccessFromFileURLs",e);
+                Log.v("can't set setAllowUniversalAccessFromFileURLs",e);
             }
         }
 /*
@@ -134,7 +133,7 @@ public class NativeFormatView extends WebView {
 	}
 
     public void loadAd(final String template,final String data){
-        Log.v("html5","data: "+data);
+        Log.v("data: "+data);
 
         setWebViewClient(new WebViewClient(){
 
@@ -142,7 +141,7 @@ public class NativeFormatView extends WebView {
             public void onPageFinished (WebView view, String url) {
 
                setWebViewClient(null);
-                Log.v("html5","url: "+url);
+                Log.v("url: "+url);
 
                 try {
                     JSONObject inp = new JSONObject();
@@ -153,8 +152,6 @@ public class NativeFormatView extends WebView {
                     json.put("libs","<script type='text/javascript'>"+libs+"</script>");
                     inp.put("data", json);
 
-                    //Log.d("html5", "render template : " + inp.toString());
-
                     setWebChromeClient(new WebChromeClient(){
                         @Override
                         public boolean onConsoleMessage (ConsoleMessage consoleMessage){
@@ -162,7 +159,7 @@ public class NativeFormatView extends WebView {
                             final String response = consoleMessage.message();
 
                             setWebChromeClient(null);
-                            Log.v("html5", "render template response : " + response);
+                            Log.v("render template response : " + response);
 
 
                             loadDataWithBaseURL("file:///android_res/raw/", response, "text/html", "utf-8", null);
@@ -196,7 +193,7 @@ public class NativeFormatView extends WebView {
 
 
         String renderTemplete = ResourceManager.getStringResource(getContext(),"render_template.html");
-        Log.v("html5","render template contents:"+renderTemplete);
+        Log.v("render template contents:"+renderTemplete);
         loadDataWithBaseURL(null,renderTemplete,"text/html","utf-8",null);
     }
 
@@ -229,13 +226,13 @@ public class NativeFormatView extends WebView {
 		if (height <= 0)
 			height = defaultHeight;
 		
-		Log.v("html5","dims: " + width + ", " + height);
-		Log.v("html5","getting creative ...");
+		Log.v("dims: " + width + ", " + height);
+		Log.v("getting creative ...");
 
 
 		NativeFormat nf = new NativeFormat(this.getContext(),width,height,this.publicationId);
 
-        Log.v("html5","instantiated builder");
+        Log.v("instantiated builder");
 
 		/*
 		 * if(this.creativeId > -1){ builder = new NativeFormatBuilder(this.getContext(), params,this.creativeId); } else { builder = new NativeFormatBuilder(this.getContext(), params, R.raw.cube); }

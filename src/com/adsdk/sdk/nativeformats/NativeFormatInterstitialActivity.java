@@ -38,8 +38,7 @@ public class NativeFormatInterstitialActivity extends Activity {
 
 			@Override
 			public void onNativeFormatLoaded(String html) {
-				// Log.e("html5","inter html:");
-				// Log.e("html5",html);
+
 			}
 
 			@Override

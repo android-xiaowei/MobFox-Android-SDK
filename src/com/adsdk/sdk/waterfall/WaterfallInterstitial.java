@@ -1,14 +1,12 @@
 package com.adsdk.sdk.waterfall;
 
 import android.content.Context;
-import android.util.AttributeSet;
-import android.util.Log;
-import android.widget.FrameLayout;
 
 import com.adsdk.sdk.Ad;
 import com.adsdk.sdk.AdListener;
 import com.adsdk.sdk.AdManager;
-import com.adsdk.sdk.banner.AdView;
+
+import com.adsdk.sdk.Log;
 import com.adsdk.sdk.nativeformats.NativeFormatInterstitial;
 import com.adsdk.sdk.nativeformats.NativeFormatView;
 
@@ -52,15 +50,15 @@ public class WaterfallInterstitial {
         String type = w.getNext();
 
         if("banner".equals(type)){
-            Log.d("waterfall", "loading banner");
+            Log.d("waterfall oading banner");
             loadBannerAd();
         }
         else if("nativeFormat".equals(type)){
-            Log.d("waterfall", "loading native format");
+            Log.d("waterfall loading native format");
             loadNativeFormatAd();
         }
         else if("video".equals(type)){
-            Log.d("waterfall", "loading video");
+            Log.d("waterfall loading video");
             loadVideoAd();
         }
         else{
@@ -90,7 +88,7 @@ public class WaterfallInterstitial {
             @Override
             public void adLoadSucceeded(Ad ad) {
 
-                Log.d("waterfall","inter banner ad success");
+                Log.d("waterfall inter banner ad success");
                 mgr.showAd();
                 if(_this.listener==null) return;
                 _this.listener.onAdLoaded();
@@ -103,7 +101,7 @@ public class WaterfallInterstitial {
 
             @Override
             public void noAdFound() {
-                Log.d("waterfall","inter banner ad not found");
+                Log.d("waterfall inter banner ad not found");
                 _this.loadAdInternal();
             }
         });
@@ -133,7 +131,7 @@ public class WaterfallInterstitial {
 
             @Override
             public void adLoadSucceeded(Ad ad) {
-                Log.d("waterfall","inter video ad success");
+                Log.d("waterfall inter video ad success");
                 mgr.showAd();
                 if(_this.listener==null) return;
                 _this.listener.onAdLoaded();
@@ -146,7 +144,7 @@ public class WaterfallInterstitial {
 
             @Override
             public void noAdFound() {
-                Log.d("waterfall","inter video ad not found");
+                Log.d("waterfall inter video ad not found");
 
                 _this.loadAdInternal();
             }
@@ -157,7 +155,7 @@ public class WaterfallInterstitial {
 
     protected void loadNativeFormatAd(){
 
-        Log.d("waterfall", "load native format ad");
+        Log.d("waterfall load native format ad");
         final WaterfallInterstitial _this = this;
         final NativeFormatInterstitial ni = new NativeFormatInterstitial(this.ctx,this.publicationId);
 
@@ -171,7 +169,7 @@ public class WaterfallInterstitial {
 
             @Override
             public void onNativeFormatFailed(Exception e) {
-                Log.d("waterfall", "load native format failed",e);
+                Log.d("waterfall load native format failed",e);
                 _this.loadAdInternal();
             }
 

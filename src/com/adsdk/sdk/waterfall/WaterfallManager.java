@@ -1,6 +1,6 @@
 package com.adsdk.sdk.waterfall;
 
-import android.util.Log;
+import com.adsdk.sdk.Log;
 import com.adsdk.sdk.networking.JSONRetriever;
 import com.adsdk.sdk.networking.JSONRetrieverImpl;
 
@@ -17,7 +17,7 @@ import java.util.Map;
  */
 public class WaterfallManager {
 
-    private static final String BASE_URL = "http://static.starbolt.io/waterfalls2.json";
+    private static final String BASE_URL = "http://sdk.starbolt.io/waterfalls.json";
 
     private static WaterfallManager instance = null;
     private Map<String,Waterfall> waterfalls = new HashMap<String,Waterfall>();
@@ -47,7 +47,7 @@ public class WaterfallManager {
 
 
                 if(e!=null) {
-                    Log.e("waterfall","failed to retrieve waterfalls", e);
+                    Log.e("waterfall failed to retrieve waterfalls", e);
                     return;
                 }
 
@@ -64,11 +64,11 @@ public class WaterfallManager {
                             JSONObject next = warr.getJSONObject(i);
                             w.add(next.getString("name"),next.getDouble("prob"));
                         }
-                        Log.d("waterfall","putting: "+k+" , "+w.toString());
+                        Log.d("waterfall putting: "+k+" , "+w.toString());
                         waterfalls.put(k,w);
                     }
                 } catch (JSONException e1) {
-                    Log.e("waterfall","error parsing waterfalls", e);
+                    Log.e("waterfall error parsing waterfalls", e);
                 }
 
 

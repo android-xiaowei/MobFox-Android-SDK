@@ -2,11 +2,12 @@ package com.adsdk.sdk.waterfall;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.util.Log;
+
 import android.widget.FrameLayout;
 
 import com.adsdk.sdk.Ad;
 import com.adsdk.sdk.AdListener;
+import com.adsdk.sdk.Log;
 import com.adsdk.sdk.banner.AdView;
 import com.adsdk.sdk.nativeformats.NativeFormatView;
 
@@ -50,14 +51,14 @@ public class WaterfallBanner extends FrameLayout {
     private void loadAdInternal(){
 
         String type = w.getNext();
-        Log.d("waterfall","Got from waterfall > "+type);
+        Log.d("waterfall Got from waterfall > " + type);
 
         if("banner".equals(type)){
-            Log.d("waterfall", "loading banner");
+            Log.d("waterfall loading banner");
             loadBannerAd();
         }
         else if("nativeFormat".equals(type)){
-            Log.d("waterfall", "loading native format");
+            Log.d("waterfall loading native format");
             loadNativeFormatAd();
         }
         else{
@@ -70,14 +71,14 @@ public class WaterfallBanner extends FrameLayout {
     protected void loadBannerAd(){
 
         final WaterfallBanner _this = this;
-        Log.d("waterfall","banner pub id: "+this.publicationId);
+        Log.d("banner pub id: "+this.publicationId);
         AdView view = new AdView(this.getContext(), "http://my.mobfox.com/request.php",this.publicationId, true, true);
         float density = getResources().getDisplayMetrics().density;
         int width = (int)(this.getWidth() / density);
         int height =  (int)(this.getHeight() / density);
 
-        Log.d("waterfall","banner width: "+width);
-        Log.d("waterfall","banner height: "+height);
+        Log.d("banner width: "+width);
+        Log.d("banner height: "+height);
 
         view.setAdspaceWidth(width);
         view.setAdspaceHeight(height);
@@ -97,7 +98,7 @@ public class WaterfallBanner extends FrameLayout {
 
             @Override
             public void adLoadSucceeded(Ad ad) {
-                Log.d("waterfall", "banner load succeeded");
+                Log.d("waterfall banner load succeeded");
                 if(_this.listener==null) return;
                 _this.listener.onAdLoaded();
             }
@@ -109,12 +110,12 @@ public class WaterfallBanner extends FrameLayout {
 
             @Override
             public void noAdFound() {
-                Log.d("waterfall", "banner no ad found");
+                Log.d("waterfall banner no ad found");
                 _this.loadAdInternal();
             }
         });
         //view.loadNextAd();
-        Log.d("waterfall", "init banner view");
+        Log.d("waterfall init banner view");
         this.removeAllViews();
         this.addView(view);
 
@@ -122,7 +123,7 @@ public class WaterfallBanner extends FrameLayout {
 
     protected void loadNativeFormatAd(){
 
-        Log.d("waterfall", "load native format ad");
+        Log.d("waterfall load native format ad");
         final WaterfallBanner _this = this;
         final NativeFormatView nfw = new NativeFormatView(this.getContext());
         nfw.setLayoutParams(new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
@@ -142,8 +143,8 @@ public class WaterfallBanner extends FrameLayout {
                 float density = getResources().getDisplayMetrics().density;
                 int width = (int)(nfw.getWidth() / density);
                 int height =  (int)(nfw.getHeight() / density);
-                Log.d("waterfall","nfw width2: "+width);
-                Log.d("waterfall","nfw height2: "+height);
+                Log.d("waterfall nfw width2: "+width);
+                Log.d("waterfall nfw height2: "+height);
 
                 if(_this.listener==null) return;
                 _this.listener.onAdLoaded();
@@ -151,7 +152,7 @@ public class WaterfallBanner extends FrameLayout {
 
             @Override
             public void onNativeFormatFailed(Exception e) {
-                Log.d("waterfall", "load native format failed",e);
+                Log.d("waterfall load native format failed",e);
                 _this.loadAdInternal();
             }
 
@@ -161,7 +162,7 @@ public class WaterfallBanner extends FrameLayout {
             }
         });
 
-        Log.d("waterfall", "init native format view");
+        Log.d("waterfall init native format view");
 
         this.removeAllViews();
         this.addView(nfw);

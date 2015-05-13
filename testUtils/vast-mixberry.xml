@@ -1,0 +1,56 @@
+<VAST xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" version="2.0">
+<Ad id="2660">
+<InLine>
+<AdSystem>Mixberry Media</AdSystem>
+<Impression>
+http://imp.mixberrymedia.com/impressions/capture?parameters=9IK1ovHJMJHSJKxU1ovbITFx9jlPnWwC7O_6kEHmpSwLzulJl0MP_ewLiP0DfVkaa4N4A64-VshpFd_hHnuwt6p2Evj7R3UPuE3N6pKCuufaK_6VPuedWRo9iGT-pAIP
+</Impression>
+<Creatives>
+<Creative AdID="2660">
+<Linear>
+<Duration>00:00:30</Duration>
+<MediaFiles>
+<MediaFile delivery="progressive" type="audio/x-mpeg-3">
+http://s3.amazonaws.com/MixBerryAdsProduction/%2F1345%2F2660%2Faudio.mp3?Expires=1431498452&AWSAccessKeyId=AKIAJCTUHES5MZ3H5B7Q&Signature=CI7gI6n%2FVhGK9VwUs3gjF2j3Acg%3D
+</MediaFile>
+</MediaFiles>
+<TrackingEvents>
+<Tracking event="start">
+http://trk.mixberrymedia.com/tracker/capture?parameters=9IK1ovHJMJHSJKxU1ovbITFx9jlPnWwC7O_6kEHmpSwLzulJl0MP_ewLiP0DfVkaa4N4A64-VshpFd_hHnuwt6p2Evj7R3UPShmiYhpxhWpJTQyI8TZFFg
+</Tracking>
+<Tracking event="firstQuartile">
+http://trk.mixberrymedia.com/tracker/capture?parameters=9IK1ovHJMJHSJKxU1ovbITFx9jlPnWwC7O_6kEHmpSwLzulJl0MP_ewLiP0DfVkaa4N4A64-VshpFd_hHnuwt6p2Evj7R3UPShmiYhpxhWrkuo-U3xEiHw
+</Tracking>
+<Tracking event="midpoint">
+http://trk.mixberrymedia.com/tracker/capture?parameters=9IK1ovHJMJHSJKxU1ovbITFx9jlPnWwC7O_6kEHmpSwLzulJl0MP_ewLiP0DfVkaa4N4A64-VshpFd_hHnuwt6p2Evj7R3UPShmiYhpxhWqKkkS0RZurxw
+</Tracking>
+<Tracking event="thirdQuartile">
+http://trk.mixberrymedia.com/tracker/capture?parameters=9IK1ovHJMJHSJKxU1ovbITFx9jlPnWwC7O_6kEHmpSwLzulJl0MP_ewLiP0DfVkaa4N4A64-VshpFd_hHnuwt6p2Evj7R3UPShmiYhpxhWp5RkMErhEUuA
+</Tracking>
+<Tracking event="complete">
+http://trk.mixberrymedia.com/tracker/capture?parameters=9IK1ovHJMJHSJKxU1ovbITFx9jlPnWwC7O_6kEHmpSwLzulJl0MP_ewLiP0DfVkaa4N4A64-VshpFd_hHnuwt6p2Evj7R3UPShmiYhpxhWr5RBqNtQbygQ
+</Tracking>
+</TrackingEvents>
+<VideoClicks>
+<ClickThrough>
+http://imp.mixberrymedia.com/impressions/action?parameters=9IK1ovHJMJHSJKxU1ovbITFx9jlPnWwC7O_6kEHmpSwLzulJl0MP_ewLiP0DfVkaa4N4A64-VshpFd_hHnuwt6p2Evj7R3UPt2sLKZvbjdnpcMjuAzolLLu1KSIek5HW2hOX3C2lj6VjMAIF-eykYOVfOTp1D6lT
+</ClickThrough>
+</VideoClicks>
+</Linear>
+</Creative>
+<Creative AdID="2660-Companion">
+<CompanionAds>
+<Companion width="300" height="250">
+<CompanionClickThrough>
+http://imp.mixberrymedia.com/impressions/action?parameters=9IK1ovHJMJHSJKxU1ovbITFx9jlPnWwC7O_6kEHmpSwLzulJl0MP_ewLiP0DfVkaa4N4A64-VshpFd_hHnuwt6p2Evj7R3UPt2sLKZvbjdnpcMjuAzolLLu1KSIek5HW2hOX3C2lj6VjMAIF-eykYOVfOTp1D6lT
+</CompanionClickThrough>
+<StaticResource creativeType="png">
+http://s3.amazonaws.com/MixBerryAdsProduction/%2F1345%2F2660%2F300x250.png?Expires=1431498452&AWSAccessKeyId=AKIAJCTUHES5MZ3H5B7Q&Signature=eUzsTUrg1MnbqqjrhajSSzuirK0%3D
+</StaticResource>
+</Companion>
+</CompanionAds>
+</Creative>
+</Creatives>
+</InLine>
+</Ad>
+</VAST>
