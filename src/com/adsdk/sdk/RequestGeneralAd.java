@@ -31,6 +31,7 @@ import com.adsdk.sdk.video.VideoData;
 public class RequestGeneralAd extends RequestAd<AdResponse> {
 
 	private final static int RELOAD_AFTER_NO_AD = 20;
+    private final static String VAST_TAG = "vast";
 
 	public RequestGeneralAd() {
 	}
@@ -138,27 +139,22 @@ public class RequestGeneralAd extends RequestAd<AdResponse> {
 			if (isVideo) {
 
                 Log.d("Detected video!");
-                Log.d("vast about to call vast");
+                android.util.Log.d(VAST_TAG,"vast about to call vast");
 				VAST vast = VASTParser.createVastFromStream(inputStream);
-                Log.d("vast returned");
+                android.util.Log.d(VAST_TAG,"vast returned");
 
-                VideoData video = null;
-                try {
-                    video = VASTParser.fillVideoDataFromVast(vast);
-                }
-                catch(Exception e){
-                    Log.e("vast failed to get video from vast",e);
-                }
+                VideoData video = VASTParser.fillVideoDataFromVast(vast);
+
                 Log.d("vast video returned");
 				if (video == null) {
-                    Log.d("vast video is null");
+                    android.util.Log.d(VAST_TAG,"vast video is null");
                     Log.d("Video could not be parsed!");
 					response.setType(Const.NO_AD);
 					if (response.getRefresh() <= 0) {
 						response.setRefresh(RELOAD_AFTER_NO_AD);
 					}
 				} else {
-                    Log.d("Got video setting data!");
+                    android.util.Log.d(VAST_TAG,"Got video setting data!");
 					response.setVideoData(video);
 					response.setType(Const.VIDEO);
 				}
@@ -249,7 +245,6 @@ public class RequestGeneralAd extends RequestAd<AdResponse> {
 
 	@Override
 	public AdResponse parseTestString() throws RequestException {
-		Log.d("parse vast here ...");
-        return parse(is, null, true);
+        return parse(is, null, false);
 	}
 }

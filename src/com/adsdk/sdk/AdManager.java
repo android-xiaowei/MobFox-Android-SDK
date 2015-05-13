@@ -131,9 +131,11 @@ public class AdManager {
 					try {
 						RequestGeneralAd requestAd = new RequestGeneralAd();
 						if (isInterstitialAdsEnabled && !alreadyRequestedInterstitial && (!prioritizeVideoAds || alreadyRequestedVideo)) {
-							request = getInterstitialRequest();
+							android.util.Log.d("admanager","requesting inter ad");
+                            request = getInterstitialRequest();
 							alreadyRequestedInterstitial = true;
 						} else if (isVideoAdsEnabled && !alreadyRequestedVideo) {
+                            android.util.Log.d("admanager","requesting video ad");
 							request = getVideoRequest();
 							alreadyRequestedVideo = true;
 						} else {
@@ -143,7 +145,9 @@ public class AdManager {
 							return;
 						}
 
+                        android.util.Log.d("admanager",request.toUri().toString());
 						mResponse = requestAd.sendRequest(request);
+
 						if (mResponse.getType() == Const.NO_AD && (mResponse.getCustomEvents() == null || mResponse.getCustomEvents().isEmpty())) {
 							if (isVideoAdsEnabled && !alreadyRequestedVideo) {
 								request = getVideoRequest();
@@ -160,22 +164,28 @@ public class AdManager {
 							Log.d("Not capable of video");
 							notifyNoAdFound();
 						} else if (mResponse.getType() == Const.VIDEO && mResponse.getCustomEvents().isEmpty()) {
+                            android.util.Log.d("admanager","video response");
 							Log.d("response OK received");
 							notifyAdLoaded(mResponse);
 						} else if (mResponse.getCustomEvents().isEmpty() && (mResponse.getType() == Const.TEXT || mResponse.getType() == Const.MRAID || mResponse.getType() == Const.IMAGE)) {
-							notifyAdLoaded(mResponse);
+                            android.util.Log.d("admanager","inter response");
+                            notifyAdLoaded(mResponse);
 						} else if (mResponse.getType() == Const.NO_AD && mResponse.getCustomEvents() != null && mResponse.getCustomEvents().isEmpty()) {
-							Log.d("response NO AD received");
+                            android.util.Log.d("admanager","no ad");
+                            Log.d("response NO AD received");
 						} else if (mResponse.getCustomEvents() != null && !mResponse.getCustomEvents().isEmpty()) {
+                            android.util.Log.d("admanager","custom events");
 							loadCustomEventFullscreen();
 							if (customEventFullscreen == null) {
 								mResponse.getCustomEvents().clear();
 								notifyNoAdFound();
 							}
 						} else {
+                            android.util.Log.d("admanager","no ad2");
 							notifyNoAdFound();
 						}
 					} catch (Throwable t) {
+                        android.util.Log.e("admanager","err",t);
 						if (isVideoAdsEnabled && !alreadyRequestedVideo) {
 							mRequestThread = null;
 							requestAdInternal(true);
