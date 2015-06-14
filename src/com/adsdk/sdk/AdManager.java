@@ -245,6 +245,7 @@ public class AdManager {
 					}
 					Log.d("starting request thread");
 					try {
+
 						RequestGeneralAd requestAd = new RequestGeneralAd(xml);
 						if (isInterstitialAdsEnabled && !prioritizeVideoAds) {
 							request = getInterstitialRequest();

@@ -21,10 +21,11 @@ public class InAppWebView extends Activity {
 
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
 
 		getWindow().requestFeature(Window.FEATURE_PROGRESS);
-		getWindow().setFeatureInt(Window.FEATURE_PROGRESS, Window.PROGRESS_VISIBILITY_ON);
+        super.onCreate(savedInstanceState);
+
+        getWindow().setFeatureInt(Window.FEATURE_PROGRESS, Window.PROGRESS_VISIBILITY_ON);
 
 		final Intent intent = this.getIntent();
 

@@ -11,6 +11,7 @@ public class WaterfallBannerTest extends AndroidTestCase {
 
 
     public void testBasic(){
+
         WaterfallManager.setRetriever(new DummyJSONRetriever());
         WaterfallBanner banner = new WaterfallBanner(this.getContext());
         banner.setPublicationId("111");
@@ -27,6 +28,7 @@ public class WaterfallBannerTest extends AndroidTestCase {
             }
         });
         banner.loadAd();
+
     }
 
 }

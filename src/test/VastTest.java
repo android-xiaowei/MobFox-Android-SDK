@@ -46,7 +46,7 @@ public class VastTest extends TestCase{
         assert(true);
     }
 
-    public void testMixberryValidity(){
+    /*public void testMixberryValidity(){
 
         Serializer serializer = new Persister();
         File vastXML = new File("./testUtils/vast-mixberry.xml");
@@ -60,6 +60,6 @@ public class VastTest extends TestCase{
         }
 
         assert(true);
-    }
+    }*/
 
 }

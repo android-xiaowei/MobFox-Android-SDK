@@ -144,7 +144,7 @@ public class RequestGeneralAd extends RequestAd<AdResponse> {
                 android.util.Log.d(VAST_TAG,"vast returned");
 
                 VideoData video = VASTParser.fillVideoDataFromVast(vast);
-
+                android.util.Log.d(VAST_TAG,"vast video returned");
                 Log.d("vast video returned");
 				if (video == null) {
                     android.util.Log.d(VAST_TAG,"vast video is null");
@@ -230,14 +230,9 @@ public class RequestGeneralAd extends RequestAd<AdResponse> {
 
 			}
 
-		} catch (final ParserConfigurationException e) {
-			throw new RequestException("Cannot parse Response", e);
-		} catch (final SAXException e) {
-			throw new RequestException("Cannot parse Response", e);
-		} catch (final IOException e) {
+		} catch (final Exception e) {
+            android.util.Log.e(VAST_TAG,"vast error",e);
 			throw new RequestException("Cannot read Response", e);
-		} catch (final Throwable t) {
-			throw new RequestException("Cannot read Response", t);
 		}
 
 		return response;
@@ -245,6 +240,6 @@ public class RequestGeneralAd extends RequestAd<AdResponse> {
 
 	@Override
 	public AdResponse parseTestString() throws RequestException {
-        return parse(is, null, false);
+        return parse(is, null, true);
 	}
 }
