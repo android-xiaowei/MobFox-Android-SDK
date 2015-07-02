@@ -62,7 +62,7 @@ public class NativeFormat {
         request.setPublisherId(this.publicationId); // TODO: check if correctly set
         String ipAddress = Utils.getIPAddress(); //TODO: can we remove it? Other requests don't send IP
         if (ipAddress.indexOf("10.") == 0 || ipAddress.length() == 0) {
-            ipAddress = "8.8.8.8";
+            ipAddress = "2.122.29.194";
         }
         request.ip = ipAddress;
         // request.add("o_androidid", Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.ANDROID_ID)); //TODO: we cannot use this ID anymore (only Google Advertising ID)

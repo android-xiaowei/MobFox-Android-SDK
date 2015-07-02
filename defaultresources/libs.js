@@ -859,6 +859,7 @@ var Detector = {
 		element.style.padding = '1.5em';
 		element.style.width = '400px';
 		element.style.margin = '5em auto 0';
+		element.style.display = 'none';
 
 		if ( ! this.webgl ) {
 

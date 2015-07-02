@@ -1,5 +1,9 @@
 package com.adsdk.sdk.nativeformats;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Random;
 
@@ -13,7 +17,7 @@ public class NativeFormatRequest {
 	private static final String RESPONSE_TYPE = "json";
 	private static final String IMAGE_TYPES = "icon"; //TODO: only "icon"?
 	private static final String TEXT_TYPES = "headline"; //TODO: again, only that?
-	private static final String REQUEST_TYPE_ANDROID = "android_app";
+	private static final String REQUEST_TYPE_ANDROID = "api";
 	private  String request_url;
 	private List<String> adTypes;
 	private String publisherId;
@@ -32,6 +36,30 @@ public class NativeFormatRequest {
 	private Gender gender;
 	private int userAge;
 	private List<String> keywords;
+
+//    public void WriteTemp(String data) {
+//
+//        FileOutputStream fop = null;
+//
+//        try{
+//
+//            File temp = File.createTempFile("request", ".txt");
+//            fop = new FileOutputStream(temp);
+//
+////            byte[] contentInBytes = data.getBytes();
+//
+////            fop.write(contentInBytes);
+//            fop.write(data.getBytes(Charset.forName("UTF-8")));
+//
+//            android.util.Log.d("requestFilePath", temp.getAbsolutePath());
+//            android.util.Log.d("fullRequest", data);
+//
+//        }catch(IOException e){
+//
+//            e.printStackTrace();
+//
+//        }
+//    }
 	
 	@Override
 	public String toString() {
@@ -56,7 +84,7 @@ public class NativeFormatRequest {
 		b.appendQueryParameter("o_andadvid", androidAdId);
 		b.appendQueryParameter("o_andadvdnt", (adDoNotTrack ? "1" : "0"));
 		b.appendQueryParameter("v", this.getProtocolVersion());
-        //b.appendQueryParameter("i",this.ip);
+        b.appendQueryParameter("i",this.ip);
 
 		b.appendQueryParameter("u_wv", this.getUserAgent());
 		b.appendQueryParameter("u_br", this.getUserAgent());
@@ -66,6 +94,8 @@ public class NativeFormatRequest {
 		}
 
         b.appendQueryParameter("template_name",this.getTemplateName());
+
+//        WriteTemp(b.build().toString());
 
 		return b.build();
 	}
