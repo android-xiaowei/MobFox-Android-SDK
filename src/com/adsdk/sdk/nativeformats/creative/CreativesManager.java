@@ -55,7 +55,7 @@ public class CreativesManager {
 					HttpGet request = new HttpGet();
 					request.setHeader("User-Agent", System.getProperty("http.agent"));
 
-					request.setURI(new URI(BASE_URL+"?p"+publicationId));
+					request.setURI(new URI(BASE_URL+"?p="+publicationId));
 
 					HttpResponse response = client.execute(request);
 					StatusLine statusLine = response.getStatusLine();
