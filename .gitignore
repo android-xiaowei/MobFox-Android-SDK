@@ -21,3 +21,7 @@ libs/vungle-publisher-adaptive-id-3.3.0.jar
 output
 out
 *.iml
+local.properties
+partner_sdks
+.gradle
+build
