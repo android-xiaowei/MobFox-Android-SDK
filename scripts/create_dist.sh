@@ -18,7 +18,7 @@ mv $TEMP/release-{{ver}}-android $TEMP/release-$VER-android
 DIR=$TEMP/release-$VER-android
 mv $DIR/MobFox-Android-SDK-{{ver}} $DIR/MobFox-Android-SDK-$VER
 mv $DIR/MobFox_Android_SDK+Mediation/Readme_GoogleAdMobAdapter_MobFoxSDK_Android_{{ver}}.txt $DIR/MobFox_Android_SDK+Mediation/Readme_GoogleAdMobAdapter_MobFoxSDK_Android_$VER.txt
-cp ../out/artifacts/Mobfox_Android_SDK/Mobfox-Android-SDK.jar $DIR/MobFox-Android-SDK-$VER/AdSdk_$VER.jar
+cp ../build/outputs/MobFox-Android-SDK.jar $DIR/MobFox-Android-SDK-$VER/AdSdk_$VER.jar
 
 cp $DIR/MobFox-Android-SDK-$VER/AdSdk_$VER.jar $DIR/MobFox-Android-SDK-$VER/AdSDK_Demo/libs/
 cp $DIR/MobFox-Android-SDK-$VER/AdSdk_$VER.jar $DIR/MobFox-Android-SDK-$VER/AdSDK_NativeAdsDemo/libs/
