@@ -26,3 +26,4 @@ partner_sdks
 .gradle
 build
 *.swp
+.DS_Store
