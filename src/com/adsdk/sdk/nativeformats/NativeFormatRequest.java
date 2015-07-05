@@ -81,7 +81,12 @@ public class NativeFormatRequest {
 		b.appendQueryParameter("u", this.getUserAgent());
 		b.appendQueryParameter("u2", this.getUserAgent2());
 		b.appendQueryParameter("r_random", Integer.toString(random));
-		b.appendQueryParameter("o_andadvid", androidAdId);
+        if(androidAdId.length() > 0){
+            b.appendQueryParameter("o_andadvid", androidAdId);
+        }
+        else {
+            b.appendQueryParameter("o_andadvid", "xxxx");
+        }
 		b.appendQueryParameter("o_andadvdnt", (adDoNotTrack ? "1" : "0"));
 		b.appendQueryParameter("v", this.getProtocolVersion());
         b.appendQueryParameter("i",this.ip);
@@ -94,7 +99,6 @@ public class NativeFormatRequest {
 		}
 
         b.appendQueryParameter("template_name",this.getTemplateName());
-
 //        WriteTemp(b.build().toString());
 
 		return b.build();

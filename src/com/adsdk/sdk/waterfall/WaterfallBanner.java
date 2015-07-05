@@ -51,6 +51,7 @@ public class WaterfallBanner extends FrameLayout {
     private void loadAdInternal(){
 
         String type = w.getNext();
+
         Log.d("waterfall Got from waterfall > " + type);
 
         if("banner".equals(type)){
