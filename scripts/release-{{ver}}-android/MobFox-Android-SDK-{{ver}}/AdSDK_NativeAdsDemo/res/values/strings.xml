@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">AdSDK_NativeAdsDemo</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="showAdButtonLabel">Show native ad</string>
+    <string name="loadNativeAdButtonLabel">Load native ad</string>
+    <string name="prepareListViewButtonLabel">Prepare list view</string>
+
+</resources>
