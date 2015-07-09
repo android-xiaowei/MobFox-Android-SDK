@@ -25,10 +25,102 @@ public class WaterfallInterstitial {
     Waterfall w= null;
     Context ctx;
 
+    AdManager bannerMgr;
+    AdManager videoMgr;
+
     public WaterfallInterstitial(Context ctx,String publicationId){
+
+        final WaterfallInterstitial _this = this;
+
         this.publicationId = publicationId;
         this.ctx = ctx;
         WaterfallManager manager = WaterfallManager.getInstance(publicationId);
+
+        bannerMgr = new AdManager(this.ctx, "http://my.mobfox.com/request.php",this.publicationId, true);
+        bannerMgr.setVideoAdsEnabled(false);
+
+        bannerMgr.setListener(new AdListener(){
+
+            @Override
+            public void adClicked() {
+
+            }
+
+            @Override
+            public void adClosed(Ad ad, boolean completed) {
+
+            }
+
+            @Override
+            public void adLoadSucceeded(Ad ad) {
+
+                Log.d("waterfall inter banner ad success");
+                android.util.Log.d("water","banner loaded !!!");
+                if(!_this.bannerMgr.isAdLoaded()){
+                    _this.loadAdInternal();
+                    return;
+                }
+
+                _this.bannerMgr.showAd();
+                if(_this.listener==null) return;
+                _this.listener.onAdLoaded();
+            }
+
+            @Override
+            public void adShown(Ad ad, boolean succeeded) {
+
+            }
+
+            @Override
+            public void noAdFound() {
+                Log.d("waterfall inter banner ad not found");
+                android.util.Log.d("water","banner ad not found.");
+                _this.loadAdInternal();
+            }
+        });
+
+        videoMgr = new AdManager(this.ctx, "http://my.mobfox.com/request.php",this.publicationId, true);
+        videoMgr.setInterstitialAdsEnabled(false);
+        videoMgr.setVideoAdsEnabled(true);
+
+        videoMgr.setListener(new AdListener(){
+
+            @Override
+            public void adClicked() {
+
+            }
+
+            @Override
+            public void adClosed(Ad ad, boolean completed) {
+
+            }
+
+            @Override
+            public void adLoadSucceeded(Ad ad) {
+                Log.d("waterfall inter video ad success");
+                android.util.Log.d("water","video loaded !!!");
+                if(!_this.videoMgr.isAdLoaded()){
+                    _this.loadAdInternal();
+                    return;
+                }
+
+                _this.videoMgr.showAd();
+                if(_this.listener==null) return;
+                _this.listener.onAdLoaded();
+            }
+
+            @Override
+            public void adShown(Ad ad, boolean succeeded) {
+
+            }
+
+            @Override
+            public void noAdFound() {
+                Log.d("waterfall inter video ad not found");
+                android.util.Log.d("water","video ad not found.");
+                _this.loadAdInternal();
+            }
+        });
     }
 
     public void setPublicationId(String publicationId) {
@@ -48,17 +140,20 @@ public class WaterfallInterstitial {
     private void loadAdInternal(){
 
         String type = w.getNext();
-
+        android.util.Log.d("water","type from wfall "+type);
         if("banner".equals(type)){
-            Log.d("waterfall oading banner");
+            Log.d("waterfall loading banner");
+            android.util.Log.d("water","waterfall loading banner");
             loadBannerAd();
         }
         else if("nativeFormat".equals(type)){
             Log.d("waterfall loading native format");
+            android.util.Log.d("water","waterfall native format");
             loadNativeFormatAd();
         }
         else if("video".equals(type)){
             Log.d("waterfall loading video");
+            android.util.Log.d("water","waterfall video format");
             loadVideoAd();
         }
         else{
@@ -70,86 +165,17 @@ public class WaterfallInterstitial {
 
     protected void loadBannerAd(){
 
-        final AdManager mgr = new AdManager(this.ctx, "http://my.mobfox.com/request.php",this.publicationId, true);
-        mgr.setVideoAdsEnabled(false);
-        final WaterfallInterstitial _this = this;
-        mgr.setListener(new AdListener(){
-
-            @Override
-            public void adClicked() {
-
-            }
-
-            @Override
-            public void adClosed(Ad ad, boolean completed) {
-
-            }
-
-            @Override
-            public void adLoadSucceeded(Ad ad) {
-
-                Log.d("waterfall inter banner ad success");
-                mgr.showAd();
-                if(_this.listener==null) return;
-                _this.listener.onAdLoaded();
-            }
-
-            @Override
-            public void adShown(Ad ad, boolean succeeded) {
-
-            }
-
-            @Override
-            public void noAdFound() {
-                Log.d("waterfall inter banner ad not found");
-                _this.loadAdInternal();
-            }
-        });
-        mgr.requestAd();
+        bannerMgr.setPublisherId(this.publicationId);
+        android.util.Log.d("water","request banner");
+        bannerMgr.requestAd();
 
     }
 
     protected void loadVideoAd(){
 
-        final AdManager mgr = new AdManager(this.ctx, "http://my.mobfox.com/request.php",this.publicationId, true);
-
-        mgr.setInterstitialAdsEnabled(false);
-        mgr.setVideoAdsEnabled(true);
-
-        final WaterfallInterstitial _this = this;
-        mgr.setListener(new AdListener(){
-
-            @Override
-            public void adClicked() {
-
-            }
-
-            @Override
-            public void adClosed(Ad ad, boolean completed) {
-
-            }
-
-            @Override
-            public void adLoadSucceeded(Ad ad) {
-                Log.d("waterfall inter video ad success");
-                mgr.showAd();
-                if(_this.listener==null) return;
-                _this.listener.onAdLoaded();
-            }
-
-            @Override
-            public void adShown(Ad ad, boolean succeeded) {
-
-            }
-
-            @Override
-            public void noAdFound() {
-                Log.d("waterfall inter video ad not found");
-
-                _this.loadAdInternal();
-            }
-        });
-        mgr.requestAd();
+        videoMgr.setPublisherId(this.publicationId);
+        android.util.Log.d("water","request video");
+        videoMgr.requestAd();
 
     }
 
@@ -163,6 +189,7 @@ public class WaterfallInterstitial {
 
             @Override
             public void onNativeFormatLoaded(String html) {
+                android.util.Log.d("water","native loaded !!!");
                 if(_this.listener==null) return;
                 _this.listener.onAdLoaded();
             }

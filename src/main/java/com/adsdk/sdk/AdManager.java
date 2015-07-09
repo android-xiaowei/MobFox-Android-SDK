@@ -98,6 +98,10 @@ public class AdManager {
 		this.mListener = listener;
 	}
 
+    public void setPublisherId(String pubId){
+        this.mPublisherId = pubId;
+    }
+
 	public void requestAd() {
 		requestAdInternal(false);
 	}
@@ -146,17 +150,20 @@ public class AdManager {
 						}
 
                         android.util.Log.d("admanager",request.toUri().toString());
+
 						mResponse = requestAd.sendRequest(request);
 
 						if (mResponse.getType() == Const.NO_AD && (mResponse.getCustomEvents() == null || mResponse.getCustomEvents().isEmpty())) {
 							if (isVideoAdsEnabled && !alreadyRequestedVideo) {
 								request = getVideoRequest();
 								alreadyRequestedVideo = true;
-								mResponse = requestAd.sendRequest(request);
+
+                                mResponse = requestAd.sendRequest(request);
 							} else if (isInterstitialAdsEnabled && !alreadyRequestedInterstitial) {
 								request = getInterstitialRequest();
 								alreadyRequestedInterstitial = true;
-								mResponse = requestAd.sendRequest(request);
+
+                                mResponse = requestAd.sendRequest(request);
 							}
 						}
 
@@ -172,6 +179,7 @@ public class AdManager {
                             notifyAdLoaded(mResponse);
 						} else if (mResponse.getType() == Const.NO_AD && mResponse.getCustomEvents() != null && mResponse.getCustomEvents().isEmpty()) {
                             android.util.Log.d("admanager","no ad");
+                            notifyNoAdFound();
                             Log.d("response NO AD received");
 						} else if (mResponse.getCustomEvents() != null && !mResponse.getCustomEvents().isEmpty()) {
                             android.util.Log.d("admanager","custom events");
@@ -462,6 +470,7 @@ public class AdManager {
 	}
 
 	private void notifyNoAdFound() {
+
 		if (mListener != null) {
 			Log.d("No ad found.");
 			mHandler.post(new Runnable() {
