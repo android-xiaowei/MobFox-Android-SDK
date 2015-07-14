@@ -64,7 +64,7 @@ public class NativeFormatInterstitialActivity extends Activity {
 
 		// this.addContentView(nfv,new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT));
 
-        nfv.loadAd(template,data);
+        nfv.loadAd(template, data);
 
 
     }

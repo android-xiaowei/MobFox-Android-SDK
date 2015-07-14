@@ -27,10 +27,9 @@ import java.lang.reflect.Method;
  */
 public class NativeFormatView extends WebView {
 
-
 	private String publicationId;
     int adWidth = 0;
-    int adHeight=0;
+    int adHeight = 0;
 
 	public interface NativeFormatAdListener {
 		public void onNativeFormatLoaded(String html);
@@ -38,9 +37,6 @@ public class NativeFormatView extends WebView {
 		public void onNativeFormatFailed(Exception e);
 
 		public void onNativeFormatDismissed(NativeFormatView banner);
-		// public void onNativeFormatClicked(MoPubView banner);
-		// public void onNativeFormatExpanded(MoPubView banner);
-		// public void onNativeFormatCollapsed(MoPubView banner);
 	}
 
 	NativeFormatAdListener listener = null;
@@ -53,21 +49,6 @@ public class NativeFormatView extends WebView {
 		Util.prepareAndroidAdId(this.getContext());
 		this.setBackgroundColor(Color.TRANSPARENT);
 
-		/*
-		 * this.setBackgroundColor(Color.TRANSPARENT); this.setLayerType(WebView.LAYER_TYPE_SOFTWARE, null); this.setBackgroundColor(Color.TRANSPARENT);
-		 */
-
-		/*
-		 * if (Build.VERSION.SDK_INT >= 11) { this.setLayerType(WebView.LAYER_TYPE_SOFTWARE, null); this.setBackgroundColor(0x01000000); } else {
-		 * 
-		 * this.setBackgroundColor(0x00000000); }
-		 * 
-		 * this.setWebViewClient(new WebViewClient() {
-		 * 
-		 * @Override public void onPageFinished(WebView view, String url) { view.setBackgroundColor(0x00000000); if (Build.VERSION.SDK_INT >= 11) { view.setLayerType(WebView.LAYER_TYPE_SOFTWARE, null); view.setBackgroundColor(0x01000000); } else {
-		 * 
-		 * view.setBackgroundColor(0x00000000); } } });
-		 */
         WebSettings webSettings = getSettings();
         webSettings.setJavaScriptEnabled(true);
 
@@ -81,24 +62,6 @@ public class NativeFormatView extends WebView {
                 Log.v("can't set setAllowUniversalAccessFromFileURLs",e);
             }
         }
-/*
-		class DismissListener {
-
-			NativeFormatView container;
-
-			public DismissListener(NativeFormatView container) {
-				this.container = container;
-			}
-
-			@JavascriptInterface
-			public void onDismiss() {
-				if (this.container.listener == null)
-					return;
-				this.container.listener.onNativeFormatDismissed(this.container);
-			}
-		}
-		addJavascriptInterface(new DismissListener(this), "dismissListener");
-*/
 	}
 
 	public NativeFormatView(Context context) {
@@ -133,6 +96,7 @@ public class NativeFormatView extends WebView {
 	}
 
     public void loadAd(final String template,final String data){
+
         Log.v("data: "+data);
 
         setWebViewClient(new WebViewClient(){
@@ -140,7 +104,7 @@ public class NativeFormatView extends WebView {
             @Override
             public void onPageFinished (WebView view, String url) {
 
-               setWebViewClient(null);
+                setWebViewClient(null);
                 Log.v("url: "+url);
 
                 try {
@@ -230,7 +194,7 @@ public class NativeFormatView extends WebView {
 		Log.v("getting creative ...");
 
 
-		NativeFormat nf = new NativeFormat(this.getContext(),width,height,this.publicationId);
+		NativeFormat nf = new NativeFormat(this.getContext(), width, height, this.publicationId, (ViewGroup) this.getRootView());
 
         Log.v("instantiated builder");
 
@@ -244,7 +208,7 @@ public class NativeFormatView extends WebView {
 
                     @Override
                     public void onSuccess(final String template, final String data) {
-                        thisView.loadAd(template,data);
+                        thisView.loadAd(template, data);
                     }
 
                     @Override

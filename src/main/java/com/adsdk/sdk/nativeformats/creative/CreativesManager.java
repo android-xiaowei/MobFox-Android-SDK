@@ -2,11 +2,15 @@ package com.adsdk.sdk.nativeformats.creative;
 
 import java.io.BufferedReader;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.net.URI;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
@@ -21,7 +25,9 @@ import org.json.JSONObject;
 
 import android.content.Context;
 import android.net.http.AndroidHttpClient;
+import android.view.ViewGroup;
 
+import com.adsdk.sdk.nativeformats.creative.CheckWebgl;
 import com.adsdk.sdk.video.ResourceManager;
 
 
@@ -29,20 +35,23 @@ import com.adsdk.sdk.video.ResourceManager;
  * Created by itamar on 07/04/15.
  */
 
-public class CreativesManager {
+public class CreativesManager implements CheckWebgl.Listener {
 
-	private static final String BASE_URL = "http://sdk.starbolt.io/creatives.json";
+	private static final String BASE_URL = "http://10.0.5.156:8080/creatives.json";
 
 	private static CreativesManager instance = null;
 	private Stack<Creative> creatives = new Stack<Creative>();
 
-	protected CreativesManager(final Context ctx, final String publicationId) {
+	private boolean webgl = false;
+
+	protected CreativesManager(final Context ctx, final String publicationId, ViewGroup view) {
+
+		CheckWebgl cw = new CheckWebgl(ctx, view);
+		cw.isWebgl(this);
 
 		// add fallback creatives
-        String libs = ResourceManager.getStringResource(ctx, "libs.js");
-
-        addResourceCreative("fallback_320x480.mustache",ResourceManager.getStringResource(ctx, "fallback_320x480.mustache"), 320, 480, 0, creatives);
-		addResourceCreative("fallback_320x50.mustache",ResourceManager.getStringResource(ctx, "fallback_320x50.mustache"), 320, 50, 0, creatives);
+        addResourceCreative("fallback_type-1.mustache", "false", "type-1", ResourceManager.getStringResource(ctx, "fallback_type-1.mustache"), 0, creatives);
+        addResourceCreative("fallback_type-2.mustache", "false", "type-2", ResourceManager.getStringResource(ctx, "fallback_type-2.mustache"), 0, creatives);
 
 		// get remote creatives
 		Thread requestThread = new Thread(new Runnable() {
@@ -77,7 +86,7 @@ public class CreativesManager {
 						for (int i = 0; i < creativeArr.length(); i++) {
 							JSONObject c = creativeArr.getJSONObject(i);
 							Log.d(c.getString("name"));
-							creatives.push(new Creative(c.getString("name"), c.getString("template"), c.getInt("width"), c.getInt("height"), c.getDouble("prob")));
+                            creatives.push(new Creative(c.getString("name"), c.getString("webgl"), c.getString("type"), c.getString("template"), c.getDouble("prob")));
 						}
 						Log.d("creatives ready");
 
@@ -106,24 +115,27 @@ public class CreativesManager {
 
 	}
 
-	public static CreativesManager getInstance(Context ctx,String publicationId) {
+	public static CreativesManager getInstance(Context ctx,String publicationId, ViewGroup view) {
 		if (instance == null) {
-			instance = new CreativesManager(ctx,publicationId);
+			instance = new CreativesManager(ctx,publicationId,view);
 		}
 		return instance;
 	}
 
-	public Creative getCreative(int width, int height) {
-
-		Log.v("width: " + width + ", height: " + height);
-		Log.v("num creatives: " + creatives.size());
+	public Creative getCreative( String type ) {
 
 		List<Creative> filtered = new ArrayList<Creative>();
 
+        android.util.Log.d("beforeCheckWebgl)", String.valueOf(webgl));
+
 		for (Creative c : creatives) {
-			Log.v("creative: " + c.getName());
-			if (c.width == width && c.height == height)
-				filtered.add(c);
+
+            if (c.getWebgl().equals(String.valueOf(webgl)) && c.getType().equals(type)) {
+
+                filtered.add(c);
+
+            }
+
 		}
 
 		if (filtered.size() == 0)
@@ -149,8 +161,16 @@ public class CreativesManager {
 
 	}
 
-	protected void addResourceCreative(String name , String template,int width, int height, double prob, Stack<Creative> stack) {
-		stack.push(new Creative(name, template, width, height, prob));
-	}
+    protected void addResourceCreative(String name, String webgl, String type, String template, double prob, Stack<Creative> stack) {
+        stack.push(new Creative(name, webgl, type, template, prob));
+    }
 
+    @Override
+    public void onWebgl(boolean isWebgl) {
+
+        android.util.Log.d("String.valueOf(isWebgl)", String.valueOf(isWebgl));
+
+        this.webgl = isWebgl;
+
+    }
 }

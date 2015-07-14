@@ -183,7 +183,7 @@ public class WaterfallInterstitial {
 
         Log.d("waterfall load native format ad");
         final WaterfallInterstitial _this = this;
-        final NativeFormatInterstitial ni = new NativeFormatInterstitial(this.ctx,this.publicationId);
+        final NativeFormatInterstitial ni = null; //new NativeFormatInterstitial(this.ctx,this.publicationId);
 
         ni.setListener(new NativeFormatView.NativeFormatAdListener(){
 

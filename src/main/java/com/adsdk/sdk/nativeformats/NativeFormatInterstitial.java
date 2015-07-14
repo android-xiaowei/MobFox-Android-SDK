@@ -2,6 +2,7 @@ package com.adsdk.sdk.nativeformats;
 
 import android.content.Context;
 import android.content.Intent;
+import android.view.ViewGroup;
 
 import com.adsdk.sdk.nativeformats.creative.CreativesManager;
 
@@ -14,11 +15,13 @@ public class NativeFormatInterstitial {
     Context ctx;
     NativeFormatInterstitialActivity activity;
     NativeFormatView.NativeFormatAdListener listener;
+    ViewGroup parent;
 
-    public NativeFormatInterstitial(Context ctx,String publicationId){
-        CreativesManager.getInstance(ctx,publicationId);
+    public NativeFormatInterstitial(Context ctx,String publicationId, ViewGroup parent){
+        CreativesManager.getInstance(ctx,publicationId,parent);
         this.publicationId = publicationId;
         this.ctx = ctx;
+        this.parent = parent;
     };
 
 
@@ -26,9 +29,9 @@ public class NativeFormatInterstitial {
         this.listener = listener;
     }
 
-    public void loadAd(){
+    public void loadAd() {
         final Intent intent = new Intent(ctx, NativeFormatInterstitialActivity.class);
-        NativeFormat nf = new NativeFormat(ctx,320,480,this.publicationId);
+        NativeFormat nf = new NativeFormat(ctx,320,480,this.publicationId,parent);
 
         nf.loadAd(new NativeFormat.Listener(){
 
