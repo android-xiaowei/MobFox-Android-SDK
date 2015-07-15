@@ -6,12 +6,12 @@ package com.adsdk.sdk.nativeformats.creative;
 public class Creative {
 
     String name;
-    String webgl;
+    boolean webgl;
     String type;
     String template;
     double prob;
 
-    public Creative(String name, String webgl, String type, String template, double prob) {
+    public Creative(String name, boolean webgl, String type, String template, double prob) {
         this.name       = name;
         this.webgl      = webgl;
         this.type       = type;
@@ -23,7 +23,7 @@ public class Creative {
         return name;
     }
 
-    public String getWebgl() {
+    public boolean getWebgl() {
         return webgl;
     }
 

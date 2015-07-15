@@ -194,7 +194,7 @@ public class NativeFormatView extends WebView {
 		Log.v("getting creative ...");
 
 
-		NativeFormat nf = new NativeFormat(this.getContext(), width, height, this.publicationId, (ViewGroup) this.getRootView());
+		NativeFormat nf = new NativeFormat(this.getContext(), width, height, this.publicationId);
 
         Log.v("instantiated builder");
 
@@ -204,7 +204,7 @@ public class NativeFormatView extends WebView {
 
 		final NativeFormatView thisView = this;
 
-        nf.loadAd(new NativeFormat.Listener() {
+        nf.loadAd(this.getSettings().getUserAgentString(),new NativeFormat.Listener() {
 
                     @Override
                     public void onSuccess(final String template, final String data) {

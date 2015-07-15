@@ -43,7 +43,7 @@ public class NativeFormat {
     int height;
     Context ctx;
 
-    public void WriteTemp(String data) {
+ /*   public void WriteTemp(String data) {
 
         FileOutputStream fop = null;
 
@@ -62,24 +62,24 @@ public class NativeFormat {
             e.printStackTrace();
 
         }
-    }
+    }*/
 
     public interface Listener {
         public void onSuccess(String template, String data);
         public void onError(Exception e);
     }
 
-	NativeFormat(Context ctx, int width, int height, String publicationId, ViewGroup view) {
+	NativeFormat(Context ctx, int width, int height, String publicationId) {
         this.ctx                = ctx;
         this.width              = width;
         this.height             = height;
         this.publicationId      = publicationId;
-        this.creative_manager   = CreativesManager.getInstance(this.ctx,publicationId,view);
+        this.creative_manager   = CreativesManager.getInstance(this.ctx,publicationId);
 	}
 
 	// ---------------------------------------------------------
 
-	public void loadAd(final Listener listener) {
+	public void loadAd(String webviewUserAgent, final Listener listener) {
 
         float ratio = height / width;
         String type;
@@ -89,7 +89,7 @@ public class NativeFormat {
         else
             type = "type-1";
 
-        final Creative creative = creative_manager.getCreative(type);
+        final Creative creative = creative_manager.getCreative(type,webviewUserAgent);
 
         final NativeFormatRequest request = new NativeFormatRequest();
 
@@ -125,7 +125,7 @@ public class NativeFormat {
 					client = AndroidHttpClient.newInstance(System.getProperty("http.agent"));
 					final String url = request.toString();
 
-                    WriteTemp(url);
+                    //WriteTemp(url);
 
 					HttpGet request = new HttpGet(url);
 					request.setHeader("User-Agent", System.getProperty("http.agent"));
