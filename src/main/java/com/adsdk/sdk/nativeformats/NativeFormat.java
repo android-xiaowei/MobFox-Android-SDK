@@ -43,6 +43,9 @@ public class NativeFormat {
     int height;
     Context ctx;
 
+    final static String TYPE_BLOCK = "block";
+    final static String TYPE_STRIPE = "stripe";
+
  /*   public void WriteTemp(String data) {
 
         FileOutputStream fop = null;
@@ -82,12 +85,12 @@ public class NativeFormat {
 	public void loadAd(String webviewUserAgent, final Listener listener) {
 
         float ratio = height / width;
-        String type;
 
-        if ( ratio < 0.5 )
-            type = "type-2";
-        else
-            type = "type-1";
+        String type = NativeFormat.TYPE_BLOCK;
+
+        if ( ratio < 0.5 ) {
+            type = NativeFormat.TYPE_STRIPE;
+        }
 
         final Creative creative = creative_manager.getCreative(type,webviewUserAgent);
 

@@ -2,9 +2,6 @@ package com.adsdk.sdk.nativeformats.creative;
 
 import java.io.BufferedReader;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
@@ -44,8 +41,8 @@ public class CreativesManager {
 	protected CreativesManager(final Context ctx, final String publicationId) {
 
 		// add fallback creatives
-        addResourceCreative("fallback_type-1.mustache", false, "type-1", ResourceManager.getStringResource(ctx, "fallback_type-1.mustache"), 0, creatives);
-        addResourceCreative("fallback_type-2.mustache", false, "type-2", ResourceManager.getStringResource(ctx, "fallback_type-2.mustache"), 0, creatives);
+        addResourceCreative("fallback_block.mustache", false, "type-1", ResourceManager.getStringResource(ctx, "fallback_block.mustache"), 0, creatives);
+        addResourceCreative("fallback_stripe.mustache", false, "type-2", ResourceManager.getStringResource(ctx, "fallback_stripe.mustache"), 0, creatives);
 
 		// get remote creatives
 		Thread requestThread = new Thread(new Runnable() {
