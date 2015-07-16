@@ -18,11 +18,14 @@ import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.HttpGet;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Context;
 import android.net.http.AndroidHttpClient;
 
+import com.adsdk.sdk.networking.JSONRetriever;
+import com.adsdk.sdk.networking.JSONRetrieverImpl;
 import com.adsdk.sdk.utils.UserAgent;
 import com.adsdk.sdk.video.ResourceManager;
 
@@ -33,76 +36,43 @@ import com.adsdk.sdk.video.ResourceManager;
 
 public class CreativesManager {
 
-	private static final String BASE_URL = "http://10.0.5.156:8080/creatives.json";
+
+	private static final String BASE_URL = "http://static.starbolt.io/creatives.new2.json";
 
 	private static CreativesManager instance = null;
 	private Stack<Creative> creatives = new Stack<Creative>();
+    private static JSONRetriever retriever = new JSONRetrieverImpl();
 
 	protected CreativesManager(final Context ctx, final String publicationId) {
 
 		// add fallback creatives
-        addResourceCreative("fallback_block.mustache", false, "type-1", ResourceManager.getStringResource(ctx, "fallback_block.mustache"), 0, creatives);
-        addResourceCreative("fallback_stripe.mustache", false, "type-2", ResourceManager.getStringResource(ctx, "fallback_stripe.mustache"), 0, creatives);
+        if(ctx!=null) {
+            addResourceCreative("fallback_block.mustache", false, "block", ResourceManager.getStringResource(ctx, "fallback_block.mustache"), 0, creatives);
+            addResourceCreative("fallback_stripe.mustache", false, "stripe", ResourceManager.getStringResource(ctx, "fallback_stripe.mustache"), 0, creatives);
+        }
+        //get remote creatives
+        retriever.retrieve(BASE_URL+"?p="+publicationId,new JSONRetriever.Listener(){
 
-		// get remote creatives
-		Thread requestThread = new Thread(new Runnable() {
+            @Override
+            public void onFinish(Exception e, JSONObject o) {
+                if(e!=null){
+                    Log.d("Failed to load creatives",e);
+                    return;
+                }
 
-			@Override
-			public void run() {
-				AndroidHttpClient client = null;
-				try {
-					client = AndroidHttpClient.newInstance(System.getProperty("http.agent"));
-					HttpGet request = new HttpGet();
-					request.setHeader("User-Agent", System.getProperty("http.agent"));
-
-					request.setURI(new URI(BASE_URL+"?p="+publicationId));
-
-					HttpResponse response = client.execute(request);
-					StatusLine statusLine = response.getStatusLine();
-
-					int statusCode = statusLine.getStatusCode();
-					if (statusCode == 200) {
-						StringBuilder builder = new StringBuilder();
-						HttpEntity entity = response.getEntity();
-						InputStream content = entity.getContent();
-						BufferedReader reader = new BufferedReader(new InputStreamReader(content));
-						String line;
-						while ((line = reader.readLine()) != null) {
-							builder.append(line + "\n");
-						}
-						String responseString = builder.toString();
-						JSONObject responseJSON = new JSONObject(responseString);
-						Log.d("creatives loaded: ");
-						JSONArray creativeArr = responseJSON.getJSONArray("creatives");
-						for (int i = 0; i < creativeArr.length(); i++) {
-							JSONObject c = creativeArr.getJSONObject(i);
-							Log.d(c.getString("name"));
-                            creatives.push(new Creative(c.getString("name"), c.getBoolean("webgl"), c.getString("type"), c.getString("template"), c.getDouble("prob")));
-						}
-						Log.d("creatives ready");
-
-					} else {
-						Log.d("Failed to load creatives");
-					}
-
-				} catch (Exception e) {
-					Log.d("Failed to load creatives with exception: ", e);
-				} finally {
-					if (client != null) {
-						client.close();
-					}
-				}
-
-			}
-		});
-		requestThread.setUncaughtExceptionHandler(new UncaughtExceptionHandler() {
-
-			@Override
-			public void uncaughtException(Thread thread, Throwable ex) {
-				Log.d("Failed to load creatives with exception: ", ex);
-			}
-		});
-		requestThread.start();
+                JSONArray creativeArr = null;
+                try {
+                    creativeArr = o.getJSONArray("creatives");
+                    for (int i = 0; i < creativeArr.length(); i++) {
+                        JSONObject c = creativeArr.getJSONObject(i);
+                        Log.d(c.getString("name"));
+                        creatives.push(new Creative(c.getString("name"), c.getBoolean("webgl"), c.getString("type"), c.getString("template"), c.getDouble("prob")));
+                    }
+                } catch (JSONException e1) {
+                    Log.d("Failed to parse creatives",e1);
+                }
+            }
+        });
 
 	}
 
@@ -153,5 +123,9 @@ public class CreativesManager {
 
     protected void addResourceCreative(String name, boolean webgl, String type, String template, double prob, Stack<Creative> stack) {
         stack.push(new Creative(name, webgl, type, template, prob));
+    }
+
+    public static void setRetriever(JSONRetriever retriever) {
+        CreativesManager.retriever = retriever;
     }
 }

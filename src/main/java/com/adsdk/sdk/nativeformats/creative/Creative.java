@@ -38,4 +38,8 @@ public class Creative {
     public double getProb() {
         return prob;
     }
+
+    public String toString(){
+        return name+",webgl:"+webgl+","+type+","+prob;
+    }
 }
