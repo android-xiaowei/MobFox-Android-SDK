@@ -85,6 +85,8 @@ public class CreativesManager {
 
 	public Creative getCreative( String type,String webviewUserAgent ) {
 
+        android.util.Log.d("useragent",webviewUserAgent);
+
         UserAgent ua = new UserAgent(webviewUserAgent);
 
 		List<Creative> filtered = new ArrayList<Creative>();

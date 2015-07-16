@@ -16,6 +16,7 @@ import org.apache.http.client.methods.HttpGet;
 
 import android.content.Context;
 import android.net.http.AndroidHttpClient;
+import android.os.Build;
 import android.os.Handler;
 import android.view.ViewGroup;
 
@@ -92,6 +93,9 @@ public class NativeFormat {
             type = NativeFormat.TYPE_STRIPE;
         }
 
+        if(Build.FINGERPRINT.startsWith("generic")){
+            webviewUserAgent = "";
+        }
         final Creative creative = creative_manager.getCreative(type,webviewUserAgent);
 
         final NativeFormatRequest request = new NativeFormatRequest();
