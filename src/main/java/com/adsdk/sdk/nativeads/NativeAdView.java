@@ -232,8 +232,8 @@ public class NativeAdView extends FrameLayout {
 			notifyImpression();
 
 			for (Tracker t : trackers) {
-				if (t.type.equals("impression")) {
-					trackImpression(t.url);
+				if (t.getType().equals("impression")) {
+					trackImpression(t.getUrl());
 				}
 			}
 		}
