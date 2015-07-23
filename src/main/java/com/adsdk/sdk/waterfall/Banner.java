@@ -14,7 +14,7 @@ import com.adsdk.sdk.nativeformats.NativeFormatView;
 /**
  * Created by nabriski on 4/28/15.
  */
-public class WaterfallBanner extends FrameLayout {
+public class Banner extends FrameLayout {
 
     public interface Listener{
         public void onAdLoaded();
@@ -25,10 +25,10 @@ public class WaterfallBanner extends FrameLayout {
     String publicationId;
     Waterfall w= null;
 
-    public WaterfallBanner(Context context){
+    public Banner(Context context){
         super(context);
     }
-    public WaterfallBanner(Context context, AttributeSet attrs){
+    public Banner(Context context, AttributeSet attrs){
         super(context,attrs);
 
     }
@@ -71,7 +71,7 @@ public class WaterfallBanner extends FrameLayout {
 
     protected void loadBannerAd(){
 
-        final WaterfallBanner _this = this;
+        final Banner _this = this;
         Log.d("banner pub id: "+this.publicationId);
         AdView view = new AdView(this.getContext(), "http://my.mobfox.com/request.php",this.publicationId, true, true);
         float density = getResources().getDisplayMetrics().density;
@@ -125,7 +125,7 @@ public class WaterfallBanner extends FrameLayout {
     protected void loadNativeFormatAd(){
 
         Log.d("waterfall load native format ad");
-        final WaterfallBanner _this = this;
+        final Banner _this = this;
         final NativeFormatView nfw = new NativeFormatView(this.getContext());
         nfw.setLayoutParams(new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
         nfw.setPublicationId(this.publicationId);
