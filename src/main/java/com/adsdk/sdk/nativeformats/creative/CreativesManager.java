@@ -37,7 +37,7 @@ import com.adsdk.sdk.video.ResourceManager;
 public class CreativesManager {
 
 
-	private static final String BASE_URL = "http://static.starbolt.io/creatives.new2.json";
+	private static final String BASE_URL = "http://sdk.starbolt.io/creatives.json";
 
 	private static CreativesManager instance = null;
 	private Stack<Creative> creatives = new Stack<Creative>();
