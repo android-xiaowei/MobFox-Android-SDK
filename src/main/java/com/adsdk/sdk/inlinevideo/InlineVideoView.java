@@ -59,24 +59,6 @@ public class InlineVideoView extends VideoEnabledWebView {
 
     NativeFormatRequest nfr = new NativeFormatRequest();
 
-    private VideoEnabledWebView webView;
-    private VideoEnabledWebChromeClient webChromeClient;
-
-
-//    public interface NativeFormatAdListener {
-//        public void onNativeFormatLoaded(String html);
-//
-//        public void onNativeFormatFailed(Exception e);
-//
-//        public void onNativeFormatDismissed(NativeFormatView banner);
-//        // public void onNativeFormatClicked(MoPubView banner);
-//        // public void onNativeFormatExpanded(MoPubView banner);
-//        // public void onNativeFormatCollapsed(MoPubView banner);
-//    }
-
-//    NativeFormatAdListener listener = null;
-    // int creativeId = -1;
-
     public class BridgeInterface {
         Context mContext;
 
@@ -118,48 +100,9 @@ public class InlineVideoView extends VideoEnabledWebView {
 
     }
 
-    public String WriteTemp(String data) {
-
-        FileOutputStream fop = null;
-
-        try{
-
-            File temp = File.createTempFile("inline-video", ".js");
-            fop = new FileOutputStream(temp);
-
-            fop.write(data.getBytes(Charset.forName("UTF-8")));
-
-//            android.util.Log.d("requestFilePath", temp.getAbsolutePath());
-//            android.util.Log.d("fullRequest", data);
-
-            return temp.getAbsolutePath();
-
-        }catch(IOException e){
-
-            e.printStackTrace();
-
-            return "false";
-
-        }
-    }
-
     private void visible() {
 
         setVisibility(this.getRootView().VISIBLE);
-
-//        if ( this.getRootView().getVisibility() == View.VISIBLE ) {
-//
-//            //visible
-//            android.util.Log.d("adVisible", "adVisible");
-//
-//        }
-//        else {
-//
-//            //not visible
-//            android.util.Log.d("adInVisible", "adInVisible");
-//            setVisibility(this.getRootView().VISIBLE);
-//
-//        }
 
     }
 
@@ -184,37 +127,13 @@ public class InlineVideoView extends VideoEnabledWebView {
     @SuppressLint({ "NewApi", "SetJavaScriptEnabled" })
     private void init() {
 
-//        Util.prepareAndroidAdId(this.getContext());
-//        this.setBackgroundColor(Color.TRANSPARENT);
-
-		/*
-		 * this.setBackgroundColor(Color.TRANSPARENT); this.setLayerType(WebView.LAYER_TYPE_SOFTWARE, null); this.setBackgroundColor(Color.TRANSPARENT);
-		 */
-
-		/*
-		 * if (Build.VERSION.SDK_INT >= 11) { this.setLayerType(WebView.LAYER_TYPE_SOFTWARE, null); this.setBackgroundColor(0x01000000); } else {
-		 * 
-		 * this.setBackgroundColor(0x00000000); }
-		 * 
-		 * this.setWebViewClient(new WebViewClient() {
-		 * 
-		 * @Override public void onPageFinished(WebView view, String url) { view.setBackgroundColor(0x00000000); if (Build.VERSION.SDK_INT >= 11) { view.setLayerType(WebView.LAYER_TYPE_SOFTWARE, null); view.setBackgroundColor(0x01000000); } else {
-		 * 
-		 * view.setBackgroundColor(0x00000000); } } });
-		 */
         WebSettings webSettings = getSettings();
         webSettings.setJavaScriptEnabled(true);
 
-//        WebView webview = new WebView(this.getContext());
         this.addJavascriptInterface(new BridgeInterface(this.getContext()), "Android");
-
-//        webView.setWebChromeClient(webChromeClient);
-
-//        webSettings.setPluginsEnabled(true);
 
         if (android.os.Build.VERSION.SDK_INT >= 16) {
 
-            //webSettings.setAllowUniversalAccessFromFileURLs(true);
             try {
                 Method m = WebSettings.class.getMethod("setAllowUniversalAccessFromFileURLs",boolean.class);
                 m.invoke(webSettings,true);
@@ -225,7 +144,6 @@ public class InlineVideoView extends VideoEnabledWebView {
 
         if (android.os.Build.VERSION.SDK_INT >= 17) {
 
-            //webSettings.setAllowUniversalAccessFromFileURLs(true);
             try {
                 Method m = WebSettings.class.getMethod("setMediaPlaybackRequiresUserGesture",boolean.class);
                 m.invoke(webSettings,false);
@@ -233,24 +151,6 @@ public class InlineVideoView extends VideoEnabledWebView {
                 Log.v("can't set setMediaPlaybackRequiresUserGesture",e);
             }
         }
-/*
-		class DismissListener {
-
-			NativeFormatView container;
-
-			public DismissListener(NativeFormatView container) {
-				this.container = container;
-			}
-
-			@JavascriptInterface
-			public void onDismiss() {
-				if (this.container.listener == null)
-					return;
-				this.container.listener.onNativeFormatDismissed(this.container);
-			}
-		}
-		addJavascriptInterface(new DismissListener(this), "dismissListener");
-*/
     }
 
     public InlineVideoView(Context context) {
@@ -272,10 +172,6 @@ public class InlineVideoView extends VideoEnabledWebView {
         this.publicationId = id;
     }
 
-//    public void setListener(NativeFormatAdListener listener) {
-//        this.listener = listener;
-//    }
-
     private void adClick(String clickURL) {
 
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(clickURL));
@@ -285,8 +181,8 @@ public class InlineVideoView extends VideoEnabledWebView {
 
     private void adClose() {
 
-//        ((ViewManager)this.getParent()).removeView(this);
         setVisibility(this.getRootView().INVISIBLE);
+
     }
 
     private void adFinish() {
@@ -316,7 +212,6 @@ public class InlineVideoView extends VideoEnabledWebView {
 
                 String BASE_URL = "http://my.mobfox.com/request.php";
 
-                String publisherId = "80187188f458cfde788d961b6882fd53";
                 String userAgent = "Mozilla/5.0 (iPhone; U; CPU iPhone OS 3_0 like Mac OS X; en-us) AppleWebKit/528.18 (KHTML, like Gecko) Version/4.0 Mobile/7A341 Safari/528.16";
                 String ipAddress = "2.122.29.194";
                 String o_andadvid = "68753A44-4D6F-1226-9C60-0050E4C00067";
@@ -324,7 +219,7 @@ public class InlineVideoView extends VideoEnabledWebView {
                 Boolean skip = true;
 
                 try {
-                    params.put("s", publisherId);
+                    params.put("s", publicationId);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -359,49 +254,6 @@ public class InlineVideoView extends VideoEnabledWebView {
                     e.printStackTrace();
                 }
 
-//                setWebChromeClient(new WebChromeClient() {
-//                    @Override
-//                    public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
-//
-//                        final String response = consoleMessage.message();
-//
-//                        android.util.Log.d("onConsoleMessage", response);
-//
-//                        ConsoleMessage.MessageLevel lvl = consoleMessage.messageLevel();
-//
-//                        android.util.Log.d("MessageLevel", lvl.toString());
-//
-//                        try {
-//                            JSONObject action = new JSONObject(response);
-//                            JSONArray keys = action.names();
-//                            String key = keys.get(0).toString();
-//                            String value = action.get(key).toString();
-//
-//                            android.util.Log.d("resKey", key);
-//                            android.util.Log.d("resVal", value);
-//
-//                            if (key.equals("clickURL")) {
-//                                adClick(value);
-//                            }
-//
-//                            if (key.equals("close")) {
-//                                adClose();
-//                            }
-//
-//                            if (key.equals("finished")) {
-//                                adFinish();
-//                            }
-//
-//                        } catch (JSONException e) {
-//                            e.printStackTrace();
-//                        }
-//
-//                        setWebChromeClient(null);
-//
-//                        return true;
-//                    }
-//                });
-
                 //init Android bridge
                 loadUrl("javascript:initAndroidBridge()");
 
@@ -420,10 +272,7 @@ public class InlineVideoView extends VideoEnabledWebView {
 
         String srcPath = getSrc(inlineVideoString, inlineName);
 
-//        loadDataWithBaseURL(srcPath, inlineVideo, "text/html", "utf-8", null);
-
-
-        loadUrl("https://m.youtube.com/");
+        loadDataWithBaseURL(srcPath, inlineVideo, "text/html", "utf-8", null);
 
     }
 
@@ -460,10 +309,6 @@ public class InlineVideoView extends VideoEnabledWebView {
 
         Log.v("dims: " + width + ", " + height);
         Log.v("getting creative ...");
-
-		/*
-		 * if(this.creativeId > -1){ builder = new NativeFormatBuilder(this.getContext(), params,this.creativeId); } else { builder = new NativeFormatBuilder(this.getContext(), params, R.raw.cube); }
-		 */
 
         final InlineVideoView thisView = this;
 
