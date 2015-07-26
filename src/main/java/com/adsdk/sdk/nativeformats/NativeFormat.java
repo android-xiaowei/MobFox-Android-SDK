@@ -112,7 +112,7 @@ public class NativeFormat {
         // params.add("o_andadvid", "c86f7529-33e2-4346-be0d-777ac53be320");//AdvertisingIdClient.getAdvertisingIdInfo(this.getContext()).getId());
         request.setAndroidAdId(Util.getAndroidAdId());
         request.setAdDoNotTrack(Util.hasAdDoNotTrack());
-//        request.setUserAgent(Util.getDefaultUserAgentString(ctx));
+        request.setUserAgent(Util.getDefaultUserAgentString(ctx));
         request.setUserAgent2(Util.buildUserAgent());
         request.setTemplateName(creative.getName());
 
