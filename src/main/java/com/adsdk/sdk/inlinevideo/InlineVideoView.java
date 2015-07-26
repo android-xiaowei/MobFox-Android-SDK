@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewManager;
 import android.view.ViewParent;
+import android.view.WindowManager;
 import android.webkit.ConsoleMessage;
 //import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
@@ -45,6 +46,8 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.List;
 
+import android.view.Window;
+
 /**
  * Created by itamar on 19/03/15.
  */
@@ -55,6 +58,9 @@ public class InlineVideoView extends VideoEnabledWebView {
     int adHeight = 0;
 
     NativeFormatRequest nfr = new NativeFormatRequest();
+
+    private VideoEnabledWebView webView;
+    private VideoEnabledWebChromeClient webChromeClient;
 
 
 //    public interface NativeFormatAdListener {
@@ -98,6 +104,10 @@ public class InlineVideoView extends VideoEnabledWebView {
 
                 if (key.equals("finished")) {
                     adFinish();
+                }
+
+                if (key.equals("fullscreen")) {
+                    toggleFullscreen(value);
                 }
 
             } catch (JSONException e) {
@@ -198,6 +208,8 @@ public class InlineVideoView extends VideoEnabledWebView {
 //        WebView webview = new WebView(this.getContext());
         this.addJavascriptInterface(new BridgeInterface(this.getContext()), "Android");
 
+//        webView.setWebChromeClient(webChromeClient);
+
 //        webSettings.setPluginsEnabled(true);
 
         if (android.os.Build.VERSION.SDK_INT >= 16) {
@@ -275,13 +287,19 @@ public class InlineVideoView extends VideoEnabledWebView {
 
 //        ((ViewManager)this.getParent()).removeView(this);
         setVisibility(this.getRootView().INVISIBLE);
-
     }
 
     private void adFinish() {
 
         //video finsihed
         android.util.Log.d("adFinished", "adFinished");
+
+    }
+
+    private void toggleFullscreen(String event) {
+
+        //toggle fullscreen
+        android.util.Log.d("fullscreen", event);
 
     }
 
@@ -402,8 +420,10 @@ public class InlineVideoView extends VideoEnabledWebView {
 
         String srcPath = getSrc(inlineVideoString, inlineName);
 
-        loadDataWithBaseURL(srcPath, inlineVideo, "text/html", "utf-8", null);
+//        loadDataWithBaseURL(srcPath, inlineVideo, "text/html", "utf-8", null);
 
+
+        loadUrl("https://m.youtube.com/");
 
     }
 
