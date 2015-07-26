@@ -11,25 +11,16 @@ import org.json.JSONObject;
 public class DummyJSONRetriever implements JSONRetriever{
 
     String lastURL;
+    String json;
+
+    public DummyJSONRetriever(String json){
+        this.json = json;
+    }
 
     @Override
     public void retrieve(String url, Listener listener) {
 
         this.lastURL = url;
-
-        String json = "{"+
-            "\"waterfalls\":{"+
-                "\"banner\" :["+
-                    "{\"name\":\"nativeFormat\",\"prob\":1.0},"+
-                    "{\"name\":\"banner\",\"prob\":1.0}"+
-                "],"+
-                "\"interstitial\":["+
-                    "{\"name\":\"nativeFormat\",\"prob\":1.0},"+
-                    "{\"name\":\"video\",\"prob\":1.0},"+
-                    "{\"name\":\"banner\",\"prob\":1.0}"+
-                "]"+
-            "}"+
-        "}";
 
         try {
             JSONObject obj = new JSONObject(json);

@@ -11,8 +11,22 @@ import junit.framework.TestCase;
  */
 public class WaterfallManagerTest extends TestCase {
 
+    String json = "{"+
+            "\"waterfalls\":{"+
+            "\"banner\" :["+
+            "{\"name\":\"nativeFormat\",\"prob\":1.0},"+
+            "{\"name\":\"banner\",\"prob\":1.0}"+
+            "],"+
+            "\"interstitial\":["+
+            "{\"name\":\"nativeFormat\",\"prob\":1.0},"+
+            "{\"name\":\"video\",\"prob\":1.0},"+
+            "{\"name\":\"banner\",\"prob\":1.0}"+
+            "]"+
+            "}"+
+            "}";
+
     public void testInit(){
-        WaterfallManager.setRetriever(new DummyJSONRetriever());
+        WaterfallManager.setRetriever(new DummyJSONRetriever(json));
         WaterfallManager manager = WaterfallManager.getInstance("111");
         Waterfall w = manager.getWaterfall("banner");
         assertNotNull(w);
@@ -26,7 +40,7 @@ public class WaterfallManagerTest extends TestCase {
     }
 
     public void testGetCopy(){
-        DummyJSONRetriever ret = new DummyJSONRetriever();
+        DummyJSONRetriever ret = new DummyJSONRetriever(json);
         WaterfallManager.setRetriever(ret);
 
         WaterfallManager manager = WaterfallManager.getInstance("111");

@@ -13,7 +13,7 @@ import com.adsdk.sdk.nativeformats.NativeFormatView;
 /**
  * Created by nabriski on 4/30/15.
  */
-public class WaterfallInterstitial {
+public class Interstitial {
 
     public interface Listener{
         public void onAdLoaded();
@@ -28,9 +28,9 @@ public class WaterfallInterstitial {
     AdManager bannerMgr;
     AdManager videoMgr;
 
-    public WaterfallInterstitial(Context ctx,String publicationId){
+    public Interstitial(Context ctx, String publicationId){
 
-        final WaterfallInterstitial _this = this;
+        final Interstitial _this = this;
 
         this.publicationId = publicationId;
         this.ctx = ctx;
@@ -182,8 +182,8 @@ public class WaterfallInterstitial {
     protected void loadNativeFormatAd(){
 
         Log.d("waterfall load native format ad");
-        final WaterfallInterstitial _this = this;
-        final NativeFormatInterstitial ni = new NativeFormatInterstitial(this.ctx,this.publicationId);
+        final Interstitial _this = this;
+        final NativeFormatInterstitial ni = null; //new NativeFormatInterstitial(this.ctx,this.publicationId);
 
         ni.setListener(new NativeFormatView.NativeFormatAdListener(){
 

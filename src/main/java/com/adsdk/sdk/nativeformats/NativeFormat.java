@@ -1,9 +1,13 @@
 package com.adsdk.sdk.nativeformats;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.Thread.UncaughtExceptionHandler;
+import java.nio.charset.Charset;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -12,7 +16,9 @@ import org.apache.http.client.methods.HttpGet;
 
 import android.content.Context;
 import android.net.http.AndroidHttpClient;
+import android.os.Build;
 import android.os.Handler;
+import android.view.ViewGroup;
 
 
 import com.adsdk.sdk.Log;
@@ -38,24 +44,60 @@ public class NativeFormat {
     int height;
     Context ctx;
 
+    final static String TYPE_BLOCK = "block";
+    final static String TYPE_STRIPE = "stripe";
+
+ /*   public void WriteTemp(String data) {
+
+        FileOutputStream fop = null;
+
+        try {
+
+            File temp = File.createTempFile("creative", ".html");
+            fop = new FileOutputStream(temp);
+
+            fop.write(data.getBytes(Charset.forName("UTF-8")));
+
+            android.util.Log.d("FilePath", temp.getAbsolutePath());
+            android.util.Log.d("FileData", data);
+
+        } catch(IOException e) {
+
+            e.printStackTrace();
+
+        }
+    }*/
+
     public interface Listener {
-        public void onSuccess(String template,String data);
+        public void onSuccess(String template, String data);
         public void onError(Exception e);
     }
 
-	NativeFormat(Context ctx,int width,int height,String publicationId) {
-        this.ctx            = ctx;
-		this.width          = width;
-        this.height         = height;
-        this.publicationId  = publicationId;
-        this.creative_manager = CreativesManager.getInstance(this.ctx,publicationId);
+	NativeFormat(Context ctx, int width, int height, String publicationId) {
+        this.ctx                = ctx;
+        this.width              = width;
+        this.height             = height;
+        this.publicationId      = publicationId;
+        this.creative_manager   = CreativesManager.getInstance(this.ctx,publicationId);
 	}
 
 	// ---------------------------------------------------------
 
-	public void loadAd(final Listener listener) {
+	public void loadAd(String webviewUserAgent, final Listener listener) {
 
-        final Creative creative = creative_manager.getCreative(width, height);
+        float ratio = height / width;
+
+        String type = NativeFormat.TYPE_BLOCK;
+
+        if ( ratio < 0.5 ) {
+            type = NativeFormat.TYPE_STRIPE;
+        }
+
+        if(Build.FINGERPRINT.startsWith("generic")){
+            webviewUserAgent = "";
+        }
+        final Creative creative = creative_manager.getCreative(type,webviewUserAgent);
+
         final NativeFormatRequest request = new NativeFormatRequest();
 
         request.setRequestUrl(BASE_URL);
@@ -89,9 +131,11 @@ public class NativeFormat {
 				try {
 					client = AndroidHttpClient.newInstance(System.getProperty("http.agent"));
 					final String url = request.toString();
+
+                    //WriteTemp(url);
+
 					HttpGet request = new HttpGet(url);
 					request.setHeader("User-Agent", System.getProperty("http.agent"));
-
 
 					HttpResponse response = client.execute(request);
                     Log.v("sent request");
@@ -99,15 +143,6 @@ public class NativeFormat {
 					StatusLine statusLine = response.getStatusLine();
 
 					int statusCode = statusLine.getStatusCode();
-
-                   /* final String data = "{\"imageassets\":{\"icon\":{\"url\":\"http:\\/\\/creative2cdn.mobfox.com\\/0419a76afdc67a97cb8e9ea44418bfe4.gif\",\"width\":\"512\",\"height\":\"512\"},\"main\":{\"url\":\"http:\\/\\/creative2cdn.mobfox.com\\/48b1eed8e5e7242f6248852a40c7a033.gif\",\"width\":\"1200\",\"height\":\"627\"}},\"textassets\":{\"headline\":\"Insta Likes & Followers!\",\"description\":\"The best app to get REAL Instagram Likes and Followers!\",\"cta\":\"Install Now\",\"rating\":\"5\",\"advertiser\":\"Polar Labs UG\"},\"trackers\":[{\"type\":\"impression\",\"url\":\"http:\\/\\/my.mobfox.com\\/rtb.impression.pixel.php?rid=7d94376702321ad625f0c0832903f8e2&price=0.10\"},{\"type\":\"impression\",\"url\":\"http:\\/\\/my.mobfox.com\\/exchange.pixel.php?h=36da1d9e3bace8f01a975f66211e8528\"}],\"click_url\":\"http:\\/\\/my.mobfox.com\\/exchange.click.php?h=36da1d9e3bace8f01a975f66211e8528\"}";
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            listener.onBuildSuccess(creative,data);
-                        }
-                    });*/
-
 
 					if (statusCode == 200) {
 
@@ -121,6 +156,8 @@ public class NativeFormat {
 							builder.append(line + "\n");
 						}
 						final String data = builder.toString();
+
+                        android.util.Log.d("builder.toString()", builder.toString());
 
                         Log.v("build got data");
 
@@ -138,7 +175,7 @@ public class NativeFormat {
                         handler.post(new Runnable() {
                             @Override
                             public void run() {
-                                listener.onSuccess(creative.getTemplate(),data);
+                                listener.onSuccess(creative.getTemplate(), data);
                             }
                         });
 

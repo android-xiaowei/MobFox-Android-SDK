@@ -18,7 +18,10 @@ public class NativeFormatRequest {
 	private static final String IMAGE_TYPES = "icon"; //TODO: only "icon"?
 	private static final String TEXT_TYPES = "headline"; //TODO: again, only that?
 	private static final String REQUEST_TYPE_ANDROID = "api";
-	private  String request_url;
+
+	private static final String USER_AGENT = "Mozilla/5.0 (iPhone; U; CPU iPhone OS 3_0 like Mac OS X; en-us) AppleWebKit/528.18 (KHTML, like Gecko) Version/4.0 Mobile/7A341 Safari/528.16";
+
+	private String request_url;
 	private List<String> adTypes;
 	private String publisherId;
 	private String userAgent;
@@ -36,30 +39,6 @@ public class NativeFormatRequest {
 	private Gender gender;
 	private int userAge;
 	private List<String> keywords;
-
-//    public void WriteTemp(String data) {
-//
-//        FileOutputStream fop = null;
-//
-//        try{
-//
-//            File temp = File.createTempFile("request", ".txt");
-//            fop = new FileOutputStream(temp);
-//
-////            byte[] contentInBytes = data.getBytes();
-//
-////            fop.write(contentInBytes);
-//            fop.write(data.getBytes(Charset.forName("UTF-8")));
-//
-//            android.util.Log.d("requestFilePath", temp.getAbsolutePath());
-//            android.util.Log.d("fullRequest", data);
-//
-//        }catch(IOException e){
-//
-//            e.printStackTrace();
-//
-//        }
-//    }
 	
 	@Override
 	public String toString() {
@@ -78,8 +57,9 @@ public class NativeFormatRequest {
 		b.appendQueryParameter("n_txt", TEXT_TYPES);
 
 		b.appendQueryParameter("s", this.getPublisherId());
-		b.appendQueryParameter("u", this.getUserAgent());
-		b.appendQueryParameter("u2", this.getUserAgent2());
+//		b.appendQueryParameter("u", this.getUserAgent());
+		b.appendQueryParameter("u", USER_AGENT);
+//		b.appendQueryParameter("u2", this.getUserAgent2());
 		b.appendQueryParameter("r_random", Integer.toString(random));
         if(androidAdId.length() > 0){
             b.appendQueryParameter("o_andadvid", androidAdId);
@@ -91,8 +71,8 @@ public class NativeFormatRequest {
 		b.appendQueryParameter("v", this.getProtocolVersion());
         b.appendQueryParameter("i",this.ip);
 
-		b.appendQueryParameter("u_wv", this.getUserAgent());
-		b.appendQueryParameter("u_br", this.getUserAgent());
+//		b.appendQueryParameter("u_wv", this.getUserAgent());
+//		b.appendQueryParameter("u_br", this.getUserAgent());
 		if (longitude != 0 && latitude != 0) {
 			b.appendQueryParameter("longitude", Double.toString(longitude));
 			b.appendQueryParameter("latitude", Double.toString(latitude));

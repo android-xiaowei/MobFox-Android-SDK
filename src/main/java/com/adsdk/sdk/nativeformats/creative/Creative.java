@@ -5,37 +5,41 @@ package com.adsdk.sdk.nativeformats.creative;
  */
 public class Creative {
 
-    int width;
-    int height;
-    String template;
     String name;
+    boolean webgl;
+    String type;
+    String template;
     double prob;
 
-    public Creative(String name,String template,int width,int height,double prob){
+    public Creative(String name, boolean webgl, String type, String template, double prob) {
         this.name       = name;
+        this.webgl      = webgl;
+        this.type       = type;
         this.template   = template;
-        this.width      = width;
-        this.height     = height;
         this.prob       = prob;
     }
 
-    public String getName(){
+    public String getName() {
         return name;
     }
 
-    public String getTemplate(){
+    public boolean getWebgl() {
+        return webgl;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public String getTemplate() {
         return template;
     }
 
-    public int getWidth(){
-        return width;
-    }
-
-    public int getHeight(){
-        return height;
-    }
-
-    public double getProb(){
+    public double getProb() {
         return prob;
+    }
+
+    public String toString(){
+        return name+",webgl:"+webgl+","+type+","+prob;
     }
 }

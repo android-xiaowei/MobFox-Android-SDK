@@ -54,13 +54,22 @@ public class NativeAd {
 	}
 
 	public static class Tracker {
-		String type;
-		String url;
+		private String type;
+		private String url;
 
 		public Tracker(String type, String url) {
 			this.type = type;
 			this.url = url;
 		}
+
+        public String getType(){
+            return type;
+        }
+
+        public String getUrl(){
+            return url;
+        }
+
 	}
 
 	private String clickUrl;
