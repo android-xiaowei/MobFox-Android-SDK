@@ -47,26 +47,26 @@ public class NativeFormat {
     final static String TYPE_BLOCK = "block";
     final static String TYPE_STRIPE = "stripe";
 
- /*   public void WriteTemp(String data) {
-
-        FileOutputStream fop = null;
-
-        try {
-
-            File temp = File.createTempFile("creative", ".html");
-            fop = new FileOutputStream(temp);
-
-            fop.write(data.getBytes(Charset.forName("UTF-8")));
-
-            android.util.Log.d("FilePath", temp.getAbsolutePath());
-            android.util.Log.d("FileData", data);
-
-        } catch(IOException e) {
-
-            e.printStackTrace();
-
-        }
-    }*/
+//    public void WriteTemp(String data) {
+//
+//        FileOutputStream fop = null;
+//
+//        try {
+//
+//            File temp = File.createTempFile("creative", ".html");
+//            fop = new FileOutputStream(temp);
+//
+//            fop.write(data.getBytes(Charset.forName("UTF-8")));
+//
+//            android.util.Log.d("FilePath", temp.getAbsolutePath());
+//            android.util.Log.d("FileData", data);
+//
+//        } catch(IOException e) {
+//
+//            e.printStackTrace();
+//
+//        }
+//    }
 
     public interface Listener {
         public void onSuccess(String template, String data);

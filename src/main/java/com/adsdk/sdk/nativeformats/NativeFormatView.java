@@ -3,6 +3,7 @@ package com.adsdk.sdk.nativeformats;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
+import android.os.Build;
 import android.util.AttributeSet;
 
 import android.view.ViewGroup;
@@ -20,7 +21,11 @@ import com.adsdk.sdk.video.ResourceManager;
 
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.lang.reflect.Method;
+import java.nio.charset.Charset;
 
 /**
  * Created by itamar on 19/03/15.
@@ -52,6 +57,10 @@ public class NativeFormatView extends WebView {
         WebSettings webSettings = getSettings();
         webSettings.setJavaScriptEnabled(true);
 
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+//            this.setWebContentsDebuggingEnabled(true);
+//        }
+
 		if (android.os.Build.VERSION.SDK_INT >= 16) {
 
 			//webSettings.setAllowUniversalAccessFromFileURLs(true);
@@ -78,6 +87,27 @@ public class NativeFormatView extends WebView {
 		super(context, attrs, defStyle);
 		init();
 	}
+
+//    public void WriteTemp(String data) {
+//
+//        FileOutputStream fop = null;
+//
+//        try {
+//
+//            File temp = File.createTempFile("creative", ".html");
+//            fop = new FileOutputStream(temp);
+//
+//            fop.write(data.getBytes(Charset.forName("UTF-8")));
+//
+//            android.util.Log.d("FilePath", temp.getAbsolutePath());
+//            android.util.Log.d("FileData", data);
+//
+//        } catch(IOException e) {
+//
+//            e.printStackTrace();
+//
+//        }
+//    }
 
     public void setAdWidth(int width){
         this.adWidth = width;
@@ -124,6 +154,7 @@ public class NativeFormatView extends WebView {
 
                             setWebChromeClient(null);
                             Log.v("render template response : " + response);
+//                            WriteTemp( response );
 
 
                             loadDataWithBaseURL("file:///android_res/raw/", response, "text/html", "utf-8", null);

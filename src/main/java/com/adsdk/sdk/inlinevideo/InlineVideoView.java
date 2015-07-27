@@ -3,29 +3,18 @@ package com.adsdk.sdk.inlinevideo;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.net.Uri;
-import android.os.Debug;
 import android.util.AttributeSet;
 
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewManager;
-import android.view.ViewParent;
-import android.view.WindowManager;
-import android.webkit.ConsoleMessage;
-//import android.webkit.JavascriptInterface;
-import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.Toast;
 
 import com.adsdk.sdk.Log;
-import com.adsdk.sdk.R;
 import com.adsdk.sdk.Util;
 
-import com.adsdk.sdk.inlinevideo.VideoEnabledWebView;
 import com.adsdk.sdk.nativeformats.NativeFormatRequest;
 import com.adsdk.sdk.video.ResourceManager;
 
@@ -33,29 +22,24 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintWriter;
 import java.lang.reflect.Method;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.charset.Charset;
-import java.util.List;
 
-import android.view.Window;
+import com.adsdk.sdk.nativeformats.Utils;
 
 /**
  * Created by itamar on 19/03/15.
  */
 public class InlineVideoView extends VideoEnabledWebView {
 
+    private static final String BASE_URL = "http://my.mobfox.com/request.php";
+
     private String publicationId;
     int adWidth = 0;
     int adHeight = 0;
+
+    final Context ctx = this.getContext();
 
     NativeFormatRequest nfr = new NativeFormatRequest();
 
@@ -77,19 +61,27 @@ public class InlineVideoView extends VideoEnabledWebView {
                 String value = action.get(key).toString();
 
                 if (key.equals("clickURL")) {
-                    adClick(value);
+                    adClick(value, key);
                 }
 
                 if (key.equals("close")) {
-                    adClose();
+                    adClose(value, key);
                 }
 
                 if (key.equals("finished")) {
-                    adFinish();
+                    adFinish(value, key);
                 }
 
-                if (key.equals("fullscreen")) {
-                    toggleFullscreen(value);
+//                if (key.equals("fullscreen")) {
+//                    toggleFullscreen(value);
+//                }
+
+                if (key.equals("error")) {
+                    adError(value, key);
+                }
+
+                if (key.equals("adLoaded")) {
+                    adLoaded(value, key);
                 }
 
             } catch (JSONException e) {
@@ -97,12 +89,6 @@ public class InlineVideoView extends VideoEnabledWebView {
             }
 
         }
-
-    }
-
-    private void visible() {
-
-        setVisibility(this.getRootView().VISIBLE);
 
     }
 
@@ -172,30 +158,52 @@ public class InlineVideoView extends VideoEnabledWebView {
         this.publicationId = id;
     }
 
-    private void adClick(String clickURL) {
+    private void adClick(String value, String key) {
 
-        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(clickURL));
-        this.getContext().startActivity(intent);
+        //video clicked
+        android.util.Log.d("userAction", "key: " + key + ", value: " + value);
 
-    }
-
-    private void adClose() {
-
-        setVisibility(this.getRootView().INVISIBLE);
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(value));
+        getContext().startActivity(intent);
 
     }
 
-    private void adFinish() {
+    private void adClose(String value, String key) {
+
+        //video closed
+        android.util.Log.d("userAction", "key: " + key + ", value: " + value);
+
+        setVisibility(View.GONE);
+
+    }
+
+    private void adFinish(String value, String key) {
 
         //video finsihed
-        android.util.Log.d("adFinished", "adFinished");
+        android.util.Log.d("userAction", "key: " + key + ", value: " + value);
 
     }
 
-    private void toggleFullscreen(String event) {
+//    private void toggleFullscreen(String value, String key) {
+//
+//        //toggle fullscreen
+//        android.util.Log.d("userAction", "key: " + key + ", value: " + value);
+//
+//    }
 
-        //toggle fullscreen
-        android.util.Log.d("fullscreen", event);
+    private void adError(String value, String key) {
+
+        //loadAd error
+        android.util.Log.d("userAction", "key: " + key + ", value: " + value);
+
+    }
+
+    private void adLoaded(String value, String key) {
+
+        //ad Loaded
+        android.util.Log.d("userAction", "key: " + key + ", value: " + value);
+
+        setVisibility(View.VISIBLE);
 
     }
 
@@ -210,11 +218,13 @@ public class InlineVideoView extends VideoEnabledWebView {
 
                 JSONObject params = new JSONObject();
 
-                String BASE_URL = "http://my.mobfox.com/request.php";
+                String ipAddress = Utils.getIPAddress(); //TODO: can we remove it? Other requests don't send IP
+                if (ipAddress.indexOf("10.") == 0 || ipAddress.length() == 0) {
+                    ipAddress = "2.122.29.194";
+                }
 
-                String userAgent = "Mozilla/5.0 (iPhone; U; CPU iPhone OS 3_0 like Mac OS X; en-us) AppleWebKit/528.18 (KHTML, like Gecko) Version/4.0 Mobile/7A341 Safari/528.16";
-                String ipAddress = "2.122.29.194";
-                String o_andadvid = "68753A44-4D6F-1226-9C60-0050E4C00067";
+                String userAgent = Util.getDefaultUserAgentString(ctx);
+                String o_andadvid = Util.getAndroidAdId();
                 Boolean autoplay = true;
                 Boolean skip = true;
 
@@ -254,12 +264,9 @@ public class InlineVideoView extends VideoEnabledWebView {
                     e.printStackTrace();
                 }
 
-                //init Android bridge
-                loadUrl("javascript:initAndroidBridge()");
+                //init Android bridge and load Ad
+                loadUrl("javascript:initAndroidBridge(" + params.toString() + ")");
 
-                //load Ad
-                android.util.Log.d("javascriptLoadAd", "javascript:loadAd(\"" + BASE_URL + "\", " + params.toString() + ")");
-                loadUrl("javascript:loadAd(\"" + BASE_URL + "\", " + params.toString() + ")");
             }
 
 
@@ -277,8 +284,6 @@ public class InlineVideoView extends VideoEnabledWebView {
     }
 
     public void loadAd() {
-
-        visible();
 
         int width = this.adWidth;
         int height = this.adHeight;
