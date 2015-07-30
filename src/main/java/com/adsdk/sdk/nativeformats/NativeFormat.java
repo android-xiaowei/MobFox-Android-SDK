@@ -132,8 +132,6 @@ public class NativeFormat {
 					client = AndroidHttpClient.newInstance(System.getProperty("http.agent"));
 					final String url = request.toString();
 
-                    //WriteTemp(url);
-
 					HttpGet request = new HttpGet(url);
 					request.setHeader("User-Agent", System.getProperty("http.agent"));
 
