@@ -31,6 +31,7 @@ public class NativeFormatInterstitial {
     }
 
     public void loadAd() {
+        android.util.Log.d("imNotHere", this.publicationId);
         final Intent intent = new Intent(ctx, NativeFormatInterstitialActivity.class);
         NativeFormat nf = new NativeFormat(ctx,320,480,this.publicationId);
         //final WebView _webview = webview;
@@ -52,4 +53,8 @@ public class NativeFormatInterstitial {
         });
 
     };
+
+    public void setPublisherId(String pubId) {
+        this.publicationId = pubId;
+    }
 }

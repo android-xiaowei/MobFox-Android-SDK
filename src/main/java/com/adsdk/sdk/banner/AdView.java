@@ -728,4 +728,8 @@ public class AdView extends FrameLayout {
 		this.keywords = keywords;
 	}
 
+	public void setPublisherId(String pubId) {
+		this.publisherId = pubId;
+	}
+
 }
