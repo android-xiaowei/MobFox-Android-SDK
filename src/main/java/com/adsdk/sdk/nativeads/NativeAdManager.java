@@ -124,4 +124,8 @@ public class NativeAdManager {
 		this.keywords = keywords;
 	}
 
+	public void setPublisherId(String pubId) {
+		this.publisherId = pubId;
+	}
+
 }

@@ -14,7 +14,7 @@ import org.json.JSONObject;
 public class InlineVideoBridge {
 
 
-   public interface Listener{
+   public interface Listener {
 
        public void onAdClicked(String href);
 

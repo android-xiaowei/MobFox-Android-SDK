@@ -36,7 +36,7 @@ public class InlineVideoView extends VideoEnabledWebView implements InlineVideoB
 
     static final String BASE_URL = "http://my.mobfox.com/request.php";
 
-    public interface Listener{
+    public interface Listener {
 
         public void onAdClicked(String href);
 

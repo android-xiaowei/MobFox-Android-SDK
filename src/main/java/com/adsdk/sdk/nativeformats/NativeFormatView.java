@@ -154,6 +154,7 @@ public class NativeFormatView extends WebView {
 
                             setWebChromeClient(null);
                             Log.v("render template response : " + response);
+
 //                            WriteTemp( response );
 
 
