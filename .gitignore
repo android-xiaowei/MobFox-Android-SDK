@@ -27,3 +27,5 @@ partner_sdks
 build
 *.swp
 .DS_Store
+.mvnRepo/
+bintrayUpload.sh

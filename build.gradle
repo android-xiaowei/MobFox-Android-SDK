@@ -6,10 +6,41 @@ buildscript {
         classpath 'com.android.tools.build:gradle:1.1.+'
     }
 }
+
+plugins {
+    id "com.jfrog.bintray" version "1.2"
+}
+
+
 apply plugin: 'android-library'
+apply plugin: 'maven'
+
 repositories {
     jcenter()
 }
+
+bintray {
+    user =System.getenv('BINTRAY_USER') 
+    key = System.getenv('BINTRAY_KEY')
+    pkg {
+        repo = 'maven'
+        name = 'MobFox-Android-SDK'
+        licenses = ['Apache-2.0']
+        vcsUrl = 'https://github.com/mobfox/MobFox-Android-SDK.git'
+        version {
+                name = '7.0.1'
+                desc = 'MobFox Android SDK 7.0.1'
+                released  = new Date()
+                vcsTag = 'v7.0.1'
+//                attributes = ['gradle-plugin': 'com.use.less:com.use.less.gradle:gradle-useless-plugin']
+        }
+        filesSpec {
+            from '.mvnRepo'
+            into '.'
+        }
+    }
+}
+
 android {
     compileSdkVersion 15
     buildToolsVersion "22.0.1"
@@ -29,7 +60,7 @@ android {
                 srcDir 'src/java'
             }
 
-            resources {
+            resources {apply plugin: 'maven'
                 srcDir 'src/resources'
             }
         }
@@ -46,10 +77,31 @@ android {
     }
 
 }
+
+group = 'com.adsdk.sdk'
+version = "7.0.1"
+
+configurations {
+    localArchives
+}
+
+uploadLocalArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: "file://localhost/Users/nabriski/projects/MobFox-Android-SDK/.mvnRepo")
+        }
+    }
+}
+
+artifacts{
+    localArchives file: file('build/outputs/MobFox-Android-SDK.jar')
+}
+
 task unitTest(type: Exec, dependsOn: assemble) {
     description = "run unit tests"
     commandLine './unittests.sh'
 }
+
 build.dependsOn unitTest
 task clearJar(type: Delete) {
     delete 'build/outputs/MobFox-Android-SDK.jar'
