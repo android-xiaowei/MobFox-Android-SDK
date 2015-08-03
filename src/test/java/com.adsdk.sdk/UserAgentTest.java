@@ -1,4 +1,4 @@
-package test;
+package com.adsdk.sdk;
 
 import com.adsdk.sdk.utils.UserAgent;
 

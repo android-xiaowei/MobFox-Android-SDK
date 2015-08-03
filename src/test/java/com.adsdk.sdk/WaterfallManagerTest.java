@@ -1,6 +1,5 @@
-package test;
+package com.adsdk.sdk;
 
-import com.adsdk.sdk.networking.JSONRetriever;
 import com.adsdk.sdk.waterfall.Waterfall;
 import com.adsdk.sdk.waterfall.WaterfallManager;
 

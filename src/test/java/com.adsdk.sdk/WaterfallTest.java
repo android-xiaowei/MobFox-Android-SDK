@@ -1,4 +1,4 @@
-package test;
+package com.adsdk.sdk;
 
 import com.adsdk.sdk.waterfall.Waterfall;
 
@@ -10,17 +10,19 @@ import junit.framework.TestCase;
 public class WaterfallTest extends TestCase {
 
     public void testBasic() {
+
         Waterfall w = new Waterfall();
-        w.add("koko",1);
-        w.add("yoyo",0);
-        w.add("loko",1);
+        w.add("koko", 1);
+        w.add("yoyo", 0);
+        w.add("loko", 1);
 
         String name = w.getNext();
-        assertEquals(name,"koko");
+        assertEquals(name, "koko");
         name = w.getNext();
-        assertEquals(name,"loko");
+        assertEquals(name, "loko");
         name = w.getNext();
         assertEquals(name, "yoyo");
+
 
     }
 
