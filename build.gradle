@@ -60,7 +60,7 @@ android {
                 srcDir 'src/java'
             }
 
-            resources {apply plugin: 'maven'
+            resources {
                 srcDir 'src/resources'
             }
         }
@@ -85,18 +85,6 @@ configurations {
     localArchives
 }
 
-uploadLocalArchives {
-    repositories {
-        mavenDeployer {
-            repository(url: "file://localhost/Users/nabriski/projects/MobFox-Android-SDK/.mvnRepo")
-        }
-    }
-}
-
-artifacts{
-    localArchives file: file('build/outputs/MobFox-Android-SDK.jar')
-}
-
 task unitTest(type: Exec, dependsOn: assemble) {
     description = "run unit tests"
     commandLine './unittests.sh'
@@ -106,13 +94,35 @@ build.dependsOn unitTest
 task clearJar(type: Delete) {
     delete 'build/outputs/MobFox-Android-SDK.jar'
 }
+
+task makeSourcesJar(type: Jar) {
+    baseName = "MobFox-Android-SDK"
+    classifier = "sources"
+    destinationDir = new File('build/outputs/')
+    from('src/main/java/')
+}
+
 task makeJar(type: Copy) {
     from('build/intermediates/bundles/release/')
     into('build/outputs/')
     include('classes.jar')
-    rename('classes.jar', 'MobFox-Android-SDK.jar')
+    rename('classes.jar', 'MobFox-Android-SDK-'+version+'.jar')
 }
+
 makeJar.dependsOn(clearJar, build)
-defaultTasks 'makeJar'
+
+uploadLocalArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: "file://localhost/Users/nabriski/projects/MobFox-Android-SDK/.mvnRepo")
+        }
+    }
+}
+
+artifacts{
+    localArchives file: file('build/outputs/MobFox-Android-SDK-'+version+'.jar'),makeSourcesJar
+}
+
+defaultTasks 'makeJar','makeSourceJar'
 dependencies {
 }
