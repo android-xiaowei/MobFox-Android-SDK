@@ -121,18 +121,13 @@ task makeSourcesJar(type: Jar) {
     destinationDir = new File('build/outputs/')
     from('src/main/java/')
 }
-
+/*
 task copyTestResources(type: Copy) {
     from "${projectDir}/src/test/resources"
     into "${buildDir}/intermediates/classes/test/debug/"
-}
-/*
-task copyTestResourcesRelease(type: Copy) {
-    from "${projectDir}/src/test/resources"
-    into "${buildDir}/intermediates/classes/test/release/resources"
-}
+
+check.dependsOn copyTestResources
 */
-check.dependsOn("copyTestResources");//,"copyTestResourcesRelease");
 
 task makeJar(type: Copy) {
     from('build/intermediates/bundles/release/')
