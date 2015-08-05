@@ -13,7 +13,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"></uses-permission>
     <!-- Optional. This permission allow us to send the device location and provide more targeted ads-->
 	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"></uses-permission>
-	
+
     <application android:debuggable="true">
        <activity
             android:name="com.adsdk.sdk.banner.InAppWebView"
