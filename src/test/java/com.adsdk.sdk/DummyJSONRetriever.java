@@ -30,6 +30,17 @@ public class DummyJSONRetriever implements JSONRetriever{
         }
     }
 
+    public void post(String url,JSONObject data,Listener listener){
+        this.lastURL = url;
+
+        try {
+            JSONObject obj = new JSONObject(json);
+            listener.onFinish(null,obj);
+        } catch (JSONException e) {
+            listener.onFinish(e,null);
+        }
+    }
+
     public String getLastURL(){
         return this.lastURL;
     }

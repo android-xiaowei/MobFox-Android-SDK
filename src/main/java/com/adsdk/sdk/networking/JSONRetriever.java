@@ -12,4 +12,6 @@ public interface JSONRetriever {
     }
 
     public void retrieve(String url,Listener listener);
+
+    public void post(String url,JSONObject data,Listener listener);
 }

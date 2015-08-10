@@ -1,6 +1,7 @@
 package com.adsdk.sdk.waterfall;
 
 import android.content.Context;
+
 import android.util.AttributeSet;
 
 import android.widget.FrameLayout;
@@ -9,7 +10,9 @@ import com.adsdk.sdk.Ad;
 import com.adsdk.sdk.AdListener;
 import com.adsdk.sdk.Log;
 import com.adsdk.sdk.banner.AdView;
+import com.adsdk.sdk.dmp.DMP;
 import com.adsdk.sdk.nativeformats.NativeFormatView;
+
 
 /**
  * Created by nabriski on 4/28/15.
@@ -25,12 +28,20 @@ public class Banner extends FrameLayout {
     String publicationId;
     Waterfall w= null;
 
+    protected void init(){
+
+        DMP dmp = DMP.getInstance(getContext());
+        dmp.update();
+    }
+
     public Banner(Context context){
         super(context);
+        init();
     }
+
     public Banner(Context context, AttributeSet attrs){
         super(context,attrs);
-
+        init();
     }
 
     public void setPublicationId(String publicationId) {

@@ -7,6 +7,7 @@ import com.adsdk.sdk.AdListener;
 import com.adsdk.sdk.AdManager;
 
 import com.adsdk.sdk.Log;
+import com.adsdk.sdk.dmp.DMP;
 import com.adsdk.sdk.nativeformats.NativeFormatInterstitial;
 import com.adsdk.sdk.nativeformats.NativeFormatView;
 
@@ -34,6 +35,10 @@ public class Interstitial {
 
         this.publicationId = publicationId;
         this.ctx = ctx;
+
+        DMP dmp = DMP.getInstance(this.ctx);
+        dmp.update();
+
         WaterfallManager manager = WaterfallManager.getInstance(publicationId);
 
         bannerMgr = new AdManager(this.ctx, "http://my.mobfox.com/request.php",this.publicationId, true);
