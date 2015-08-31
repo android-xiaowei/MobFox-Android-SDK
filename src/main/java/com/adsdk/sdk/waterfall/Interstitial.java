@@ -194,14 +194,13 @@ public class Interstitial {
 
             @Override
             public void onNativeFormatLoaded(String html) {
-                android.util.Log.d("water","native loaded !!!");
                 if(_this.listener==null) return;
                 _this.listener.onAdLoaded();
             }
 
             @Override
             public void onNativeFormatFailed(Exception e) {
-                Log.d("waterfall load native format failed",e);
+                if(_this.listener==null) return;
                 _this.loadAdInternal();
             }
 
@@ -212,7 +211,6 @@ public class Interstitial {
         });
 
         ni.loadAd();
-
     }
 
     public void setWaterfallInterstitialListener(Listener listener){
