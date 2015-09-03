@@ -67,7 +67,7 @@ public class Interstitial {
                 }
 
                 _this.bannerMgr.showAd();
-                if(_this.listener==null) return;
+                if(_this.listener == null) return;
                 _this.listener.onAdLoaded();
             }
 
@@ -200,7 +200,6 @@ public class Interstitial {
 
             @Override
             public void onNativeFormatFailed(Exception e) {
-                if(_this.listener==null) return;
                 _this.loadAdInternal();
             }
 
@@ -212,10 +211,5 @@ public class Interstitial {
 
         ni.loadAd();
     }
-
-    public void setWaterfallInterstitialListener(Listener listener){
-        this.listener = listener;
-    }
-
 
 }
