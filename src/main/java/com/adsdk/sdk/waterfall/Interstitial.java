@@ -37,7 +37,7 @@ public class Interstitial {
         this.ctx = ctx;
 
         DMP dmp = DMP.getInstance(this.ctx);
-        dmp.update();
+        dmp.update(ctx);
 
         WaterfallManager manager = WaterfallManager.getInstance(publicationId);
 

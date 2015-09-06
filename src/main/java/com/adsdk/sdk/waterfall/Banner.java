@@ -28,20 +28,20 @@ public class Banner extends FrameLayout {
     String publicationId;
     Waterfall w= null;
 
-    protected void init(){
+    protected void init(Context c){
 
         DMP dmp = DMP.getInstance(getContext());
-        dmp.update();
+        dmp.update(c);
     }
 
     public Banner(Context context){
         super(context);
-        init();
+        init(context);
     }
 
     public Banner(Context context, AttributeSet attrs){
         super(context,attrs);
-        init();
+        init(context);
     }
 
     public void setPublicationId(String publicationId) {
