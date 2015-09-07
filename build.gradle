@@ -19,8 +19,6 @@ repositories {
     jcenter()
 }
 
-version = "7.0.6"
-
 bintray {
     user =System.getenv('BINTRAY_USER') 
     key = System.getenv('BINTRAY_KEY')
@@ -30,10 +28,10 @@ bintray {
         licenses = ['Apache-2.0']
         vcsUrl = 'https://github.com/mobfox/MobFox-Android-SDK.git'
         version {
-                name = version
-                desc = 'MobFox Android SDK '+version
+                name = '7.0.6'
+                desc = 'MobFox Android SDK 7.0.6'
                 released  = new Date()
-                vcsTag = 'v'+version
+                vcsTag = 'v7.0.6'
 //                attributes = ['gradle-plugin': 'com.use.less:com.use.less.gradle:gradle-useless-plugin']
         }
         filesSpec {
@@ -81,7 +79,7 @@ android.libraryVariants.all { variant ->
 }
 
 group = 'com.adsdk.sdk'
-
+version = "7.0.6"
 
 /*
 configurations {
