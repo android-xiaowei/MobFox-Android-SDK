@@ -28,10 +28,10 @@ bintray {
         licenses = ['Apache-2.0']
         vcsUrl = 'https://github.com/mobfox/MobFox-Android-SDK.git'
         version {
-                name = '7.0.6'
-                desc = 'MobFox Android SDK 7.0.6'
+                name = '7.0.7'
+                desc = 'MobFox Android SDK 7.0.7'
                 released  = new Date()
-                vcsTag = 'v7.0.6'
+                vcsTag = 'v7.0.7'
 //                attributes = ['gradle-plugin': 'com.use.less:com.use.less.gradle:gradle-useless-plugin']
         }
         filesSpec {
@@ -79,7 +79,7 @@ android.libraryVariants.all { variant ->
 }
 
 group = 'com.adsdk.sdk'
-version = "7.0.6"
+version = "7.0.7"
 
 /*
 configurations {
