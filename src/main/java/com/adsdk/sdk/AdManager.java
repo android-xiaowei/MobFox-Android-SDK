@@ -27,7 +27,7 @@ public class AdManager {
 	private static HashMap<Long, AdManager> sRunningAds = new HashMap<Long, AdManager>();
 
 	private String mPublisherId;
-	private String androidAdId;
+	//private String androidAdId;
 	private boolean adDoNotTrack;
 	private boolean mIncludeLocation;
 	private static Context mContext;
@@ -406,7 +406,7 @@ public class AdManager {
 	private void initialize() throws IllegalArgumentException {
 		Log.d("Ad SDK Version:" + Const.VERSION);
 
-		this.androidAdId = Util.getAndroidAdId();
+		//this.androidAdId = Util.getAndroidAdId();
 		this.adDoNotTrack = Util.hasAdDoNotTrack();
 
 		if ((mPublisherId == null) || (mPublisherId.length() == 0)) {
@@ -414,7 +414,7 @@ public class AdManager {
 			throw new IllegalArgumentException("User Id cannot be null or empty");
 		}
 
-		Log.d("AdManager Publisher Id:" + mPublisherId + " Advertising Id:" + androidAdId);
+		//Log.d("AdManager Publisher Id:" + mPublisherId + " Advertising Id:" + androidAdId);
 		mEnabled = (Util.getMemoryClass(getContext()) > 16);
 		customFullscreenListener = createCustomFullscreenListener();
 	}
@@ -535,7 +535,7 @@ public class AdManager {
 	private AdRequest getInterstitialRequest() {
 		if (this.request == null) {
 			this.request = new AdRequest();
-			request.setAndroidAdId(androidAdId);
+			request.setAndroidAdId(Util.getAndroidAdId());
 			request.setAdDoNotTrack(adDoNotTrack);
 			this.request.setPublisherId(this.mPublisherId);
 			this.request.setUserAgent(Util.getDefaultUserAgentString(mContext));
@@ -580,7 +580,7 @@ public class AdManager {
 	private AdRequest getVideoRequest() {
 		if (this.request == null) {
 			this.request = new AdRequest();
-			request.setAndroidAdId(androidAdId);
+            request.setAndroidAdId(Util.getAndroidAdId());
 			request.setAdDoNotTrack(adDoNotTrack);
 			this.request.setPublisherId(this.mPublisherId);
 			this.request.setUserAgent(Util.getDefaultUserAgentString(mContext));
