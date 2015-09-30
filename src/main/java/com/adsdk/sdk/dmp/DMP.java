@@ -48,7 +48,7 @@ public class DMP  {
 
     protected void post(String androidID) throws Exception{
 
-        final Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
+        /*final Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
         mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
         final List<ResolveInfo> pkgAppsList = context.getPackageManager().queryIntentActivities( mainIntent, 0);
 
@@ -68,7 +68,7 @@ public class DMP  {
             public void onFinish(Exception e, JSONObject o) {
                 android.util.Log.d("dmp.update","finished updating");
             }
-        });
+        });*/
 
     }
 
@@ -141,7 +141,7 @@ public class DMP  {
 
     public void update(final Context c){
 
-        Calendar lastUpdate = readLastUpdate(c);
+        /*Calendar lastUpdate = readLastUpdate(c);
         final Calendar now        = Calendar.getInstance();
 
 
@@ -168,7 +168,7 @@ public class DMP  {
             }
 
         };
-        task.execute();
+        task.execute();*/
 
     }
 
