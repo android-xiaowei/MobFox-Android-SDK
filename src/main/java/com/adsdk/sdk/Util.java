@@ -1,9 +1,14 @@
 package com.adsdk.sdk;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -278,5 +283,73 @@ public class Util {
 		
 		return bitmap;
 	}
+
+    public static String read(Context c,String name){
+
+
+        FileInputStream fis = null;
+        try {
+            fis =c.openFileInput(name);
+        } catch (FileNotFoundException e) {
+            android.util.Log.d("dmp.update","last update not found");
+            return null;
+        }
+
+        BufferedReader bufReader =new BufferedReader(new InputStreamReader(fis));
+
+        String         line = null;
+        StringBuilder  stringBuilder = new StringBuilder();
+        String         ls = System.getProperty("line.separator");
+
+        try {
+            while ((line = bufReader.readLine()) != null) {
+                stringBuilder.append(line);
+                stringBuilder.append(ls);
+            }
+
+        } catch (Exception e) {
+            return null;
+        }
+        finally{
+            try {
+                bufReader.close();
+            } catch (IOException e) {
+
+            }
+        }
+
+        return stringBuilder.toString();
+
+    };
+
+    public static void write(Context c,String name,String data){
+
+        FileOutputStream fos = null;
+
+        try {
+            fos = c.openFileOutput(name,Context.MODE_PRIVATE);
+        } catch (FileNotFoundException e) {
+            android.util.Log.d("dmp.update","writer - last update not found");
+            return;
+        }
+
+        BufferedWriter bufWriter = new BufferedWriter(new OutputStreamWriter(fos));
+        try {
+            //android.util.Log.d("dmp.update","write update: "+String.valueOf(lastUpdate.getTimeInMillis()));
+            bufWriter.write(data);
+            bufWriter.flush();
+
+        } catch (IOException e) {
+            android.util.Log.d("dmp.update","unable to write");
+            return;
+        }
+        finally{
+            try {
+                bufWriter.close();
+            } catch (IOException e) {
+            }
+        }
+
+    }
 
 }

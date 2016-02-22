@@ -5,7 +5,11 @@ public interface Const {
 	public static final String ENCODING = "UTF-8";
 	public static final String RESPONSE_ENCODING = "ISO-8859-1";
 
+<<<<<<< HEAD
 	public static final String VERSION = "7";
+=======
+	public static final String VERSION = "7.0.11";
+>>>>>>> 010ec4465272e675660e1285860123a7af23d650
 
 	public static final String PROTOCOL_VERSION = "3.0";
 

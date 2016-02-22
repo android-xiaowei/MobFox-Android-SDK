@@ -74,6 +74,7 @@ public class WaterfallManager {
 
             }
         });
+
     }
 
     public static WaterfallManager getInstance(String publisherID) {

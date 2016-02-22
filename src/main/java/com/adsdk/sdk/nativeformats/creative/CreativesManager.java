@@ -9,7 +9,9 @@ import java.lang.Thread.UncaughtExceptionHandler;
 import java.net.URI;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Random;
 import java.util.Stack;
 import com.adsdk.sdk.Log;
 
@@ -24,6 +26,8 @@ import org.json.JSONObject;
 import android.content.Context;
 import android.net.http.AndroidHttpClient;
 
+import com.adsdk.sdk.Util;
+import com.adsdk.sdk.dmp.DMP;
 import com.adsdk.sdk.networking.JSONRetriever;
 import com.adsdk.sdk.networking.JSONRetrieverImpl;
 import com.adsdk.sdk.utils.UserAgent;
@@ -38,10 +42,13 @@ public class CreativesManager {
 
 
 	private static final String BASE_URL = "http://sdk.starbolt.io/creatives.json";
+    public static final String UPDATE_FILE = "mobfox-update-file";
 
-	private static CreativesManager instance = null;
+    private static CreativesManager instance = null;
 	private Stack<Creative> creatives = new Stack<Creative>();
     private static JSONRetriever retriever = new JSONRetrieverImpl();
+
+
 
 	protected CreativesManager(final Context ctx, final String publicationId) {
 
@@ -74,6 +81,46 @@ public class CreativesManager {
             }
         });
 
+        if(ctx==null) return;
+
+        //check for updates
+        String update = Util.read(ctx,DMP.BUNDLE_FILE);
+        if(update == null) return;
+
+
+        String next = Util.read(ctx, CreativesManager.UPDATE_FILE);
+        Calendar updateTime = null;
+
+        if(next==null){
+            updateTime = Calendar.getInstance();
+            Random generator = new Random();
+            int i = generator.nextInt(2) + 1;
+            updateTime.add(Calendar.DAY_OF_YEAR,i);
+            Util.write(ctx, CreativesManager.UPDATE_FILE, String.valueOf(updateTime.getTimeInMillis()));
+            return;
+        }
+
+
+        updateTime = Calendar.getInstance();
+        updateTime.setTimeInMillis(Long.parseLong(next.trim()));
+
+        if(Calendar.getInstance().before(updateTime)) return;
+
+        JSONObject updateObj = new JSONObject();
+        try {
+            updateObj.put("u",update);
+        } catch (JSONException e) {
+        }
+        ctx.deleteFile(DMP.BUNDLE_FILE);
+        ctx.deleteFile(CreativesManager.UPDATE_FILE);
+
+        JSONRetriever ret = new JSONRetrieverImpl();
+        ret.post("http://dmp.starbolt.io/logger.json",updateObj,new JSONRetriever.Listener(){
+            @Override
+            public void onFinish(Exception e, JSONObject o) {
+                android.util.Log.d("creatives.update","finished updating");
+            }
+        });
 	}
 
 	public static CreativesManager getInstance(Context ctx,String publicationId) {
