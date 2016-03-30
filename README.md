@@ -1,3 +1,6 @@
+# This is the Old MobFox SDK and is no longer maintained.
+### Please refer here: https://github.com/mobfox/MobFox-Android-SDK-Core-Lib for the new version
+
 MobFox Android SDK
 =====================
 
